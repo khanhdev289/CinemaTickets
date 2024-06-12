@@ -10,30 +10,37 @@ import {
   TextInput,
   Dimensions,
   Image,
-  Animated
+  Animated,
 } from 'react-native';
-import { SvgXml } from 'react-native-svg';
+import {SvgXml} from 'react-native-svg';
 import iconNotification from '../../assets/icons/iconNotification';
 import iconSearch from '../../assets/icons/iconSearch';
 import iconStar from '../../assets/icons/iconStar';
 import iconVideo from '../../assets/icons/iconVideo';
 import iconCalendar from '../../assets/icons/iconCalendar';
 
-
 const screenWidth = Dimensions.get('screen').width;
 const screenHeight = Dimensions.get('screen').height;
 
 // Sample data
 const nowPlayingMoviesList = [
-  { id: '1', title: 'AvengersAvengers - Infinity War', poster: 'https://via.placeholder.com/150' },
-  { id: '2', title: 'Movie 2', poster: 'https://via.placeholder.com/150' },
-  { id: '3', title: 'Movie 3', poster: 'https://via.placeholder.com/150' },
+  {
+    id: '1',
+    title: 'AvengersAvengers - Infinity War',
+    poster: 'https://via.placeholder.com/150',
+  },
+  {id: '2', title: 'Movie 2', poster: 'https://via.placeholder.com/150'},
+  {id: '3', title: 'Movie 3', poster: 'https://via.placeholder.com/150'},
 ];
 
 const upcomingMoviesList = [
-  { id: '4', title: 'Avatar 2: The Way Of Water', poster: 'https://via.placeholder.com/150' },
-  { id: '5', title: 'Movie 5', poster: 'https://via.placeholder.com/150' },
-  { id: '6', title: 'Movie 6', poster: 'https://via.placeholder.com/150' },
+  {
+    id: '4',
+    title: 'Avatar 2: The Way Of Water',
+    poster: 'https://via.placeholder.com/150',
+  },
+  {id: '5', title: 'Movie 5', poster: 'https://via.placeholder.com/150'},
+  {id: '6', title: 'Movie 6', poster: 'https://via.placeholder.com/150'},
 ];
 const categoryList = [
   {
@@ -50,16 +57,17 @@ const categoryList = [
     id: '3',
     title: 'Item 3',
     imageUrl: 'https://via.placeholder.com/150',
-  },]
+  },
+];
 const newsList = [
-  { id: '7', title: 'News 1', poster: 'https://via.placeholder.com/150' },
-  { id: '8', title: 'News 2', poster: 'https://via.placeholder.com/150' },
-  { id: '9', title: 'News 3', poster: 'https://via.placeholder.com/150' },
+  {id: '7', title: 'News 1', poster: 'https://via.placeholder.com/150'},
+  {id: '8', title: 'News 2', poster: 'https://via.placeholder.com/150'},
+  {id: '9', title: 'News 3', poster: 'https://via.placeholder.com/150'},
 ];
 
-const HomeScreen = ({ navigation }) => {
+const HomeScreen = ({navigation}) => {
   const searchMoviesFunction = () => {
-    alert('Search function clicked');
+    navigation.navigate('MyTickets');
   };
 
   return (
@@ -83,34 +91,43 @@ const HomeScreen = ({ navigation }) => {
         </View>
       </View>
       {/* Phim dang chiếu */}
-      <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 10 }}>
+      <View
+        style={{
+          flex: 1,
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          paddingHorizontal: 10,
+        }}>
         <Text style={styles.categoryTitle}>Phim đang chiếu</Text>
         <TouchableOpacity onPress={() => alert('Xem tất cả clicked!')}>
           <Text style={styles.viewAllText}>Xem tất cả</Text>
-
         </TouchableOpacity>
       </View>
       <FlatList
         data={nowPlayingMoviesList}
-        keyExtractor={(item) => item.id}
+        keyExtractor={item => item.id}
         horizontal
         showsHorizontalScrollIndicator={false}
-        renderItem={({ item, index }) => (
+        renderItem={({item, index}) => (
           <View style={styles.movieItemNowPlaying}>
             <TouchableOpacity>
               <Image
                 style={{
                   width: '100%',
                   height: '80%',
-                  borderRadius: 10, backgroundColor: 'gray'
+                  borderRadius: 10,
+                  backgroundColor: 'gray',
                 }}
-                source={{ uri: item.poster }}
+                source={{uri: item.poster}}
               />
               <Text numberOfLines={1} style={styles.movieTitle}>
                 {item.title}
               </Text>
-              <Text style={styles.moviecategory1}>2h29m • Hành động, Phiêu lưu, sci-fi</Text>
-              <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
+              <Text style={styles.moviecategory1}>
+                2h29m • Hành động, Phiêu lưu, sci-fi
+              </Text>
+              <View style={{flexDirection: 'row', justifyContent: 'center'}}>
                 <SvgXml xml={iconStar()} />
                 <Text style={styles.movieStar}>4.8 (1.222)</Text>
               </View>
@@ -119,7 +136,14 @@ const HomeScreen = ({ navigation }) => {
         )}
       />
 
-      <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 10 }}>
+      <View
+        style={{
+          flex: 1,
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          paddingHorizontal: 10,
+        }}>
         <Text style={styles.categoryTitle}>Phim sắp chiếu</Text>
         <TouchableOpacity onPress={() => alert('Xem tất cả clicked!')}>
           <Text style={styles.viewAllText}>Xem tất cả</Text>
@@ -127,34 +151,46 @@ const HomeScreen = ({ navigation }) => {
       </View>
       <FlatList
         data={upcomingMoviesList}
-        keyExtractor={(item) => item.id}
+        keyExtractor={item => item.id}
         horizontal
         showsHorizontalScrollIndicator={false}
-        renderItem={({ item, index }) => (
+        renderItem={({item, index}) => (
           <View style={styles.movieItem}>
             <TouchableOpacity onPress={() => alert(`Movie ID: ${item.id}`)}>
               <Image
                 style={{
                   width: '100%',
                   height: '75%',
-                  borderRadius: 10, backgroundColor: 'gray'
+                  borderRadius: 10,
+                  backgroundColor: 'gray',
                 }}
-                source={{ uri: item.poster }}
+                source={{uri: item.poster}}
               />
               <Text style={styles.movieTitle2}>{item.title}</Text>
-              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+              <View style={{flexDirection: 'row', alignItems: 'center'}}>
                 <SvgXml xml={iconVideo()} width={14} height={14} />
-                <Text style={{ fontSize: 10, marginLeft: 5, color: '#DEDEDE' }}>Adventure, Sci-fi</Text>
+                <Text style={{fontSize: 10, marginLeft: 5, color: '#DEDEDE'}}>
+                  Adventure, Sci-fi
+                </Text>
               </View>
-              <View style={{ flexDirection: 'row' }}>
+              <View style={{flexDirection: 'row'}}>
                 <SvgXml xml={iconCalendar()} width={14} height={14} />
-                <Text style={{ fontSize: 10, marginLeft: 5, color: '#DEDEDE' }}>20.12.2022</Text>
+                <Text style={{fontSize: 10, marginLeft: 5, color: '#DEDEDE'}}>
+                  20.12.2022
+                </Text>
               </View>
             </TouchableOpacity>
           </View>
         )}
       />
-      <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 10 }}>
+      <View
+        style={{
+          flex: 1,
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          paddingHorizontal: 10,
+        }}>
         <Text style={styles.categoryTitle}>Khuyến mãi</Text>
         <TouchableOpacity onPress={() => alert('Xem tất cả clicked!')}>
           <Text style={styles.viewAllText}>Xem tất cả</Text>
@@ -164,12 +200,20 @@ const HomeScreen = ({ navigation }) => {
         style={{
           width: '100%',
           height: screenHeight * 0.2,
-          borderRadius: 10, margin: 16
+          borderRadius: 10,
+          margin: 16,
         }}
-        source={{ uri: 'https://via.placeholder.com/150' }}
+        source={{uri: 'https://via.placeholder.com/150'}}
       />
 
-      <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 10 }}>
+      <View
+        style={{
+          flex: 1,
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          paddingHorizontal: 10,
+        }}>
         <Text style={styles.categoryTitle}>Thể Loại</Text>
         <TouchableOpacity onPress={() => alert('Xem tất cả clicked!')}>
           <Text style={styles.viewAllText}>Xem tất cả</Text>
@@ -177,64 +221,77 @@ const HomeScreen = ({ navigation }) => {
       </View>
       <View
         style={{
-          width: '100%', height: screenHeight * 0.1, backgroundColor: 'black', marginLeft: 10,
+          width: '100%',
+          height: screenHeight * 0.1,
+          backgroundColor: 'black',
+          marginLeft: 10,
         }}>
         <FlatList
           data={categoryList}
-          keyExtractor={(item) => item.id}
+          keyExtractor={item => item.id}
           horizontal
           showsHorizontalScrollIndicator={false}
-          renderItem={({ item, index }) => (
-            <View style={{ marginLeft: 15, height: '100%', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }} >
+          renderItem={({item, index}) => (
+            <View
+              style={{
+                marginLeft: 15,
+                height: '100%',
+                flexDirection: 'column',
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}>
               <TouchableOpacity>
                 <Image
                   style={{
                     width: 60,
                     height: 60,
                     backgroundColor: 'gray',
-                    borderRadius: 30
+                    borderRadius: 30,
                   }}
-                  source={{ uri: item.imageUrl }}
+                  source={{uri: item.imageUrl}}
                 />
-                <Text numberOfLines={1} style={{
-                  color: '#F2F2F2',
-                  textAlign: 'center',
-                  fontSize: 10,
-                  marginTop: 10,
-                }}>
+                <Text
+                  numberOfLines={1}
+                  style={{
+                    color: '#F2F2F2',
+                    textAlign: 'center',
+                    fontSize: 10,
+                    marginTop: 10,
+                  }}>
                   {item.title}
                 </Text>
-
               </TouchableOpacity>
             </View>
           )}
         />
-
       </View>
       <Text style={styles.categoryTitle}>Tin mới</Text>
       <FlatList
         data={newsList}
-        keyExtractor={(item) => item.id}
+        keyExtractor={item => item.id}
         horizontal
         showsHorizontalScrollIndicator={false}
-        renderItem={({ item, index }) => (
+        renderItem={({item, index}) => (
           <View style={styles.movieItemNew}>
             <TouchableOpacity onPress={() => alert(`News ID: ${item.id}`)}>
               <Image
                 style={{
                   width: '100%',
                   height: '70%',
-                  borderRadius: 10, backgroundColor: 'gray'
+                  borderRadius: 10,
+                  backgroundColor: 'gray',
                 }}
-                source={{ uri: item.poster }}
+                source={{uri: item.poster}}
               />
-              <Text style={{
-                color: '#F2F2F2',
-                
-                fontSize: 12,
-                marginTop: 10,
-              }}>When The Batman 2 Starts Filming Reportedly Revealed</Text>
+              <Text
+                style={{
+                  color: '#F2F2F2',
 
+                  fontSize: 12,
+                  marginTop: 10,
+                }}>
+                When The Batman 2 Starts Filming Reportedly Revealed
+              </Text>
             </TouchableOpacity>
           </View>
         )}
@@ -273,8 +330,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: 'darkgray',
     borderRadius: 10,
-    padding: 5
-
+    padding: 5,
   },
   viewAllText: {
     fontSize: 14,
@@ -304,7 +360,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: 'gray',
     borderRadius: 10,
-    margin: 12
+    margin: 12,
   },
   movieItemNew: {
     width: screenWidth * 0.5,
@@ -313,7 +369,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: 'gray',
     borderRadius: 10,
-    margin: 12
+    margin: 12,
   },
   movieTitle: {
     color: '#F2F2F2',
@@ -331,13 +387,11 @@ const styles = StyleSheet.create({
     color: '#F2F2F2',
     textAlign: 'center',
     fontSize: 12,
-
   },
   movieStar: {
     color: '#F2F2F2',
     textAlign: 'center',
     fontSize: 10,
-
   },
 });
 

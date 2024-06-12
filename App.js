@@ -4,6 +4,7 @@ import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import BottomNavication from './src/screens/other/BottomNavication';
 import SignInScreen from './src/screens/start/SignInScreen';
+import MyTicketScreen from './src/screens/home/MyTicketScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -15,11 +16,15 @@ export default function App() {
           name="Home"
           component={BottomNavication}
           options={{headerShown: false}}
-        
         />
         <Stack.Screen
           name="Login"
           component={SignInScreen}
+          options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name="MyTickets"
+          component={MyTicketScreen}
           options={{headerShown: false}}
         />
       </Stack.Navigator>
