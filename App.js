@@ -15,6 +15,7 @@ export default function App() {
           name="Home"
           component={BottomNavication}
           options={{headerShown: false}}
+        
         />
         <Stack.Screen
           name="Login"
