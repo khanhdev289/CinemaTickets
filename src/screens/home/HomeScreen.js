@@ -18,6 +18,7 @@ import iconSearch from '../../assets/icons/iconSearch';
 import iconStar from '../../assets/icons/iconStar';
 import iconVideo from '../../assets/icons/iconVideo';
 import iconCalendar from '../../assets/icons/iconCalendar';
+import { useNavigation } from '@react-navigation/native';
 
 
 const screenWidth = Dimensions.get('screen').width;
@@ -57,10 +58,67 @@ const newsList = [
   { id: '9', title: 'News 3', poster: 'https://via.placeholder.com/150' },
 ];
 
-const HomeScreen = ({ navigation }) => {
-  const searchMoviesFunction = () => {
-    alert('Search function clicked');
-  };
+
+
+const HomeScreen = () => {
+  const renderMovieItem = ({item, index}) => (
+    <TouchableOpacity
+      onPress={() => {
+        navigation.push('MovieDetailScreen', {movieid: item.id});
+      }}
+      style={{
+        marginLeft: index === 0 ? 36 : 0,
+        marginRight: index === nowPlayingMoviesList.length - 1 ? 36 : 0,
+      }}>
+      <View
+        style={{
+          display: 'flex',
+          flex: 1,
+          backgroundColor: 'black',
+          maxWidth: 0.5* screenWidth,
+     
+        }}>
+        <Image
+          style={{
+            aspectRatio: 2 / 3,
+            borderRadius: 20,
+            width: 0.5 * screenWidth,
+          }}
+          source={{uri:  item.poster}}
+        />
+          <Text
+            numberOfLines={1}
+            style={{
+              fontSize: 20,
+              color:'white',
+              textAlign: 'center',
+            }}>
+            {item.title}
+          </Text>
+        <View>
+        <Text style={styles.moviecategory1}>2h29m • Hành động, Phiêu lưu, sci-fi</Text>
+          <View
+            style={{
+              flexDirection: 'row',
+              gap: 10,
+              alignItems: 'center',
+              justifyContent: 'center',
+              
+            }}>
+           <SvgXml xml={iconStar()}/>
+           <Text style={styles.movieStar}>4.8 (1.222)</Text>
+            <Text
+              style={{
+                fontSize: 14,
+                color: 'white',
+              }}>
+            </Text>
+          </View>
+        </View>
+      </View>
+    </TouchableOpacity>
+  );
+  const navigation = useNavigation(); 
 
   return (
     <ScrollView style={styles.container} bounces={false}>
@@ -77,8 +135,8 @@ const HomeScreen = ({ navigation }) => {
           <TextInput
             style={styles.searchInput}
             placeholder="Tìm kiếm phim..."
-            placeholderTextColor="#1C1C1C"
-            onFocus={searchMoviesFunction}
+            placeholderTextColor="#8C8C8C"
+            onFocus={() => navigation.navigate('SearchScreeen')}
           />
         </View>
       </View>
@@ -87,36 +145,18 @@ const HomeScreen = ({ navigation }) => {
         <Text style={styles.categoryTitle}>Phim đang chiếu</Text>
         <TouchableOpacity onPress={() => alert('Xem tất cả clicked!')}>
           <Text style={styles.viewAllText}>Xem tất cả</Text>
-
         </TouchableOpacity>
       </View>
       <FlatList
         data={nowPlayingMoviesList}
         keyExtractor={(item) => item.id}
+        bounces={false}
+        snapToInterval={0.7 * screenWidth + 36}
         horizontal
         showsHorizontalScrollIndicator={false}
-        renderItem={({ item, index }) => (
-          <View style={styles.movieItemNowPlaying}>
-            <TouchableOpacity>
-              <Image
-                style={{
-                  width: '100%',
-                  height: '80%',
-                  borderRadius: 10, backgroundColor: 'gray'
-                }}
-                source={{ uri: item.poster }}
-              />
-              <Text numberOfLines={1} style={styles.movieTitle}>
-                {item.title}
-              </Text>
-              <Text style={styles.moviecategory1}>2h29m • Hành động, Phiêu lưu, sci-fi</Text>
-              <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
-                <SvgXml xml={iconStar()} />
-                <Text style={styles.movieStar}>4.8 (1.222)</Text>
-              </View>
-            </TouchableOpacity>
-          </View>
-        )}
+        decelerationRate={0}
+        contentContainerStyle={{gap: 36}}
+        renderItem={renderMovieItem}
       />
 
       <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 10 }}>
@@ -137,7 +177,8 @@ const HomeScreen = ({ navigation }) => {
                 style={{
                   width: '100%',
                   height: '75%',
-                  borderRadius: 10, backgroundColor: 'gray'
+                  aspectRatio: 3/4,
+                  borderRadius: 10, 
                 }}
                 source={{ uri: item.poster }}
               />
@@ -160,14 +201,16 @@ const HomeScreen = ({ navigation }) => {
           <Text style={styles.viewAllText}>Xem tất cả</Text>
         </TouchableOpacity>
       </View>
+      <View style={{flex:1,alignItems:'center'}}>
       <Image
         style={{
-          width: '100%',
+          width: '90%',
           height: screenHeight * 0.2,
-          borderRadius: 10, margin: 16
+          borderRadius: 10, 
+  
         }}
         source={{ uri: 'https://via.placeholder.com/150' }}
-      />
+      /></View>
 
       <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 10 }}>
         <Text style={styles.categoryTitle}>Thể Loại</Text>
@@ -209,9 +252,16 @@ const HomeScreen = ({ navigation }) => {
             </View>
           )}
         />
-
       </View>
+
+      
+      <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 10 }}>
       <Text style={styles.categoryTitle}>Tin mới</Text>
+      <TouchableOpacity onPress={() => alert('Xem tất cả clicked!')}>
+          <Text style={styles.viewAllText}>Xem tất cả</Text>
+        </TouchableOpacity>
+        </View>
+
       <FlatList
         data={newsList}
         keyExtractor={(item) => item.id}
@@ -223,14 +273,14 @@ const HomeScreen = ({ navigation }) => {
               <Image
                 style={{
                   width: '100%',
-                  height: '70%',
-                  borderRadius: 10, backgroundColor: 'gray'
+                  height: '75%',
+                  aspectRatio: 3/2,
+                  borderRadius: 10,
                 }}
                 source={{ uri: item.poster }}
               />
               <Text style={{
                 color: '#F2F2F2',
-                
                 fontSize: 12,
                 marginTop: 10,
               }}>When The Batman 2 Starts Filming Reportedly Revealed</Text>
@@ -241,6 +291,7 @@ const HomeScreen = ({ navigation }) => {
       />
     </ScrollView>
   );
+  
 };
 
 const styles = StyleSheet.create({
@@ -259,22 +310,21 @@ const styles = StyleSheet.create({
     color: '#F2F2F2',
   },
   searchContainer: {
-    paddingHorizontal: 20,
+    paddingHorizontal: 10,
     marginBottom: 20,
+    borderRadius: 10,
+    backgroundColor:'#1C1C1C'
   },
   searchInput: {
-    backgroundColor: 'darkgray',
-    borderRadius: 10,
+    backgroundColor:'#1C1C1C',
     padding: 5,
+    marginLeft:10,
     color: 'white',
   },
   searchWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'darkgray',
-    borderRadius: 10,
     padding: 5
-
   },
   viewAllText: {
     fontSize: 14,
@@ -302,7 +352,7 @@ const styles = StyleSheet.create({
     height: screenHeight * 0.3,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'gray',
+    backgroundColor: 'black',
     borderRadius: 10,
     margin: 12
   },
@@ -311,7 +361,7 @@ const styles = StyleSheet.create({
     height: screenHeight * 0.2,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'gray',
+    backgroundColor: 'black',
     borderRadius: 10,
     margin: 12
   },

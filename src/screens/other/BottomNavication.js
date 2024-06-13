@@ -17,7 +17,7 @@ const Tab = createBottomTabNavigator();
 
 const BottomNavication = () => {
   return (
-    <NavigationContainer independent={true}>
+  
       <Tab.Navigator>
       <Tab.Screen
         name="Trang chủ"
@@ -68,7 +68,7 @@ const BottomNavication = () => {
           }}
         />
       </Tab.Navigator>
-    </NavigationContainer>
+    
   );
 };
 
