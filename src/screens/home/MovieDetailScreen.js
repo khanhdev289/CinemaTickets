@@ -1,102 +1,106 @@
 import React, { useState } from 'react';
-import { StyleSheet, Text, View, Image, Dimensions, TouchableOpacity, FlatList, ScrollView, Button } from 'react-native';
+import { StyleSheet, Text, View, Image, Dimensions, TouchableOpacity, FlatList, ScrollView } from 'react-native';
 import { SvgXml } from 'react-native-svg';
 import iconStar from '../../assets/icons/iconStar';
 import iconStarWhite from '../../assets/icons/iconStarWhite';
 import iconPlay from '../../assets/icons/iconPlay';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-
-
 const screenWidth = Dimensions.get('screen').width;
 const screenHeight = Dimensions.get('screen').height;
 
 const MovieDetailScreen = () => {
   const [isExpanded, setIsExpanded] = useState(false);
+  const [selectedTheater, setSelectedTheater] = useState(null);
+
   const directorList = [
     { id: '1', title: 'Anthony Russo', poster: 'https://via.placeholder.com/150' },
     { id: '2', title: 'Movie 2', poster: 'https://via.placeholder.com/150' },
     { id: '3', title: 'Movie 3', poster: 'https://via.placeholder.com/150' },
   ];
+
   const handleToggleExpand = () => {
     setIsExpanded(!isExpanded);
   };
 
-  const summaryText = 'As the Avengers and their allies have continued to protect the world from threats too large for any one hero to handle, a new danger has emerged from the cosmic shadows: Thanos.';
+  const summaryText =
+    'As the Avengers and their allies have continued to protect the world from threats too large for any one hero to handle, a new danger has emerged from the cosmic shadows: Thanos.';
   const truncatedSummary = summaryText.length > 100 ? summaryText.substring(0, 100) + '...' : summaryText;
+
   const renderDirector = ({ item }) => (
-    <View style={styles.itemContainerDirector}>
+    <View style={styles.itemContainer}>
       <Image style={styles.posterItem} source={{ uri: item.poster }} />
       <Text style={styles.itemTitle}>{item.title}</Text>
     </View>
   );
-  const renderTheater = ({ item }) => (
-    <View style={{
-      borderWidth: 1,
-      borderColor: 'white',
-      borderRadius: 5,
-      margin:10, padding:10, width: '90%'
-    }}>
-      <Text style={styles.itemTitle}>Mỹ Đình Theater</Text>
-      <Text>Đường Mễ Trì,Mễ Trì,Hà Nội;</Text>
-    </View>
-  );
-  return (
 
+  const renderTheater = ({ item }) => (
+    <TouchableOpacity
+      onPress={() => setSelectedTheater(item.id)}
+      style={[
+        styles.theaterContainer,
+        selectedTheater === item.id ? { borderColor: '#FFD700' } : null,
+      ]}
+    >
+      <Text style={styles.theaterTitle}>{item.title}</Text>
+      <Text style={styles.theaterAddress}>Đường Mễ Trì, Mễ Trì, Hà Nội</Text>
+    </TouchableOpacity>
+  );
+
+  return (
     <SafeAreaView style={styles.container}>
       <ScrollView>
-        <Image
-          style={styles.poster}
-          source={{ uri: 'https://via.placeholder.com/150' }}
-        />
-        <Text style={styles.title}>Avengers: Infinity War</Text>
-        <Text style={styles.movieTime}>2h29m • 16.12.2022</Text>
-        <View style={styles.reviewContainer}>
-          <Text style={styles.reviewText}>Review</Text>
-          <SvgXml xml={iconStar()} />
-          <Text style={styles.reviewScore}>4.8 (1,222)</Text>
-        </View>
-
-        <View style={styles.ratingContainer}>
-          <View style={styles.rating}>
-            {[...Array(5)].map((_, index) => (
-              <SvgXml
-                key={index}
-                xml={iconStarWhite()}
-                width={24}
-                height={24}
-                fill={index < 5 ? "#FFD700" : "#CCCCCC"}
-              />
-            ))}
+        <Image style={styles.poster} source={{ uri: 'https://via.placeholder.com/150' }} />
+        <View style={styles.infoContainer}>
+          <Text style={styles.title}>Avengers: Infinity War</Text>
+          <Text style={styles.movieTime}>2h29m • 16.12.2022</Text>
+          <View style={styles.reviewContainer}>
+            <Text style={styles.reviewText}>Review</Text>
+            <SvgXml xml={iconStar()} />
+            <Text style={styles.reviewScore}>4.8 (1,222)</Text>
           </View>
-          <TouchableOpacity
-            style={styles.trailerButton}
-            onPress={() => {
-              // Xử lý sự kiện khi nhấn nút xem trailer
-            }}
-            accessibilityLabel="Watch Trailer"
-          >
-            <SvgXml xml={iconPlay()} />
-            <Text style={styles.trailerButtonText}>Xem Trailer</Text>
-          </TouchableOpacity>
+          <View style={styles.ratingContainer}>
+            <View style={styles.rating}>
+              {[...Array(5)].map((_, index) => (
+                <SvgXml
+                  key={index}
+                  xml={iconStarWhite()}
+                  width={24}
+                  height={24}
+                  fill={index < 5 ? '#FFD700' : '#CCCCCC'}
+                />
+              ))}
+            </View>
+            <TouchableOpacity style={styles.trailerButton}>
+              <SvgXml xml={iconPlay()} />
+              <Text style={styles.trailerButtonText}>Xem Trailer</Text>
+            </TouchableOpacity>
+          </View>
         </View>
 
         <View style={styles.infoContainer}>
-          <Text style={styles.infoText}>Thể loại: </Text>
-          <Text style={styles.infoText}>Độ tuổi: </Text>
-          <Text style={styles.infoText}>Ngôn ngữ: </Text>
+          <Text style={styles.infoText}>Thể loại: Hành động, Phiêu lưu, Siêu anh hùng</Text>
+          <Text style={styles.infoText}>Độ tuổi: 13+</Text>
+          <Text style={styles.infoText}>Ngôn ngữ: Tiếng Anh, Tiếng Việt (phụ đề)</Text>
         </View>
 
         <Text style={styles.summaryTitle}>Tóm Tắt</Text>
         <Text style={styles.summaryText}>
           {isExpanded ? summaryText : truncatedSummary}
           {!isExpanded && summaryText.length > 100 && (
-            <Text style={styles.readMoreText} onPress={handleToggleExpand}> Xem thêm</Text>
+            <Text style={styles.readMoreText} onPress={handleToggleExpand}>
+              {' '}
+              Xem thêm
+            </Text>
           )}
         </Text>
         {isExpanded && (
-          <Text style={styles.readMoreText} onPress={handleToggleExpand}> Thu gọn</Text>
+          <Text style={styles.readMoreText} onPress={handleToggleExpand}>
+            {' '}
+            Thu gọn
+          </Text>
         )}
+
         <Text style={styles.summaryTitle}>Nhà sản xuất</Text>
         <FlatList
           data={directorList}
@@ -104,7 +108,9 @@ const MovieDetailScreen = () => {
           horizontal
           showsHorizontalScrollIndicator={false}
           renderItem={renderDirector}
+          contentContainerStyle={{ paddingHorizontal: 10 }}
         />
+
         <Text style={styles.summaryTitle}>Diễn viên</Text>
         <FlatList
           data={directorList}
@@ -112,68 +118,69 @@ const MovieDetailScreen = () => {
           horizontal
           showsHorizontalScrollIndicator={false}
           renderItem={renderDirector}
+          contentContainerStyle={{ paddingHorizontal: 10 }}
         />
+
         <Text style={styles.summaryTitle}>Các cụm rạp</Text>
         <FlatList
           data={directorList}
           keyExtractor={(item) => item.id}
-          showsHorizontalScrollIndicator={false}
           renderItem={renderTheater}
+          contentContainerStyle={{ paddingHorizontal: 10 }}
         />
-      <TouchableOpacity style={styles.button} >
-    <Text style={styles.buttonText}>Tiếp tục</Text>
-  </TouchableOpacity>
+
+        <TouchableOpacity style={styles.button} onPress={() => console.log('Button pressed')}>
+          <Text style={styles.buttonText}>Tiếp tục</Text>
+        </TouchableOpacity>
       </ScrollView>
     </SafeAreaView>
-
-
   );
 };
-
-export default MovieDetailScreen;
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: 'center',
-    padding: 16,
-    backgroundColor: 'black'
+    backgroundColor: 'black',
+    padding:16
   },
   poster: {
     width: '100%',
-    height: screenHeight * 0.2,
+    height: screenHeight * 0.3,
+    resizeMode: 'cover',
+  },
+  infoContainer: {
+    padding: 16,
   },
   title: {
-    fontSize: 20,
+    fontSize: 24,
+    fontWeight: 'bold',
     color: 'white',
-    marginVertical: 8,
   },
   movieTime: {
-    fontSize: 12,
+    fontSize: 14,
     color: '#BFBFBF',
-    marginBottom: 20,
+    marginBottom: 10,
   },
   reviewContainer: {
     flexDirection: 'row',
-    margin: 20,
     alignItems: 'center',
+    marginBottom: 10,
   },
   reviewText: {
     color: 'white',
-    marginHorizontal: 10,
-    fontSize: 14,
+    fontSize: 16,
+    marginRight: 10,
   },
   reviewScore: {
     color: 'white',
-    marginHorizontal: 5,
-    fontSize: 12,
+    fontSize: 16,
   },
   ratingContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    width: '100%',
-    paddingHorizontal: 20,
+    marginTop: 10,
+    marginBottom: 20,
   },
   rating: {
     flexDirection: 'row',
@@ -181,38 +188,38 @@ const styles = StyleSheet.create({
   trailerButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 5,
-    borderWidth: 1,
-    borderColor: 'white',
+    backgroundColor: '#1C1C1C',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
     borderRadius: 5,
   },
   trailerButtonText: {
-    marginLeft: 10,
+    color: 'white',
     fontSize: 16,
-    color: '#BFBFBF',
-  },
-  infoContainer: {
-    margin: 20,
+    marginLeft: 8,
   },
   infoText: {
-    fontSize: 14,
-    marginVertical: 5,
+    fontSize: 16,
     color: '#F2F2F2',
+    marginBottom: 5,
   },
   summaryTitle: {
-    fontSize: 22,
-    marginVertical: 10,
+    fontSize: 20,
+    fontWeight: 'bold',
     color: 'white',
+    marginTop: 20,
+    marginBottom: 10,
   },
   summaryText: {
-    fontSize: 14,
+    fontSize: 16,
     color: '#F2F2F2',
+    lineHeight: 24,
   },
   readMoreText: {
     color: '#FFD700',
-    fontSize: 14,
+    fontSize: 16,
   },
-  itemContainerDirector: {
+  itemContainer: {
     flexDirection: 'row',
     borderRadius: 10,
     marginHorizontal: 10,
@@ -224,22 +231,42 @@ const styles = StyleSheet.create({
     width: 50,
     height: 50,
     borderRadius: 25,
+    marginRight:5
   },
   itemTitle: {
-    marginLeft: 10,
     color: 'white',
-    fontSize: 12,
     textAlign: 'center',
+  },
+  theaterContainer: {
+    borderWidth: 1,
+    borderColor: 'white',
+    borderRadius: 5,
+    padding: 10,
+    marginBottom: 10,
+  },
+  theaterTitle: {
+    color: 'white',
+    fontSize: 16,
+    marginBottom: 5,
+  },
+  theaterAddress: {
+    color: '#BFBFBF',
+    fontSize: 14,
   },
   button: {
     backgroundColor: '#FFD700',
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    borderRadius: 20, // Đây là nơi bạn có thể điều chỉnh góc bo tròn
+    paddingVertical: 12,
+    alignItems: 'center',
+    borderRadius: 10,
+    marginHorizontal: 20,
+    marginBottom: 20,
   },
+
   buttonText: {
-    fontSize: 16,
+    fontSize: 18,
+    fontWeight: 'bold',
     color: 'black',
-    textAlign: 'center',
   },
 });
+
+export default MovieDetailScreen;

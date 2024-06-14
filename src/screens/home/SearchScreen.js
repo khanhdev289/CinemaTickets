@@ -7,6 +7,7 @@ import iconSearch from '../../assets/icons/iconSearch';
 import iconStar from '../../assets/icons/iconStar';
 import iconCalendar from '../../assets/icons/iconCalendar';
 import iconVideo from '../../assets/icons/iconVideo';
+import iconClock from '../../assets/icons/iconClock';
 const screenWidth = Dimensions.get('screen').width;
 const screenHeight = Dimensions.get('screen').height;
 
@@ -54,7 +55,7 @@ const SearchScreeen = () => {
                 <Text style={{ fontSize: 12, marginLeft: 5, color: '#DEDEDE' }}>4.0 (982)</Text>
               </View>
               <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                <SvgXml xml={iconCalendar()} width={14} height={14} />
+                <SvgXml xml={iconClock()} width={14} height={14} />
                 <Text style={{ fontSize: 12, marginLeft: 5, color: '#DEDEDE' }}>2 hour 5 minutes</Text>
               </View>
               <View style={{ flexDirection: 'row', alignItems: 'center' }}>

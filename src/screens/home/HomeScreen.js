@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef, useState } from 'react';
 import {
   Text,
   View,
@@ -19,16 +19,17 @@ import iconStar from '../../assets/icons/iconStar';
 import iconVideo from '../../assets/icons/iconVideo';
 import iconCalendar from '../../assets/icons/iconCalendar';
 import { useNavigation } from '@react-navigation/native';
-
-
 const screenWidth = Dimensions.get('screen').width;
 const screenHeight = Dimensions.get('screen').height;
 
 // Sample data
+
+
 const nowPlayingMoviesList = [
   { id: '1', title: 'AvengersAvengers - Infinity War', poster: 'https://via.placeholder.com/150' },
   { id: '2', title: 'Movie 2', poster: 'https://via.placeholder.com/150' },
   { id: '3', title: 'Movie 3', poster: 'https://via.placeholder.com/150' },
+  { id: '4', title: 'Movie 3', poster: 'https://via.placeholder.com/150' },
 ];
 
 const upcomingMoviesList = [
@@ -61,22 +62,31 @@ const newsList = [
 
 
 const HomeScreen = () => {
+  const [visibleIndex, setVisibleIndex] = useState(0);
+const flatListRef = useRef(null);
+
+const onViewableItemsChanged = useRef(({ viewableItems }) => {
+  if (viewableItems.length > 0) {
+    setVisibleIndex(viewableItems[0].index);
+  }
+}).current;
+
+const viewConfigRef = useRef({ viewAreaCoveragePercentThreshold: 30 }).current;
   const renderMovieItem = ({item, index}) => (
     <TouchableOpacity
       onPress={() => {
         navigation.push('MovieDetailScreen', {movieid: item.id});
       }}
-      style={{
-        marginLeft: index === 0 ? 36 : 0,
-        marginRight: index === nowPlayingMoviesList.length - 1 ? 36 : 0,
-      }}>
+     >
       <View
         style={{
+          marginTop:50,
+          margin:10,
           display: 'flex',
           flex: 1,
           backgroundColor: 'black',
           maxWidth: 0.5* screenWidth,
-     
+          height:0.5*screenHeight,
         }}>
         <Image
           style={{
@@ -148,17 +158,26 @@ const HomeScreen = () => {
         </TouchableOpacity>
       </View>
       <FlatList
+        ref={flatListRef}
         data={nowPlayingMoviesList}
         keyExtractor={(item) => item.id}
         bounces={false}
-        snapToInterval={0.7 * screenWidth + 36}
+        snapToInterval={0.5 * screenWidth }
         horizontal
         showsHorizontalScrollIndicator={false}
         decelerationRate={0}
-        contentContainerStyle={{gap: 36}}
-        renderItem={renderMovieItem}
+        contentContainerStyle={{ paddingHorizontal: 10 }}
+        renderItem={({ item, index }) => {
+          const scale = index === visibleIndex ? 1.2 : 1; // Điều chỉnh kích thước dựa trên khả năng hiển thị
+          return (
+            <View style={{ transform: [{ scale }], marginHorizontal: 18 }}>
+              {renderMovieItem({ item })}
+            </View>
+          );
+        }}
+        onViewableItemsChanged={onViewableItemsChanged}
+        viewabilityConfig={viewConfigRef}
       />
-
       <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 10 }}>
         <Text style={styles.categoryTitle}>Phim sắp chiếu</Text>
         <TouchableOpacity onPress={() => alert('Xem tất cả clicked!')}>
@@ -212,7 +231,7 @@ const HomeScreen = () => {
         source={{ uri: 'https://via.placeholder.com/150' }}
       /></View>
 
-      <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 10 }}>
+      <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 10,margin:10 }}>
         <Text style={styles.categoryTitle}>Thể Loại</Text>
         <TouchableOpacity onPress={() => alert('Xem tất cả clicked!')}>
           <Text style={styles.viewAllText}>Xem tất cả</Text>
@@ -220,7 +239,7 @@ const HomeScreen = () => {
       </View>
       <View
         style={{
-          width: '100%', height: screenHeight * 0.1, backgroundColor: 'black', marginLeft: 10,
+          width: '100%', height: screenHeight * 0.15, backgroundColor: 'black', marginLeft: 10,
         }}>
         <FlatList
           data={categoryList}
@@ -228,14 +247,14 @@ const HomeScreen = () => {
           horizontal
           showsHorizontalScrollIndicator={false}
           renderItem={({ item, index }) => (
-            <View style={{ marginLeft: 15, height: '100%', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }} >
+            <View style={{ marginLeft: 15, height:screenHeight*0.15, flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }} >
               <TouchableOpacity>
                 <Image
                   style={{
-                    width: 60,
-                    height: 60,
+                    width: screenHeight* 0.1,
+                    height:screenHeight*0.1 ,
                     backgroundColor: 'gray',
-                    borderRadius: 30
+                    borderRadius:screenHeight* 0.05
                   }}
                   source={{ uri: item.imageUrl }}
                 />

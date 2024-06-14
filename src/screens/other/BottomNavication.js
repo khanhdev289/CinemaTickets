@@ -1,10 +1,10 @@
-import {StyleSheet, Text, View} from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import React from 'react';
 import MyTicketScreen from '../home/MyTicketScreen';
 import MovieScreen from '../home/MovieScreen';
 import ProfileScreen from '../home/ProfileScreen';
-import {NavigationContainer} from '@react-navigation/native';
-import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
+import { NavigationContainer } from '@react-navigation/native';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import HomeScreen from '../home/HomeScreen';
 
 import { SvgXml } from 'react-native-svg';
@@ -15,31 +15,34 @@ import iconUser from '../../assets/icons/iconUser';
 
 const Tab = createBottomTabNavigator();
 
-const BottomNavication = () => {
+const BottomNavigation = () => {
   return (
-  
-      <Tab.Navigator>
-      <Tab.Screen
-        name="Trang chủ"
-        component={HomeScreen}
-        options={{
+   
+      <Tab.Navigator
+        screenOptions={{
+          tabBarStyle: { backgroundColor: 'black' },
+          tabBarActiveTintColor: 'yellow',
           headerShown: false,
-          tabBarLabel: 'Trang Chủ',
-          title: 'Tất cả bài viết',
-          tabBarIcon: ({ color, size }) => (
-            <SvgXml xml={iconHome()} />
-          ),
         }}
-      />
+      >
+        <Tab.Screen
+          name="Trang chủ"
+          component={HomeScreen}
+          options={{
+            tabBarLabel: 'Trang Chủ',
+            tabBarIcon: ({ color, size }) => (
+              <SvgXml xml={iconHome()} fill={color} />
+            ),
+          }}
+        />
         <Tab.Screen
           name="Vé"
           component={MyTicketScreen}
           options={{
-            headerShown: true,
+          
             tabBarLabel: 'Vé',
-            title: 'Vé',
             tabBarIcon: ({ color, size }) => (
-              <SvgXml xml={iconTicket()} />
+              <SvgXml xml={iconTicket()} fill={color} />
             ),
           }}
         />
@@ -47,11 +50,9 @@ const BottomNavication = () => {
           name="Phim"
           component={MovieScreen}
           options={{
-            headerShown: true,
             tabBarLabel: 'Phim',
-            title: 'Phim',
             tabBarIcon: ({ color, size }) => (
-              <SvgXml xml={iconVideo()} />
+              <SvgXml xml={iconVideo()} fill={color} />
             ),
           }}
         />
@@ -59,17 +60,15 @@ const BottomNavication = () => {
           name="Cá Nhân"
           component={ProfileScreen}
           options={{
-            headerShown: true,
             tabBarLabel: 'Cá Nhân',
-            title: 'Cá Nhân',
             tabBarIcon: ({ color, size }) => (
-              <SvgXml xml={iconUser()} />
+              <SvgXml xml={iconUser()} fill={color} />
             ),
           }}
         />
       </Tab.Navigator>
-    
+
   );
 };
 
-export default BottomNavication;
+export default BottomNavigation;
