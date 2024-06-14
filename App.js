@@ -4,9 +4,13 @@ import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import BottomNavication from './src/screens/other/BottomNavication';
 import SignInScreen from './src/screens/start/SignInScreen';
+
+import MyTicketScreen from './src/screens/home/MyTicketScreen';
+
 import SignUpScreen from './src/screens/start/SignUpScreen';
 import ComfirmOTP from './src/screens/start/ComfirmOTP';
 import WelcomeScreen from './src/screens/start/WelcomeScreen';
+
 
 const Stack = createNativeStackNavigator();
 
@@ -18,7 +22,6 @@ export default function App() {
           name="Home"
           component={BottomNavication}
           options={{headerShown: false}}
-        
         />
         <Stack.Screen
           name="Welcome"
@@ -31,6 +34,10 @@ export default function App() {
           options={{headerShown: false}}
         />
         <Stack.Screen
+
+          name="MyTickets"
+          component={MyTicketScreen}
+
           name="Register"
           component={SignUpScreen}
           options={{headerShown: false}}
