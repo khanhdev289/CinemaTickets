@@ -1,4 +1,3 @@
-
 import {StyleSheet, Text, View} from 'react-native';
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
@@ -13,20 +12,16 @@ import SignUpScreen from './src/screens/start/SignUpScreen';
 import ComfirmOTP from './src/screens/start/ComfirmOTP';
 import WelcomeScreen from './src/screens/start/WelcomeScreen';
 
-
 const Stack = createNativeStackNavigator();
 
 export default function App() {
   return (
     <NavigationContainer>
-
       <Stack.Navigator initialRouteName="Welcome">
-
         <Stack.Screen
           name="Home"
           component={BottomNavication}
           options={{headerShown: false}}
-        
         />
         <Stack.Screen
           name="Welcome"
@@ -39,20 +34,15 @@ export default function App() {
           options={{headerShown: false}}
         />
 
-         <Stack.Screen
-          name = "SearchScreeen"
-          component= {SearchScreeen}
+        <Stack.Screen
+          name="SearchScreeen"
+          component={SearchScreeen}
           options={{headerShown: false}}
         />
-         <Stack.Screen
-          name = "MovieDetailScreen"
-          component= {MovieDetailScreen}
+        <Stack.Screen name="MovieDetailScreen" component={MovieDetailScreen} />
 
+        <Stack.Screen name="MyTickets" component={MyTicketScreen} />
         <Stack.Screen
-
-          name="MyTickets"
-          component={MyTicketScreen}
-
           name="Register"
           component={SignUpScreen}
           options={{headerShown: false}}
