@@ -31,8 +31,11 @@
     "react-native-screens": "^3.31.1",
     "react-native-snap-carousel": "^3.9.1",
     "react-native-svg": "^15.3.0",
+
     "react-native-swiper-flatlist": "^3.2.4",
-    "react-native-vector-icons": "^10.1.0"
+
+    "react-native-vector-icons": "^10.1.0",
+    "react-responsive-carousel": "^3.2.23"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
