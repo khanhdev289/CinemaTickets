@@ -57,7 +57,6 @@ export default function App() {
           component={ProfileScreen}
           options={{headerShown: false}}
         />
-
         <Stack.Screen
           name="MyTickets"
           component={MyTicketScreen}
