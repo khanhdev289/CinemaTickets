@@ -36,7 +36,7 @@ const BottomNavigation = () => {
       />
       <Tab.Screen
         name="Vé"
-        component={TicketScreen}
+        component={MyTicketScreen}
         options={{
           tabBarLabel: 'Vé',
           tabBarIcon: ({color, size}) => (

@@ -10,16 +10,17 @@ import React, {useState} from 'react';
 import {SvgXml} from 'react-native-svg';
 import iconsBack from '../../assets/icons/iconsBack';
 import CheckBox from '@react-native-community/checkbox';
+import {useNavigation} from '@react-navigation/native';
 
-const ChangePassScreen = ({navigation}) => {
-  const [isChecked, setIsChecked] = useState(false);
+const ChangePassScreen = () => {
+  const navigation = useNavigation();
 
   const handleOtp = () => {
     navigation.navigate('Otp');
   };
 
   const handleBack = () => {
-    navigation.navigate('ProfileScreen');
+    navigation.goBack();
   };
 
   return (
