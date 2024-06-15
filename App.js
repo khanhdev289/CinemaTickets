@@ -11,6 +11,9 @@ import MyTicketScreen from './src/screens/home/MyTicketScreen';
 import SignUpScreen from './src/screens/start/SignUpScreen';
 import ComfirmOTP from './src/screens/start/ComfirmOTP';
 import WelcomeScreen from './src/screens/start/WelcomeScreen';
+import ChangePassScreen from './src/screens/other/ChangePassScreen';
+import ProfileScreen from './src/screens/home/ProfileScreen';
+import TicketScreen from './src/screens/home/TicketScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -39,9 +42,32 @@ export default function App() {
           component={SearchScreeen}
           options={{headerShown: false}}
         />
-        <Stack.Screen name="MovieDetailScreen" component={MovieDetailScreen} />
+        <Stack.Screen
+          name="MovieDetailScreen"
+          component={MovieDetailScreen}
+          options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name="ChangePassScreen"
+          component={ChangePassScreen}
+          options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name="ProfileScreen"
+          component={ProfileScreen}
+          options={{headerShown: false}}
+        />
 
-        <Stack.Screen name="MyTickets" component={MyTicketScreen} />
+        <Stack.Screen
+          name="MyTickets"
+          component={MyTicketScreen}
+          options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name="TicketScreen"
+          component={TicketScreen}
+          options={{headerShown: false}}
+        />
         <Stack.Screen
           name="Register"
           component={SignUpScreen}
