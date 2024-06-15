@@ -10,18 +10,22 @@ import React, {useState} from 'react';
 import {SvgXml} from 'react-native-svg';
 import iconsBack from '../../assets/icons/iconsBack';
 import CheckBox from '@react-native-community/checkbox';
+
 import {useNavigation} from '@react-navigation/native';
 
 const ChangePassScreen = () => {
   const navigation = useNavigation();
+
 
   const handleOtp = () => {
     navigation.navigate('Otp');
   };
 
   const handleBack = () => {
+
     navigation.goBack();
-  };
+  }
+
 
   return (
     <SafeAreaView style={styles.container}>
@@ -72,7 +76,6 @@ const ChangePassScreen = () => {
   );
 };
 
-export default ChangePassScreen;
 
 const styles = StyleSheet.create({
   container: {
@@ -142,3 +145,5 @@ const styles = StyleSheet.create({
     fontFamily: 'bold',
   },
 });
+
+export default ChangePassScreen;

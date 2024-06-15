@@ -13,11 +13,13 @@ import {SafeAreaView} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/Ionicons';
 import Modal from 'react-native-modal';
 import {launchImageLibrary} from 'react-native-image-picker';
+
 import iconEditProfile from '../../assets/icons/iconProfile/iconEditProfile';
 import iconMyTicketProfile from '../../assets/icons/iconProfile/iconMyTicketProfile';
 import iconChangePassProfile from '../../assets/icons/iconProfile/iconChangePassProfile';
 import iconFaceIdProfile from '../../assets/icons/iconProfile/iconFaceIdProfile';
 import {SvgXml} from 'react-native-svg';
+
 
 const ProfileScreen = ({navigation}) => {
   const [isEnabled, setIsEnabled] = useState(false);
@@ -63,11 +65,13 @@ const ProfileScreen = ({navigation}) => {
           <View style={styles.profileContent}>
             <View style={{flexDirection: 'row', justifyContent: 'center'}}>
               <Text style={styles.profileName}>{profileName}</Text>
+
               <TouchableOpacity
                 style={{marginLeft: 40, alignContent: 'flex-end'}}
                 onPress={toggleModal}>
                 <SvgXml style={{color: 'black'}} xml={iconEditProfile()} />
               </TouchableOpacity>
+
             </View>
 
             <Text style={styles.profileInfo}>{profilePhone}</Text>
@@ -80,7 +84,9 @@ const ProfileScreen = ({navigation}) => {
           onPress={() => {
             navigation.navigate('TicketScreen');
           }}>
+
           <SvgXml style={{color: 'black'}} xml={iconMyTicketProfile()} />
+
           <Text style={styles.menuText}>Vé của tôi</Text>
         </TouchableOpacity>
 
@@ -89,12 +95,16 @@ const ProfileScreen = ({navigation}) => {
           onPress={() => {
             navigation.navigate('ChangePassScreen');
           }}>
+
           <SvgXml style={{color: 'black'}} xml={iconChangePassProfile()} />
+
           <Text style={styles.menuText}>Đổi mật khẩu</Text>
         </TouchableOpacity>
 
         <View style={styles.menuItem}>
+
           <SvgXml style={{color: 'black'}} xml={iconFaceIdProfile()} />
+
           <Text style={styles.menuText}>Face ID / Touch ID</Text>
           <Switch
             trackColor={{false: '#767577', true: '#81b0ff'}}
