@@ -1,4 +1,5 @@
-import React, { useRef, useState } from 'react';
+
+import React, {useRef, useState} from 'react';
 import {
   Text,
   View,
@@ -10,32 +11,43 @@ import {
   TextInput,
   Dimensions,
   Image,
-  Animated
+  Animated,
 } from 'react-native';
-import { SvgXml } from 'react-native-svg';
+import {SvgXml} from 'react-native-svg';
+
 import iconNotification from '../../assets/icons/iconNotification';
 import iconSearch from '../../assets/icons/iconSearch';
 import iconStar from '../../assets/icons/iconStar';
 import iconVideo from '../../assets/icons/iconVideo';
 import iconCalendar from '../../assets/icons/iconCalendar';
-import { useNavigation } from '@react-navigation/native';
+
+import {useNavigation} from '@react-navigation/native';
+import {SafeAreaView} from 'react-native-safe-area-context';
+
 const screenWidth = Dimensions.get('screen').width;
 const screenHeight = Dimensions.get('screen').height;
 
 // Sample data
-
-
 const nowPlayingMoviesList = [
-  { id: '1', title: 'AvengersAvengers - Infinity War', poster: 'https://via.placeholder.com/150' },
-  { id: '2', title: 'Movie 2', poster: 'https://via.placeholder.com/150' },
-  { id: '3', title: 'Movie 3', poster: 'https://via.placeholder.com/150' },
-  { id: '4', title: 'Movie 3', poster: 'https://via.placeholder.com/150' },
+  {
+    id: '1',
+    title: 'AvengersAvengers - Infinity War',
+    poster: 'https://via.placeholder.com/150',
+  },
+  {id: '2', title: 'Movie 2', poster: 'https://via.placeholder.com/150'},
+  {id: '3', title: 'Movie 3', poster: 'https://via.placeholder.com/150'},
+  {id: '4', title: 'Movie 3', poster: 'https://via.placeholder.com/150'},
 ];
 
 const upcomingMoviesList = [
-  { id: '4', title: 'Avatar 2: The Way Of Water', poster: 'https://via.placeholder.com/150' },
-  { id: '5', title: 'Movie 5', poster: 'https://via.placeholder.com/150' },
-  { id: '6', title: 'Movie 6', poster: 'https://via.placeholder.com/150' },
+  {
+    id: '4',
+    title: 'Avatar 2: The Way Of Water',
+    poster: 'https://via.placeholder.com/150',
+  },
+  {id: '5', title: 'Movie 5', poster: 'https://via.placeholder.com/150'},
+  {id: '6', title: 'Movie 6', poster: 'https://via.placeholder.com/150'},
+
 ];
 const categoryList = [
   {
@@ -52,41 +64,41 @@ const categoryList = [
     id: '3',
     title: 'Item 3',
     imageUrl: 'https://via.placeholder.com/150',
-  },]
-const newsList = [
-  { id: '7', title: 'News 1', poster: 'https://via.placeholder.com/150' },
-  { id: '8', title: 'News 2', poster: 'https://via.placeholder.com/150' },
-  { id: '9', title: 'News 3', poster: 'https://via.placeholder.com/150' },
+  },
 ];
-
-
+const newsList = [
+  {id: '7', title: 'News 1', poster: 'https://via.placeholder.com/150'},
+  {id: '8', title: 'News 2', poster: 'https://via.placeholder.com/150'},
+  {id: '9', title: 'News 3', poster: 'https://via.placeholder.com/150'},
+];
 
 const HomeScreen = () => {
   const [visibleIndex, setVisibleIndex] = useState(0);
-const flatListRef = useRef(null);
+  const flatListRef = useRef(null);
 
-const onViewableItemsChanged = useRef(({ viewableItems }) => {
-  if (viewableItems.length > 0) {
-    setVisibleIndex(viewableItems[0].index);
-  }
-}).current;
+  const onViewableItemsChanged = useRef(({viewableItems}) => {
+    if (viewableItems.length > 0) {
+      setVisibleIndex(viewableItems[0].index);
+    }
+  }).current;
 
-const viewConfigRef = useRef({ viewAreaCoveragePercentThreshold: 30 }).current;
+  const viewConfigRef = useRef({viewAreaCoveragePercentThreshold: 30}).current;
+
   const renderMovieItem = ({item, index}) => (
     <TouchableOpacity
       onPress={() => {
         navigation.push('MovieDetailScreen', {movieid: item.id});
-      }}
-     >
+      }}>
       <View
         style={{
-          marginTop:50,
-          margin:10,
+          marginTop: 50,
+          margin: 10,
           display: 'flex',
           flex: 1,
           backgroundColor: 'black',
-          maxWidth: 0.5* screenWidth,
-          height:0.5*screenHeight,
+          maxWidth: 0.5 * screenWidth,
+          height: 0.5 * screenHeight,
+
         }}>
         <Image
           style={{
@@ -94,35 +106,38 @@ const viewConfigRef = useRef({ viewAreaCoveragePercentThreshold: 30 }).current;
             borderRadius: 20,
             width: 0.5 * screenWidth,
           }}
-          source={{uri:  item.poster}}
+          source={{uri: item.poster}}
         />
-          <Text
-            numberOfLines={1}
-            style={{
-              fontSize: 20,
-              color:'white',
-              textAlign: 'center',
-            }}>
-            {item.title}
-          </Text>
+        <Text
+          numberOfLines={1}
+          style={{
+            fontSize: 20,
+            color: 'white',
+            textAlign: 'center',
+          }}>
+          {item.title}
+        </Text>
         <View>
-        <Text style={styles.moviecategory1}>2h29m • Hành động, Phiêu lưu, sci-fi</Text>
+          <Text style={styles.moviecategory1}>
+            2h29m • Hành động, Phiêu lưu, sci-fi
+          </Text>
+
           <View
             style={{
               flexDirection: 'row',
               gap: 10,
               alignItems: 'center',
               justifyContent: 'center',
-              
             }}>
-           <SvgXml xml={iconStar()}/>
-           <Text style={styles.movieStar}>4.8 (1.222)</Text>
+            <SvgXml xml={iconStar()} />
+            <Text style={styles.movieStar}>4.8 (1.222)</Text>
+
             <Text
               style={{
                 fontSize: 14,
                 color: 'white',
-              }}>
-            </Text>
+              }}></Text>
+
           </View>
         </View>
       </View>
@@ -316,7 +331,9 @@ const viewConfigRef = useRef({ viewAreaCoveragePercentThreshold: 30 }).current;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'black',
+    backgroundColor: '#000000',
+    padding: 5,
+
   },
   headerContainer: {
     flexDirection: 'row',
@@ -332,18 +349,20 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     marginBottom: 20,
     borderRadius: 10,
-    backgroundColor:'#1C1C1C'
+    backgroundColor: '#1C1C1C',
   },
   searchInput: {
-    backgroundColor:'#1C1C1C',
+    backgroundColor: '#1C1C1C',
     padding: 5,
-    marginLeft:10,
+    marginLeft: 10,
+
     color: 'white',
   },
   searchWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 5
+    padding: 5,
+
   },
   viewAllText: {
     fontSize: 14,
@@ -373,7 +392,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: 'black',
     borderRadius: 10,
-    margin: 12
+    margin: 12,
+
   },
   movieItemNew: {
     width: screenWidth * 0.5,
@@ -382,7 +402,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: 'black',
     borderRadius: 10,
-    margin: 12
+    margin: 12,
+
   },
   movieTitle: {
     color: '#F2F2F2',
@@ -406,8 +427,8 @@ const styles = StyleSheet.create({
     color: '#F2F2F2',
     textAlign: 'center',
     fontSize: 10,
-
   },
 });
+
 
 export default HomeScreen;
