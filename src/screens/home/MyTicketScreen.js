@@ -1,4 +1,5 @@
 import React from 'react';
+
 import {
   View,
   Text,
@@ -22,12 +23,14 @@ import iconMoneyMyTicket from '../../assets/icons/iconMyTicket/iconMoneyMyTicket
 import iconLocationMyTicket from '../../assets/icons/iconMyTicket/iconLocationMyTicket';
 import iconNoteMyTicket from '../../assets/icons/iconMyTicket/iconNoteMyTicket';
 
+
 const MyTicketScreen = () => {
   const navigation = useNavigation();
   const handleBack = () => {
     navigation.goBack();
   };
   return (
+
     <SafeAreaView style={styles.container}>
       <ScrollView>
         <View style={styles.header}>
@@ -106,16 +109,20 @@ const MyTicketScreen = () => {
         </View>
       </ScrollView>
     </SafeAreaView>
+
   );
 };
 
 const styles = StyleSheet.create({
   container: {
+
     flex: 1,
+
     padding: 20,
     backgroundColor: 'black',
   },
   header: {
+
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
@@ -148,10 +155,12 @@ const styles = StyleSheet.create({
   },
   movieTitle: {
     alignItems: 'flex-start',
+
     fontSize: 20,
     fontWeight: 'bold',
     textAlign: 'center',
     marginBottom: 10,
+
     color: 'black',
   },
   movieDetails: {
@@ -164,25 +173,33 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-around',
     marginVertical: 20,
+
   },
   timeText: {
     fontSize: 16,
     fontWeight: 'bold',
+
     color: 'black',
+
   },
   dateText: {
     fontSize: 16,
     fontWeight: 'bold',
+
     color: 'black',
+
   },
   rapText: {
     fontSize: 16,
     fontWeight: 'bold',
+
     color: 'black',
+
   },
   seatText: {
     fontSize: 16,
     fontWeight: 'bold',
+
     color: 'black',
   },
   qrCodeContainer: {
@@ -201,11 +218,13 @@ const styles = StyleSheet.create({
     height: 1,
     backgroundColor: '#ccc',
     marginVertical: 16,
+
   },
   priceText: {
     fontSize: 18,
     fontWeight: 'bold',
     textAlign: 'center',
+
     marginBottom: 20,
     color: 'black',
     marginLeft: 10,
@@ -214,14 +233,17 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginLeft: 10,
     color: 'black',
+
     marginBottom: 20,
   },
   instructionText: {
     fontSize: 14,
     textAlign: 'center',
+
     marginTop: 5,
     color: 'black',
     marginLeft: 10,
+
   },
 });
 
