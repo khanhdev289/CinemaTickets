@@ -11,10 +11,17 @@ import {SvgXml} from 'react-native-svg';
 import iconsBack from '../../assets/icons/iconsBack';
 import CheckBox from '@react-native-community/checkbox';
 import {useNavigation} from '@react-navigation/native';
+import ModalDropdown from 'react-native-modal-dropdown';
+import DatePicker from 'react-native-modern-datepicker';
 
 const SignUpScreen = () => {
   const [isChecked, setIsChecked] = useState(false);
   const navigation = useNavigation();
+
+  const [selectedGender, setSelectedGender] = useState('Chọn giới tính');
+
+  const [birthDate, setBirthDate] = useState('');
+  const [showDatePicker, setShowDatePicker] = useState(false);
 
   const handleOtp = () => {
     navigation.navigate('Otp');
@@ -24,6 +31,15 @@ const SignUpScreen = () => {
     navigation.goBack();
   };
 
+  const genderOptions = ['Nam', 'Nữ', 'Khác'];
+
+  const handleOptionSelect = (index, value) => {
+    setSelectedGender(value);
+  };
+  const handleDateChange = date => {
+    setBirthDate(date);
+    setShowDatePicker(false);
+  };
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
@@ -55,6 +71,15 @@ const SignUpScreen = () => {
         </View>
 
         <View style={styles.inputRegister}>
+          <Text style={styles.label}>Số điện thoại</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Nhập số điện thoại"
+            placeholderTextColor="#FFFFFF"
+          />
+        </View>
+
+        <View style={styles.inputRegister}>
           <Text style={styles.label}>Mật Khẩu</Text>
           <TextInput
             style={styles.input}
@@ -63,23 +88,46 @@ const SignUpScreen = () => {
             secureTextEntry
           />
         </View>
+
         <View style={styles.inputRegister}>
           <Text style={styles.label}>Ngày tháng năm sinh</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Chọn ngày tháng năm sinh"
-            placeholderTextColor="#FFFFFF"
+          <TouchableOpacity
+            onPress={() => setShowDatePicker(!showDatePicker)}
+            style={styles.input}>
+            <Text style={{color: '#FFFFFF'}}>
+              {birthDate || 'Chọn ngày tháng năm sinh'}
+            </Text>
+          </TouchableOpacity>
+          {showDatePicker && (
+            <View style={styles.datePickerContainer}>
+              <DatePicker
+                mode="calendar"
+                onDateChange={handleDateChange}
+                options={{
+                  backgroundColor: '#FFFFFF',
+                  textHeaderColor: '#000000',
+                  textDefaultColor: '#000000',
+                  selectedTextColor: '#000000',
+                  mainColor: '#D9D9D9',
+                  textSecondaryColor: '#D9D9D9',
+                }}
+                style={styles.datePicker}
+              />
+            </View>
+          )}
+        </View>
+        <View style={styles.inputRegister}>
+          <Text style={styles.label}>Giới tính</Text>
+          <ModalDropdown
+            options={genderOptions}
+            onSelect={handleOptionSelect}
+            defaultValue={selectedGender}
+            textStyle={styles.dropdownText}
+            dropdownStyle={styles.dropdownStyle}
+            saveScrollPosition={false}
           />
         </View>
 
-        <View style={styles.inputRegister}>
-          <Text style={styles.label}>Giới tính</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="hh?"
-            placeholderTextColor="#FFFFFF"
-          />
-        </View>
         <View style={styles.checkBoxContainer}>
           <CheckBox
             value={isChecked}
@@ -89,7 +137,7 @@ const SignUpScreen = () => {
             boxType="circle"
           />
           <Text style={[styles.checkBoxText, {color: '#FF9C00'}]}>
-            Accept Terms & Conditions
+            Chấp nhận các quyền riêng tư
           </Text>
         </View>
       </View>
@@ -163,11 +211,48 @@ const styles = StyleSheet.create({
   button: {
     backgroundColor: '#FCC434',
     borderRadius: 20,
-    paddingVertical: 15, // Đặt khoảng cách dọc giữa các yếu tố của nút
+    paddingVertical: 15,
     alignItems: 'center',
   },
   buttonText: {
     color: '#000000',
     fontSize: 20,
+  },
+
+  checkBox: {
+    marginRight: 10,
+  },
+  checkBoxText: {
+    color: '#FFFFFF',
+  },
+
+  dropdownText: {
+    fontSize: 14,
+    color: '#FFFFFF',
+    padding: 10,
+    borderWidth: 1.5,
+    borderColor: '#D9D9D9',
+    borderRadius: 10,
+    width: '100%',
+  },
+  dropdownStyle: {
+    backgroundColor: '#000000',
+    borderWidth: 1.5,
+    borderColor: '#FCC434',
+    borderRadius: 10,
+    width: '75%',
+    height: '150',
+    alignSelf: 'center',
+  },
+  datePickerContainer: {
+    position: 'absolute',
+    bottom: 50,
+    left: 0,
+    right: 0,
+    zIndex: 1,
+  },
+  datePicker: {
+    borderRadius: 10,
+    marginTop: 10,
   },
 });

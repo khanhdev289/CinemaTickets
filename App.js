@@ -4,6 +4,7 @@ import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import BottomNavication from './src/screens/other/BottomNavication';
 import SignInScreen from './src/screens/start/SignInScreen';
+
 import SearchScreeen from './src/screens/home/SearchScreen';
 import MovieDetailScreen from './src/screens/home/MovieDetailScreen';
 
@@ -54,7 +55,6 @@ export default function App() {
           component={SignInScreen}
           options={{headerShown: false}}
         />
-
         <Stack.Screen
           name="SearchScreeen"
           component={SearchScreeen}
