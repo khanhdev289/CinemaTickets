@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   View,
   Text,
@@ -7,7 +7,6 @@ import {
   Switch,
   TouchableOpacity,
   TextInput,
-  Button,
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import Modal from 'react-native-modal';
@@ -18,15 +17,49 @@ import iconMyTicketProfile from '../../assets/icons/iconProfile/iconMyTicketProf
 import iconChangePassProfile from '../../assets/icons/iconProfile/iconChangePassProfile';
 import iconFaceIdProfile from '../../assets/icons/iconProfile/iconFaceIdProfile';
 import {SvgXml} from 'react-native-svg';
+import axios from 'axios';
+
+const POSTS_API_URL = 'http://139.180.132.97:3000/users';
+const IMAGE_API_URL = 'http://139.180.132.97:3000/images/';
 
 const ProfileScreen = ({navigation}) => {
   const [isEnabled, setIsEnabled] = useState(false);
   const [isModalVisible, setModalVisible] = useState(false);
-  const [profileImage, setProfileImage] = useState(
-    'https://via.placeholder.com/150',
-  );
-  const [profileName, setProfileName] = useState('Johnny Bá Khánh');
-  const [profilePhone, setProfilePhone] = useState('(084) 378-332-809');
+  const [idUser, setIdUser] = useState('');
+  const [profileImage, setProfileImage] = useState('');
+  const [profileEmail, setProfileEmail] = useState('');
+  const [profileName, setProfileName] = useState('');
+  const [profilePhone, setProfilePhone] = useState('');
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    fetchDataUser();
+  }, []);
+
+  const fetchDataUser = async () => {
+    try {
+      const userID = '666dd4cc2262470e147ad102';
+      const token =
+        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2NjZkZDRjYzIyNjI0NzBlMTQ3YWQxMDIiLCJyb2xlIjoidXNlciIsImVtYWlsIjoicXVhbmprbDk4QGdtYWlsLmNvbSIsImlhdCI6MTcxODU0NjE0NCwiZXhwIjoxNzE5MTUwOTQ0fQ.mmYibUvBFnwJ6upnaTQGBuZsnwB1a_pVOcj0ARwhH-I';
+
+      const axiosInstance = axios.create({
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const url = `${POSTS_API_URL}/${userID}`;
+      const response = await axiosInstance.get(url);
+
+      const userData = response.data.getUser;
+      setProfileImage(userData.image);
+      setProfileName(userData.name);
+      setProfilePhone(userData.number_phone);
+      setProfileEmail(userData.email);
+    } catch (error) {
+      console.error('Lỗi khi tải dữ liệu người dùng: ', error);
+    }
+  };
 
   const toggleSwitch = () => setIsEnabled(previousState => !previousState);
 
@@ -44,7 +77,7 @@ const ProfileScreen = ({navigation}) => {
       },
       response => {
         if (response.didCancel) {
-          console.log('out');
+          console.log('Cancelled');
         } else if (response.error) {
           console.log('ImagePicker Error: ', response.error);
         } else {
@@ -55,92 +88,116 @@ const ProfileScreen = ({navigation}) => {
     );
   };
 
+  const updateUserData = async () => {
+    try {
+      const userID = '666dd4cc2262470e147ad102';
+      const token =
+        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2NjZkZDRjYzIyNjI0NzBlMTQ3YWQxMDIiLCJyb2xlIjoidXNlciIsImVtYWlsIjoicXVhbmprbDk4QGdtYWlsLmNvbSIsImlhdCI6MTcxODU0NjE0NCwiZXhwIjoxNzE5MTUwOTQ0fQ.mmYibUvBFnwJ6upnaTQGBuZsnwB1a_pVOcj0ARwhH-I';
+
+      const formData = new FormData();
+      formData.append('image', {
+        uri: profileImage,
+        type: 'image/jpeg',
+        name: 'profile_image.jpg',
+      });
+      formData.append('name', profileName);
+      formData.append('number_phone', profilePhone);
+
+      const axiosInstance = axios.create({
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+
+      const url = `${POSTS_API_URL}/${userID}`;
+      const response = await axiosInstance.put(url, formData);
+
+      const updatedUserData = response.data;
+      setProfileName(updatedUserData.name);
+      setProfilePhone(updatedUserData.number_phone);
+
+      toggleModal();
+    } catch (error) {
+      console.error('Lỗi khi cập nhật thông tin người dùng: ', error);
+    }
+  };
+
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.container}>
-        <View style={styles.profileHeader}>
-          <Image source={{uri: profileImage}} style={styles.profileImage} />
-          <View style={styles.profileContent}>
-            <View style={{flexDirection: 'row', justifyContent: 'center'}}>
-              <Text style={styles.profileName}>{profileName}</Text>
-
-              <TouchableOpacity
-                style={{marginLeft: 40, alignContent: 'flex-end'}}
-                onPress={toggleModal}>
-                <SvgXml style={{color: 'black'}} xml={iconEditProfile()} />
-              </TouchableOpacity>
-            </View>
-
-            <Text style={styles.profileInfo}>{profilePhone}</Text>
-            <Text style={styles.profileInfo}>khanhngphq051@example.com</Text>
-          </View>
-        </View>
-
-        <TouchableOpacity
-          style={styles.menuItem}
-          onPress={() => {
-            navigation.navigate('TicketScreen');
-          }}>
-          <SvgXml style={{color: 'black'}} xml={iconMyTicketProfile()} />
-
-          <Text style={styles.menuText}>Vé của tôi</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={styles.menuItem}
-          onPress={() => {
-            navigation.navigate('ChangePassScreen');
-          }}>
-          <SvgXml style={{color: 'black'}} xml={iconChangePassProfile()} />
-
-          <Text style={styles.menuText}>Đổi mật khẩu</Text>
-        </TouchableOpacity>
-
-        <View style={styles.menuItem}>
-          <SvgXml style={{color: 'black'}} xml={iconFaceIdProfile()} />
-
-          <Text style={styles.menuText}>Face ID / Touch ID</Text>
-          <Switch
-            trackColor={{false: '#767577', true: '#81b0ff'}}
-            thumbColor={isEnabled ? '#f5dd4b' : '#f4f3f4'}
-            onValueChange={toggleSwitch}
-            value={isEnabled}
-            style={styles.switch}
-          />
-        </View>
-
-        <TouchableOpacity style={styles.logoutButton}>
-          <Text style={styles.logoutText}>Đăng Xuất</Text>
-        </TouchableOpacity>
-
-        <Modal isVisible={isModalVisible} onBackdropPress={toggleModal}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Cập nhật thông tin cá nhân</Text>
-            <TouchableOpacity onPress={selectImage}>
-              <Image
-                source={{uri: profileImage}}
-                style={styles.modalProfileImage}
-              />
-            </TouchableOpacity>
-            <TextInput
-              style={styles.modalInput}
-              value={profileName}
-              onChangeText={setProfileName}
-              placeholder="Nhập tên"
-            />
-            <TextInput
-              style={styles.modalInput}
-              value={profilePhone}
-              onChangeText={setProfilePhone}
-              placeholder="Nhập số điện thoại"
-              keyboardType="phone-pad"
-            />
-            <TouchableOpacity style={styles.modalButton} onPress={toggleModal}>
-              <Text style={styles.logoutText}>Lưu</Text>
+      <View style={styles.profileHeader}>
+        <Image
+          source={{uri: IMAGE_API_URL + profileImage}}
+          style={styles.profileImage}
+        />
+        <View style={styles.profileContent}>
+          <View style={styles.headerRow}>
+            <Text style={styles.profileName}>{profileName}</Text>
+            <TouchableOpacity style={styles.editButton} onPress={toggleModal}>
+              <SvgXml xml={iconEditProfile()} />
             </TouchableOpacity>
           </View>
-        </Modal>
+          <Text style={styles.profileInfo}>{profilePhone}</Text>
+          <Text style={styles.profileInfo}>{profileEmail}</Text>
+        </View>
       </View>
+      <TouchableOpacity
+        style={styles.menuItem}
+        onPress={() => {
+          navigation.navigate('TicketScreen');
+        }}>
+        <SvgXml xml={iconMyTicketProfile()} style={styles.menuIcon} />
+        <Text style={styles.menuText}>Vé của tôi</Text>
+      </TouchableOpacity>
+      <TouchableOpacity
+        style={styles.menuItem}
+        onPress={() => {
+          navigation.navigate('ChangePassScreen');
+        }}>
+        <SvgXml xml={iconChangePassProfile()} style={styles.menuIcon} />
+        <Text style={styles.menuText}>Đổi mật khẩu</Text>
+      </TouchableOpacity>
+      <View style={styles.menuItem}>
+        <SvgXml xml={iconFaceIdProfile()} style={styles.menuIcon} />
+        <Text style={styles.menuText}>Face ID / Touch ID</Text>
+        <Switch
+          trackColor={{false: '#767577', true: '#81b0ff'}}
+          thumbColor={isEnabled ? '#f5dd4b' : '#f4f3f4'}
+          onValueChange={toggleSwitch}
+          value={isEnabled}
+          style={styles.switch}
+        />
+      </View>
+      <TouchableOpacity style={styles.logoutButton}>
+        <Text style={styles.logoutText}>Đăng Xuất</Text>
+      </TouchableOpacity>
+      <Modal isVisible={isModalVisible} onBackdropPress={toggleModal}>
+        <View style={styles.modalContent}>
+          <Text style={styles.modalTitle}>Cập nhật thông tin cá nhân</Text>
+          <TouchableOpacity onPress={selectImage}>
+            <Image
+              source={{uri: IMAGE_API_URL + profileImage}}
+              style={styles.modalProfileImage}
+            />
+          </TouchableOpacity>
+          <TextInput
+            style={styles.modalInput}
+            value={profileName}
+            onChangeText={setProfileName}
+            placeholder="Nhập tên"
+          />
+          <TextInput
+            style={styles.modalInput}
+            value={profilePhone}
+            onChangeText={setProfilePhone}
+            placeholder="Nhập số điện thoại"
+            keyboardType="phone-pad"
+          />
+          <TouchableOpacity style={styles.modalButton} onPress={updateUserData}>
+            <Text style={styles.logoutText}>Lưu</Text>
+          </TouchableOpacity>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 };
@@ -148,7 +205,7 @@ const ProfileScreen = ({navigation}) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000',
+    backgroundColor: '#000000',
     padding: 16,
   },
   profileHeader: {
@@ -160,6 +217,11 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
     flexDirection: 'column',
     marginLeft: 20,
+  },
+  headerRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
   profileImage: {
     width: 100,
@@ -183,6 +245,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     borderBottomColor: '#444',
     borderBottomWidth: 1,
+  },
+  menuIcon: {
+    color: '#fff',
   },
   menuText: {
     color: '#fff',
@@ -238,6 +303,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderRadius: 10,
     marginHorizontal: 15,
+  },
+  editButton: {
+    marginLeft: 'auto',
+    alignItems: 'flex-end',
   },
 });
 
