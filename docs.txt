@@ -1,11 +1,20 @@
-assets: chức các loại là hình ảnh, font, color...
-theme: chức các stylesheet css
-containers: chứa các xử lý logic liên quan của từng màn hình
-screens: chứa các màn hình hiển thị 
-navigators: chứa xử lý sự kiện di chuyển màn hình và định nghĩa các const cho các route màn hình
-common: chứa các định nghĩa key, value const
-untils: chứa các xử lý logic chung cho ứng dụng. ví dụ như: xử lý format thời gian, xử lý chuỗi, xử lý request...
+npm i @react-navigation/native-stack
+npm i @react-navigation/bottom-tabs
+npm install react-native-svg
+npm i react-native-qrcode-svg
+npm i react-native-confirmation-code-field
+npm i @react-native-community/checkbox
+npm i react-native-swiper-flatlist
+npm I react-native-image-picker
+npm i @react-navigation/material-top-tabs
+Npm I react-native-modal
 
+
+npm install react-native-svg-transformer
+npm install react-native-screens
+npm install react-native-safe-area-context
+npm i react-native-modal-dropdown
+npm i react-native-modern-datepicker
 
 ///
 

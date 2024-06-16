@@ -10,7 +10,6 @@ import {
   Button,
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
-import Icon from 'react-native-vector-icons/Ionicons';
 import Modal from 'react-native-modal';
 import {launchImageLibrary} from 'react-native-image-picker';
 
@@ -19,7 +18,6 @@ import iconMyTicketProfile from '../../assets/icons/iconProfile/iconMyTicketProf
 import iconChangePassProfile from '../../assets/icons/iconProfile/iconChangePassProfile';
 import iconFaceIdProfile from '../../assets/icons/iconProfile/iconFaceIdProfile';
 import {SvgXml} from 'react-native-svg';
-
 
 const ProfileScreen = ({navigation}) => {
   const [isEnabled, setIsEnabled] = useState(false);
@@ -71,7 +69,6 @@ const ProfileScreen = ({navigation}) => {
                 onPress={toggleModal}>
                 <SvgXml style={{color: 'black'}} xml={iconEditProfile()} />
               </TouchableOpacity>
-
             </View>
 
             <Text style={styles.profileInfo}>{profilePhone}</Text>
@@ -84,7 +81,6 @@ const ProfileScreen = ({navigation}) => {
           onPress={() => {
             navigation.navigate('TicketScreen');
           }}>
-
           <SvgXml style={{color: 'black'}} xml={iconMyTicketProfile()} />
 
           <Text style={styles.menuText}>Vé của tôi</Text>
@@ -95,14 +91,12 @@ const ProfileScreen = ({navigation}) => {
           onPress={() => {
             navigation.navigate('ChangePassScreen');
           }}>
-
           <SvgXml style={{color: 'black'}} xml={iconChangePassProfile()} />
 
           <Text style={styles.menuText}>Đổi mật khẩu</Text>
         </TouchableOpacity>
 
         <View style={styles.menuItem}>
-
           <SvgXml style={{color: 'black'}} xml={iconFaceIdProfile()} />
 
           <Text style={styles.menuText}>Face ID / Touch ID</Text>

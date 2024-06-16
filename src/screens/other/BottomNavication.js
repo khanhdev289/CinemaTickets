@@ -1,21 +1,13 @@
-import { StyleSheet, Text, View } from 'react-native';
+import {StyleSheet, Text, View} from 'react-native';
 import React from 'react';
 import MyTicketScreen from '../home/MyTicketScreen';
 import MovieScreen from '../home/MovieScreen';
 import ProfileScreen from '../home/ProfileScreen';
-import { NavigationContainer } from '@react-navigation/native';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import {NavigationContainer} from '@react-navigation/native';
+import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import HomeScreen from '../home/HomeScreen';
 import {SvgXml} from 'react-native-svg';
 
-import iconHome from '../../assets/icons/iconHome';
-import iconTicket from '../../assets/icons/iconTicket';
-import iconVideo from '../../assets/icons/iconVideo';
-import iconUser from '../../assets/icons/iconUser';
-import TicketScreen from '../home/TicketScreen';
-
-
-import {SvgXml} from 'react-native-svg';
 import iconHome from '../../assets/icons/iconHome';
 import iconTicket from '../../assets/icons/iconTicket';
 import iconVideo from '../../assets/icons/iconVideo';
@@ -44,9 +36,7 @@ const BottomNavigation = () => {
       />
       <Tab.Screen
         name="Vé"
-
         component={TicketScreen}
-
         options={{
           tabBarLabel: 'Vé',
           tabBarIcon: ({color, size}) => (
@@ -75,7 +65,6 @@ const BottomNavigation = () => {
         }}
       />
     </Tab.Navigator>
-
   );
 };
 

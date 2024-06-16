@@ -1,7 +1,14 @@
-import { Dimensions, FlatList, Image, StyleSheet, Text, View } from 'react-native';
+import {
+  Dimensions,
+  FlatList,
+  Image,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native';
 import React from 'react';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { SvgXml } from 'react-native-svg';
+import {SafeAreaView} from 'react-native-safe-area-context';
+import {SvgXml} from 'react-native-svg';
 import iconStar from '../../assets/icons/iconStar';
 import iconCalendar from '../../assets/icons/iconCalendar';
 import iconVideo from '../../assets/icons/iconVideo';
@@ -10,11 +17,15 @@ const screenWidth = Dimensions.get('screen').width;
 const screenHeight = Dimensions.get('screen').height;
 const NowPlayingScreen = () => {
   const listMovie = [
-    { id: '4', title: 'Avatar 2: The Way Of Water', poster: 'https://via.placeholder.com/150' },
-    { id: '5', title: 'Movie 5', poster: 'https://via.placeholder.com/150' },
-    { id: '6', title: 'Movie 6', poster: 'https://via.placeholder.com/150' },
+    {
+      id: '4',
+      title: 'Avatar 2: The Way Of Water',
+      poster: 'https://via.placeholder.com/150',
+    },
+    {id: '5', title: 'Movie 5', poster: 'https://via.placeholder.com/150'},
+    {id: '6', title: 'Movie 6', poster: 'https://via.placeholder.com/150'},
   ];
-  const renderItem = ({ item }) => (
+  const renderItem = ({item}) => (
     <View style={styles.item}>
       <Image
         style={{
@@ -23,30 +34,37 @@ const NowPlayingScreen = () => {
           aspectRatio: 3 / 4,
           borderRadius: 10,
         }}
-        source={{ uri: item.poster }}
+        source={{uri: item.poster}}
       />
-      <Text numberOfLines={2} style={styles.titleItem}>{item.title}</Text>
-      <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+      <Text numberOfLines={2} style={styles.titleItem}>
+        {item.title}
+      </Text>
+      <View style={{flexDirection: 'row', alignItems: 'center'}}>
         <SvgXml xml={iconStar()} width={14} height={14} />
-        <Text style={{ fontSize: 12, marginLeft: 5, color: '#DEDEDE' }}>4.0 (982)</Text>
+        <Text style={{fontSize: 12, marginLeft: 5, color: '#DEDEDE'}}>
+          4.0 (982)
+        </Text>
       </View>
-      <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+      <View style={{flexDirection: 'row', alignItems: 'center'}}>
         <SvgXml xml={iconClock()} width={14} height={14} />
-        <Text style={{ fontSize: 12, marginLeft: 5, color: '#DEDEDE' }}>2 hour 5 minutes</Text>
+        <Text style={{fontSize: 12, marginLeft: 5, color: '#DEDEDE'}}>
+          2 hour 5 minutes
+        </Text>
       </View>
-      <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+      <View style={{flexDirection: 'row', alignItems: 'center'}}>
         <SvgXml xml={iconVideo()} width={14} height={14} />
-        <Text style={{ fontSize: 12, marginLeft: 5, color: '#DEDEDE' }}>Action, Sci-fi</Text>
+        <Text style={{fontSize: 12, marginLeft: 5, color: '#DEDEDE'}}>
+          Action, Sci-fi
+        </Text>
       </View>
     </View>
   );
   return (
     <SafeAreaView style={styles.container}>
-
       <FlatList
         data={listMovie}
         renderItem={renderItem}
-        keyExtractor={(item) => item.id}
+        keyExtractor={item => item.id}
         numColumns={2}
         columnWrapperStyle={styles.row}
         contentContainerStyle={styles.resultList}
@@ -62,7 +80,7 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 16,
     paddingLeft: 25,
-    backgroundColor: 'black'
+    backgroundColor: 'black',
   },
   item: {
     width: screenWidth * 0.4,
@@ -73,7 +91,7 @@ const styles = StyleSheet.create({
   },
   titleItem: {
     fontSize: 12,
-    color: '#FCC434'
+    color: '#FCC434',
   },
   row: {
     flex: 1,

@@ -1,26 +1,11 @@
-
 import {StyleSheet, Text, View} from 'react-native';
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import BottomNavication from './src/screens/other/BottomNavication';
 import SignInScreen from './src/screens/start/SignInScreen';
-
-import SearchScreeen from './src/screens/home/SearchScreen';
+import SearchScreen from './src/screens/home/SearchScreen';
 import MovieDetailScreen from './src/screens/home/MovieDetailScreen';
-
-
 import MyTicketScreen from './src/screens/home/MyTicketScreen';
-
-import SignUpScreen from './src/screens/start/SignUpScreen';
-import ComfirmOTP from './src/screens/start/ComfirmOTP';
-import WelcomeScreen from './src/screens/start/WelcomeScreen';
-
-
-import SearchScreeen from './src/screens/home/SearchScreen';
-import MovieDetailScreen from './src/screens/home/MovieDetailScreen';
-
-import MyTicketScreen from './src/screens/home/MyTicketScreen';
-
 import SignUpScreen from './src/screens/start/SignUpScreen';
 import ComfirmOTP from './src/screens/start/ComfirmOTP';
 import WelcomeScreen from './src/screens/start/WelcomeScreen';
@@ -38,12 +23,6 @@ export default function App() {
           name="Home"
           component={BottomNavication}
           options={{headerShown: false}}
-        
-        />
-        <Stack.Screen
-          name="Welcome"
-          component={WelcomeScreen}
-          options={{headerShown: false}}
         />
         <Stack.Screen
           name="Welcome"
@@ -57,7 +36,7 @@ export default function App() {
         />
         <Stack.Screen
           name="SearchScreeen"
-          component={SearchScreeen}
+          component={SearchScreen}
           options={{headerShown: false}}
         />
 
