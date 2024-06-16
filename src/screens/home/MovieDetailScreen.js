@@ -51,34 +51,37 @@ const MovieDetailScreen = () => {
     <SafeAreaView style={styles.container}>
       <ScrollView>
         <Image style={styles.poster} source={{ uri: 'https://via.placeholder.com/150' }} />
-        <View style={styles.infoContainer}>
-          <Text style={styles.title}>Avengers: Infinity War</Text>
-          <Text style={styles.movieTime}>2h29m • 16.12.2022</Text>
-          <View style={styles.reviewContainer}>
-            <Text style={styles.reviewText}>Review</Text>
-            <SvgXml xml={iconStar()} />
-            <Text style={styles.reviewScore}>4.8 (1,222)</Text>
-          </View>
-          <View style={styles.ratingContainer}>
-            <View style={styles.rating}>
-              {[...Array(5)].map((_, index) => (
-                <SvgXml
-                  key={index}
-                  xml={iconStarWhite()}
-                  width={24}
-                  height={24}
-                  fill={index < 5 ? '#FFD700' : '#CCCCCC'}
-                />
-              ))}
+        <View style={styles.infoOverlay}>
+          <View style={styles.infoContainer}>
+            <Text style={styles.title}>Avengers: Infinity War</Text>
+            <Text style={styles.movieTime}>2h29m • 16.12.2022</Text>
+            <View style={styles.reviewContainer}>
+              <Text style={styles.reviewText}>Review</Text>
+              <SvgXml xml={iconStar()} />
+              <Text style={styles.reviewScore}>4.8 (1,222)</Text>
             </View>
-            <TouchableOpacity style={styles.trailerButton}>
-              <SvgXml xml={iconPlay()} />
-              <Text style={styles.trailerButtonText}>Xem Trailer</Text>
-            </TouchableOpacity>
+            <View style={styles.ratingContainer}>
+              <View style={styles.rating}>
+                {[...Array(5)].map((_, index) => (
+                  <SvgXml
+                    key={index}
+                    xml={iconStarWhite()}
+                    width={24}
+                    height={24}
+                    fill={index < 5 ? '#FFD700' : '#CCCCCC'}
+                  />
+                ))}
+              </View>
+              <TouchableOpacity style={styles.trailerButton}>
+                <SvgXml xml={iconPlay()} />
+                <Text style={styles.trailerButtonText}>Xem Trailer</Text>
+              </TouchableOpacity>
+            </View>
           </View>
         </View>
 
-        <View style={styles.infoContainer}>
+        <View >
+
           <Text style={styles.infoText}>Thể loại: Hành động, Phiêu lưu, Siêu anh hùng</Text>
           <Text style={styles.infoText}>Độ tuổi: 13+</Text>
           <Text style={styles.infoText}>Ngôn ngữ: Tiếng Anh, Tiếng Việt (phụ đề)</Text>
@@ -141,15 +144,26 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: 'black',
-    padding:16
+
+    padding:8
   },
   poster: {
     width: '100%',
-    height: screenHeight * 0.3,
+    height: screenHeight * 0.25,
     resizeMode: 'cover',
   },
-  infoContainer: {
+  infoOverlay: {
+    marginTop: -50, 
+    marginHorizontal:16,
+    marginBottom:20,
     padding: 16,
+    backgroundColor: '#1C1C1C',
+   borderRadius:20,
+  },
+  infoContainer: {
+    backgroundColor: '#1C1C1C',
+    marginTop: -10,
+
   },
   title: {
     fontSize: 24,
@@ -191,7 +205,9 @@ const styles = StyleSheet.create({
     backgroundColor: '#1C1C1C',
     paddingHorizontal: 16,
     paddingVertical: 8,
-    borderRadius: 5,
+
+    borderRadius: 5,borderWidth:1,borderColor:'white'
+
   },
   trailerButtonText: {
     color: 'white',
