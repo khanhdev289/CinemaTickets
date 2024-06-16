@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {
   View,
   Text,
@@ -7,6 +7,7 @@ import {
   Switch,
   TouchableOpacity,
   TextInput,
+  ActivityIndicator,
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import Modal from 'react-native-modal';
@@ -31,6 +32,7 @@ const ProfileScreen = ({navigation}) => {
   const [profileName, setProfileName] = useState('');
   const [profilePhone, setProfilePhone] = useState('');
   const [user, setUser] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     fetchDataUser();
@@ -38,6 +40,8 @@ const ProfileScreen = ({navigation}) => {
 
   const fetchDataUser = async () => {
     try {
+      setIsLoading(true);
+
       const userID = '666dd4cc2262470e147ad102';
       const token =
         'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2NjZkZDRjYzIyNjI0NzBlMTQ3YWQxMDIiLCJyb2xlIjoidXNlciIsImVtYWlsIjoicXVhbmprbDk4QGdtYWlsLmNvbSIsImlhdCI6MTcxODU0NjE0NCwiZXhwIjoxNzE5MTUwOTQ0fQ.mmYibUvBFnwJ6upnaTQGBuZsnwB1a_pVOcj0ARwhH-I';
@@ -56,6 +60,8 @@ const ProfileScreen = ({navigation}) => {
       setProfileName(userData.name);
       setProfilePhone(userData.number_phone);
       setProfileEmail(userData.email);
+
+      setIsLoading(false);
     } catch (error) {
       console.error('Lỗi khi tải dữ liệu người dùng: ', error);
     }
@@ -90,6 +96,8 @@ const ProfileScreen = ({navigation}) => {
 
   const updateUserData = async () => {
     try {
+      setIsLoading(true);
+
       const userID = '666dd4cc2262470e147ad102';
       const token =
         'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2NjZkZDRjYzIyNjI0NzBlMTQ3YWQxMDIiLCJyb2xlIjoidXNlciIsImVtYWlsIjoicXVhbmprbDk4QGdtYWlsLmNvbSIsImlhdCI6MTcxODU0NjE0NCwiZXhwIjoxNzE5MTUwOTQ0fQ.mmYibUvBFnwJ6upnaTQGBuZsnwB1a_pVOcj0ARwhH-I';
@@ -117,6 +125,8 @@ const ProfileScreen = ({navigation}) => {
       setProfileName(updatedUserData.name);
       setProfilePhone(updatedUserData.number_phone);
 
+      setIsLoading(false);
+
       toggleModal();
     } catch (error) {
       console.error('Lỗi khi cập nhật thông tin người dùng: ', error);
@@ -125,6 +135,11 @@ const ProfileScreen = ({navigation}) => {
 
   return (
     <SafeAreaView style={styles.container}>
+      {isLoading && (
+        <View style={styles.loadingOverlay}>
+          <ActivityIndicator size="large" color="#f7b731" />
+        </View>
+      )}
       <View style={styles.profileHeader}>
         <Image
           source={{uri: IMAGE_API_URL + profileImage}}
@@ -207,6 +222,13 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#000000',
     padding: 16,
+  },
+  loadingOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 1,
   },
   profileHeader: {
     alignItems: 'center',
