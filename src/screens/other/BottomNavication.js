@@ -15,11 +15,17 @@ import iconUser from '../../assets/icons/iconUser';
 import TicketScreen from '../home/TicketScreen';
 
 
+import {SvgXml} from 'react-native-svg';
+import iconHome from '../../assets/icons/iconHome';
+import iconTicket from '../../assets/icons/iconTicket';
+import iconVideo from '../../assets/icons/iconVideo';
+import iconUser from '../../assets/icons/iconUser';
+import TicketScreen from '../home/TicketScreen';
+
 const Tab = createBottomTabNavigator();
 
 const BottomNavigation = () => {
   return (
-
     <Tab.Navigator
       screenOptions={{
         tabBarStyle: {backgroundColor: 'black'},
@@ -38,7 +44,9 @@ const BottomNavigation = () => {
       />
       <Tab.Screen
         name="Vé"
+
         component={TicketScreen}
+
         options={{
           tabBarLabel: 'Vé',
           tabBarIcon: ({color, size}) => (

@@ -81,6 +81,7 @@ const MovieDetailScreen = () => {
         </View>
 
         <View >
+
           <Text style={styles.infoText}>Thể loại: Hành động, Phiêu lưu, Siêu anh hùng</Text>
           <Text style={styles.infoText}>Độ tuổi: 13+</Text>
           <Text style={styles.infoText}>Ngôn ngữ: Tiếng Anh, Tiếng Việt (phụ đề)</Text>
@@ -130,6 +131,7 @@ const MovieDetailScreen = () => {
           renderItem={renderTheater}
           contentContainerStyle={{ paddingHorizontal: 10 }}
         />
+
         <TouchableOpacity style={styles.button} onPress={() => console.log('Button pressed')}>
           <Text style={styles.buttonText}>Tiếp tục</Text>
         </TouchableOpacity>
@@ -142,6 +144,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: 'black',
+
     padding:8
   },
   poster: {
@@ -160,6 +163,7 @@ const styles = StyleSheet.create({
   infoContainer: {
     backgroundColor: '#1C1C1C',
     marginTop: -10,
+
   },
   title: {
     fontSize: 24,
@@ -201,7 +205,9 @@ const styles = StyleSheet.create({
     backgroundColor: '#1C1C1C',
     paddingHorizontal: 16,
     paddingVertical: 8,
+
     borderRadius: 5,borderWidth:1,borderColor:'white'
+
   },
   trailerButtonText: {
     color: 'white',

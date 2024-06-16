@@ -28,6 +28,7 @@ const screenWidth = Dimensions.get('screen').width;
 const screenHeight = Dimensions.get('screen').height;
 
 // Sample data
+
 const nowPlayingMoviesList = [
   {
     id: '1',
@@ -282,10 +283,12 @@ const HomeScreen = () => {
                   {item.title}
                 </Text>
 
+
               </TouchableOpacity>
             </View>
           )}
         />
+
       </View>
 
       
@@ -355,6 +358,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#1C1C1C',
     padding: 5,
     marginLeft: 10,
+
 
     color: 'white',
   },
@@ -429,6 +433,5 @@ const styles = StyleSheet.create({
     fontSize: 10,
   },
 });
-
 
 export default HomeScreen;
