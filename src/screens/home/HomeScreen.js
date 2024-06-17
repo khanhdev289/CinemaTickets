@@ -1,4 +1,4 @@
-import React, {useRef, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {
   Text,
   View,
@@ -22,56 +22,38 @@ import iconCalendar from '../../assets/icons/iconCalendar';
 
 import {useNavigation} from '@react-navigation/native';
 import {SafeAreaView} from 'react-native-safe-area-context';
+import { fetchMovies } from '../../../api';
 
 const screenWidth = Dimensions.get('screen').width;
 const screenHeight = Dimensions.get('screen').height;
 
-// Sample data
 
-const nowPlayingMoviesList = [
-  {
-    id: '1',
-    title: 'AvengersAvengers - Infinity War',
-    poster: 'https://via.placeholder.com/150',
-  },
-  {id: '2', title: 'Movie 2', poster: 'https://via.placeholder.com/150'},
-  {id: '3', title: 'Movie 3', poster: 'https://via.placeholder.com/150'},
-  {id: '4', title: 'Movie 3', poster: 'https://via.placeholder.com/150'},
-];
-
-const upcomingMoviesList = [
-  {
-    id: '4',
-    title: 'Avatar 2: The Way Of Water',
-    poster: 'https://via.placeholder.com/150',
-  },
-  {id: '5', title: 'Movie 5', poster: 'https://via.placeholder.com/150'},
-  {id: '6', title: 'Movie 6', poster: 'https://via.placeholder.com/150'},
-];
-const categoryList = [
-  {
-    id: '1',
-    title: 'Item 1',
-    imageUrl: 'https://via.placeholder.com/150',
-  },
-  {
-    id: '2',
-    title: 'Item 2',
-    imageUrl: 'https://via.placeholder.com/150',
-  },
-  {
-    id: '3',
-    title: 'Item 3',
-    imageUrl: 'https://via.placeholder.com/150',
-  },
-];
-const newsList = [
-  {id: '7', title: 'News 1', poster: 'https://via.placeholder.com/150'},
-  {id: '8', title: 'News 2', poster: 'https://via.placeholder.com/150'},
-  {id: '9', title: 'News 3', poster: 'https://via.placeholder.com/150'},
-];
 
 const HomeScreen = () => {
+  const [nowPlayingMoviesList, setNowPlayingMoviesList] = useState([]);
+  const [upcomingMoviesList, setUpcomingMoviesList] = useState([]);
+  const [categoryList, setCategoryList] = useState([]);
+  const [newsList, setNewsList] = useState([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const nowPlayingResponse = await fetchMovies();
+        setNowPlayingMoviesList(nowPlayingResponse.data);
+        console.log(nowPlayingMoviesList.data)
+
+        // const categoriesResponse = await fetchCategories();
+        // setCategoryList(categoriesResponse.data);
+
+        // const newsResponse = await fetchNews();
+        // setNewsList(newsResponse.data);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+
+    fetchData();
+  }, []);
   const [visibleIndex, setVisibleIndex] = useState(0);
   const flatListRef = useRef(null);
 
@@ -104,7 +86,7 @@ const HomeScreen = () => {
             borderRadius: 20,
             width: 0.5 * screenWidth,
           }}
-          source={{uri: item.poster}}
+          source={{uri: item.image}}
         />
         <Text
           numberOfLines={1}
