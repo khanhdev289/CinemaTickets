@@ -188,7 +188,7 @@ const ProfileScreen = ({navigation}) => {
         <TouchableOpacity
           style={styles.menuItem}
           onPress={() => {
-            navigation.navigate('MyTickets');
+            navigation.navigate('ScanQrScreen');
           }}>
           <SvgXml xml={iconMyTicketProfile()} style={styles.menuIcon} />
           <Text style={styles.menuText}>Vé của tôi</Text>

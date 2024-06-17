@@ -10,7 +10,7 @@ npm i @react-navigation/material-top-tabs
 Npm I react-native-modal
 npm i axios
 npm install react-native-animatable
-
+npm install @react-native-async-storage/async-storage
 
 npm install react-native-svg-transformer
 npm install react-native-screens

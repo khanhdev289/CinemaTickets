@@ -12,6 +12,8 @@ import WelcomeScreen from './src/screens/start/WelcomeScreen';
 import ChangePassScreen from './src/screens/other/ChangePassScreen';
 import ProfileScreen from './src/screens/home/ProfileScreen';
 import TicketScreen from './src/screens/home/TicketScreen';
+import ScanQrScreen from './src/screens/staff/ScanQrScreen';
+import AuthScreen from './src/screens/staff/AuthScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -74,6 +76,16 @@ export default function App() {
         <Stack.Screen
           name="Otp"
           component={ComfirmOTP}
+          options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name="ScanQrScreen"
+          component={ScanQrScreen}
+          options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name="AuthScreen"
+          component={AuthScreen}
           options={{headerShown: false}}
         />
       </Stack.Navigator>
