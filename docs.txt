@@ -8,6 +8,8 @@ npm i react-native-swiper-flatlist
 npm I react-native-image-picker
 npm i @react-navigation/material-top-tabs
 Npm I react-native-modal
+npm i axios
+npm install react-native-animatable
 
 
 npm install react-native-svg-transformer
