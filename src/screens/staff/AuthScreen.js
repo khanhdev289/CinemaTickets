@@ -23,6 +23,13 @@ import iconMoneyMyTicket from '../../assets/icons/iconMyTicket/iconMoneyMyTicket
 import iconLocationMyTicket from '../../assets/icons/iconMyTicket/iconLocationMyTicket';
 import iconNoteMyTicket from '../../assets/icons/iconMyTicket/iconNoteMyTicket';
 import iconSuccess from '../../assets/icons/iconMyTicket/iconSuccess';
+import {
+  PDFDocument,
+  Page,
+  Text as PdfText,
+  Image as PdfImage,
+  rgb,
+} from 'react-native-pdf-lib';
 
 const placeholderImage = require('../../assets/images/image.png');
 const IMAGE_API_URL = 'http://139.180.132.97:3000/images/';
@@ -35,9 +42,6 @@ const AuthScreen = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // if (route.params && route.params.ticketId) {
-    //   fetchTicketData(route.params.ticketId);
-    // }
     fetchTicketData('66700c16f4605faf50aa72c3');
   }, [route.params]);
 
@@ -66,11 +70,74 @@ const AuthScreen = () => {
       setLoading(false);
     }
   };
+
   const handleBack = () => {
     navigation.goBack();
   };
-  const handlePrintTicket = () => {
-    Alert.alert('Chức năng này cập nhật sau');
+
+  const handlePrintTicket = async () => {
+    try {
+      const pdfPath = await createPdf(ticketData);
+      Alert.alert('PDF created', `Path: ${pdfPath}`);
+    } catch (error) {
+      console.error('Error creating PDF: ', error);
+      Alert.alert('Error', 'Unable to create PDF');
+    }
+  };
+
+  const createPdf = async data => {
+    const page1 = Page.create()
+      .setMediaBox(200, 200)
+      .drawText(data.movie.name, {
+        x: 5,
+        y: 170,
+        size: 10,
+      })
+      .drawText(`Duration: ${data.movie.duration}`, {
+        x: 5,
+        y: 150,
+        size: 10,
+      })
+      .drawText(`Genre: ${data.movie.genre}`, {
+        x: 5,
+        y: 130,
+        size: 10,
+      })
+      .drawText(`Time: ${data.time.time}`, {
+        x: 5,
+        y: 110,
+        size: 10,
+      })
+      .drawText(`Date: ${new Date(data.showdate.date).toLocaleDateString()}`, {
+        x: 5,
+        y: 90,
+        size: 10,
+      })
+      .drawText(`Room: ${data.room.name}`, {
+        x: 5,
+        y: 70,
+        size: 10,
+      })
+      .drawText(`Seat: ${data.seat.map(item => item.name).join(', ')}`, {
+        x: 5,
+        y: 50,
+        size: 10,
+      })
+      .drawText(`Total: ${data.total} VND`, {
+        x: 5,
+        y: 30,
+        size: 10,
+      })
+      .drawText(`Cinema: ${data.cinema.name}`, {
+        x: 5,
+        y: 10,
+        size: 10,
+      });
+
+    const pdfDoc = PDFDocument.create('Ticket.pdf').addPages(page1);
+
+    const pdfPath = await pdfDoc.write();
+    return pdfPath;
   };
 
   if (loading) {
@@ -155,12 +222,6 @@ const AuthScreen = () => {
                 {ticketData.cinema.name}
                 {'\n'}
                 {ticketData.cinema.address}
-              </Text>
-            </View>
-            <View style={styles.detailsContainerAndIcon}>
-              <SvgXml style={{color: 'black'}} xml={iconNoteMyTicket()} />
-              <Text style={styles.instructionText}>
-                Xuất trình mã QR này cho quầy vé để nhận vé
               </Text>
             </View>
           </View>

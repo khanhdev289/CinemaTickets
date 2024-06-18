@@ -14,6 +14,7 @@ import ProfileScreen from './src/screens/home/ProfileScreen';
 import TicketScreen from './src/screens/home/TicketScreen';
 import ScanQrScreen from './src/screens/staff/ScanQrScreen';
 import AuthScreen from './src/screens/staff/AuthScreen';
+import UpdateUserScreen from './src/screens/other/UpdateUserScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -86,6 +87,11 @@ export default function App() {
         <Stack.Screen
           name="AuthScreen"
           component={AuthScreen}
+          options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name="UpdateUserScreen"
+          component={UpdateUserScreen}
           options={{headerShown: false}}
         />
       </Stack.Navigator>

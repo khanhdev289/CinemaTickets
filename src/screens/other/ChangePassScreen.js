@@ -6,6 +6,7 @@ import {
   SafeAreaView,
   TextInput,
   TouchableOpacity,
+  Alert,
 } from 'react-native';
 import {SvgXml} from 'react-native-svg';
 import iconsBack from '../../assets/icons/iconsBack';
@@ -27,12 +28,13 @@ const ChangePassScreen = () => {
         return;
       }
 
-      const userID = '666fe9e1f0849a6a8a904a4c';
+      const userID = '666fd219ee2f49b478863f44';
       const token =
-        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2NjZmZTllMWYwODQ5YTZhOGE5MDRhNGMiLCJyb2xlIjoidXNlciIsImVtYWlsIjoiZHV5a2hhbmhzdDFAZ21haWwuY29tIiwiaWF0IjoxNzE4NjEwNTUwLCJleHAiOjE3MTkyMTUzNTB9.V3N_5YzfYE5TtSPAlnm8MrK9rSza77ZhjpiAqhjkEQU';
+        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2NjZmZDIxOWVlMmY0OWI0Nzg4NjNmNDQiLCJyb2xlIjoidXNlciIsImVtYWlsIjoicXVhbmprbDk4QGdtYWlsLmNvbSIsImlhdCI6MTcxODYzODMyMywiZXhwIjoxNzE5MjQzMTIzfQ.FvojXxh-YwbketVrgg6PiD-rIZFiXql_bK72Lu1lQ0A';
 
       const requestData = {
-        password: newPassword,
+        passwordOld: currentPassword,
+        passwordNew: newPassword,
       };
 
       const config = {
@@ -46,9 +48,12 @@ const ChangePassScreen = () => {
       const response = await axios.put(url, requestData, config);
 
       const updatedUserData = response.data;
+      Alert.alert(updatedUserData);
       console.log('Updated user data:', updatedUserData);
 
-      navigation.navigate('Home');
+      setCurrentPassword('');
+      setNewPassword('');
+      setConfirmPassword('');
     } catch (error) {
       console.error('Lỗi khi cập nhật mật khẩu người dùng: ', error);
     }

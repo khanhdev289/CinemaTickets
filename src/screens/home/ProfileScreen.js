@@ -29,7 +29,6 @@ const placeholderImage = require('../../assets/images/logo.png');
 
 const ProfileScreen = ({navigation}) => {
   const [isEnabled, setIsEnabled] = useState(false);
-  const [isModalVisible, setModalVisible] = useState(false);
   const [profileImage, setProfileImage] = useState('');
   const [profileEmail, setProfileEmail] = useState('');
   const [profileName, setProfileName] = useState('');
@@ -79,70 +78,21 @@ const ProfileScreen = ({navigation}) => {
 
   const toggleSwitch = () => setIsEnabled(previousState => !previousState);
 
-  const toggleModal = () => {
-    setModalVisible(!isModalVisible);
+  const toggleUpdateUser = () => {
+    navigation.navigate('UpdateUserScreen', {
+      dataUserImage: profileImage,
+      dataUserName: profileName,
+      dataUserPhone: profilePhone,
+    });
   };
 
-  const selectImage = () => {
-    launchImageLibrary(
-      {
-        mediaType: 'photo',
-        maxWidth: 300,
-        maxHeight: 300,
-        quality: 1,
-      },
-      response => {
-        if (response.didCancel) {
-          console.log('Cancelled');
-        } else if (response.error) {
-          console.log('ImagePicker Error: ', response.error);
-        } else {
-          const uri = response.assets[0].uri;
-          setProfileImage(uri);
-        }
-      },
-    );
-  };
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', () => {
+      fetchDataUser();
+    });
 
-  const updateUserData = async () => {
-    try {
-      setIsLoading(true);
-
-      const userID = '666fe9e1f0849a6a8a904a4c';
-      const token =
-        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2NjZmZTllMWYwODQ5YTZhOGE5MDRhNGMiLCJyb2xlIjoidXNlciIsImVtYWlsIjoiZHV5a2hhbmhzdDFAZ21haWwuY29tIiwiaWF0IjoxNzE4NjEwNTUwLCJleHAiOjE3MTkyMTUzNTB9.V3N_5YzfYE5TtSPAlnm8MrK9rSza77ZhjpiAqhjkEQU';
-
-      const formData = new FormData();
-      formData.append('image', {
-        uri: profileImage,
-        type: 'image/jpeg',
-        name: 'profile_image.jpg',
-      });
-      formData.append('name', profileName);
-      formData.append('number_phone', profilePhone);
-
-      const axiosInstance = axios.create({
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'multipart/form-data',
-        },
-      });
-
-      const url = `${POSTS_API_URL}/${userID}`;
-      const response = await axiosInstance.put(url, formData);
-
-      const updatedUserData = response.data;
-      setProfileName(updatedUserData.name);
-      setProfilePhone(updatedUserData.number_phone);
-
-      setIsLoading(false);
-      onRefresh();
-      toggleModal();
-    } catch (error) {
-      console.error('Lỗi khi cập nhật thông tin người dùng: ', error);
-      setIsLoading(false);
-    }
-  };
+    return unsubscribe;
+  }, [navigation]);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -175,7 +125,9 @@ const ProfileScreen = ({navigation}) => {
               <Text style={styles.profileName}>
                 {profileName || 'Tên người dùng'}
               </Text>
-              <TouchableOpacity style={styles.editButton} onPress={toggleModal}>
+              <TouchableOpacity
+                style={styles.editButton}
+                onPress={toggleUpdateUser}>
                 <SvgXml xml={iconEditProfile()} />
               </TouchableOpacity>
             </View>
@@ -188,7 +140,7 @@ const ProfileScreen = ({navigation}) => {
         <TouchableOpacity
           style={styles.menuItem}
           onPress={() => {
-            navigation.navigate('ScanQrScreen');
+            navigation.navigate('AuthScreen');
           }}>
           <SvgXml xml={iconMyTicketProfile()} style={styles.menuIcon} />
           <Text style={styles.menuText}>Vé của tôi</Text>
@@ -216,37 +168,6 @@ const ProfileScreen = ({navigation}) => {
           <Text style={styles.logoutText}>Đăng Xuất</Text>
         </TouchableOpacity>
       </ScrollView>
-      <Modal isVisible={isModalVisible} onBackdropPress={toggleModal}>
-        <View style={styles.modalContent}>
-          <Text style={styles.modalTitle}>Cập nhật thông tin cá nhân</Text>
-          <TouchableOpacity onPress={selectImage}>
-            <Image
-              source={
-                profileImage
-                  ? {uri: IMAGE_API_URL + profileImage}
-                  : placeholderImage
-              }
-              style={styles.modalProfileImage}
-            />
-          </TouchableOpacity>
-          <TextInput
-            style={styles.modalInput}
-            value={profileName}
-            onChangeText={setProfileName}
-            placeholder="Nhập tên"
-          />
-          <TextInput
-            style={styles.modalInput}
-            value={profilePhone}
-            onChangeText={setProfilePhone}
-            placeholder="Nhập số điện thoại"
-            keyboardType="phone-pad"
-          />
-          <TouchableOpacity style={styles.modalButton} onPress={updateUserData}>
-            <Text style={styles.logoutText}>Lưu</Text>
-          </TouchableOpacity>
-        </View>
-      </Modal>
     </SafeAreaView>
   );
 };
