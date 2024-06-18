@@ -3,13 +3,26 @@ import {Alert, TouchableOpacity, Text, View, StyleSheet} from 'react-native';
 import QRCodeScanner from 'react-native-qrcode-scanner';
 import {RNCamera} from 'react-native-camera';
 import {useNavigation} from '@react-navigation/native';
+import {PERMISSIONS, request} from 'react-native-permissions';
 
 const ScanQrScreen = () => {
   const navigation = useNavigation();
-  const scannerRef = useRef(null); // Ref for QRCodeScanner component
+  const scannerRef = useRef(null);
   const [scanned, setScanned] = useState(false);
 
+  const requestCameraPermission = async () => {
+    const result = await request(PERMISSIONS.IOS.CAMERA);
+    if (result !== 'granted') {
+      Alert.alert(
+        'Camera Permission',
+        'Camera permission is required to scan QR codes.',
+      );
+    }
+  };
+
   useEffect(() => {
+    requestCameraPermission();
+
     const unsubscribe = navigation.addListener('focus', () => {
       setScanned(false);
     });

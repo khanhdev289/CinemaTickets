@@ -97,7 +97,7 @@ const AuthScreen = () => {
           <View
             style={{
               flexDirection: 'row',
-              justifyContent: 'center',
+              justifyContent: 'space-around',
               padding: 20,
             }}>
             <Image
