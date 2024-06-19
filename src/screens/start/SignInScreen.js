@@ -7,14 +7,43 @@ import {
   TextInput,
   TouchableOpacity,
 } from 'react-native';
-import React from 'react';
+import React, {useState} from 'react';
 import {useNavigation} from '@react-navigation/native';
+import Spinner from 'react-native-loading-spinner-overlay';
+import {useAuth} from '../../components/AuthProvider ';
+import axios from 'axios';
 
 const SignInScreen = () => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const {login} = useAuth();
   const navigation = useNavigation();
+  const [loading, setLoading] = useState(false);
 
-  const handleHome = () => {
-    navigation.navigate('Home');
+  const handleLogin = () => {
+    setLoading(true);
+    axios
+      .post('http://139.180.132.97:3000/auth/login', {
+        email: email,
+        password: password,
+      })
+      .then(response => {
+        if (!response.data || response.data.error) {
+          setLoading(false);
+          console.error('Đăng nhập thất bại:', response.data.message);
+          alert('Đăng nhập thất bại: ' + response.data.message);
+        } else {
+          setLoading(false);
+          console.log('Đăng nhập thành công:', response.data);
+          const userData = response.data;
+          login(userData);
+          navigation.navigate('Home');
+        }
+      })
+      .catch(error => {
+        setLoading(false);
+        console.error('Đăng nhập thất bại:', error);
+      });
   };
   return (
     <ImageBackground
@@ -33,6 +62,7 @@ const SignInScreen = () => {
               style={styles.input}
               placeholder="Nhập Email"
               placeholderTextColor="#FFFFFF"
+              onChangeText={text => setEmail(text)}
             />
           </View>
           <View style={styles.inputPass}>
@@ -42,17 +72,23 @@ const SignInScreen = () => {
               placeholder="Nhập Mật Khẩu"
               placeholderTextColor="#FFFFFF"
               secureTextEntry
+              onChangeText={text => setPassword(text)}
             />
           </View>
         </View>
         <View style={styles.forgotPassword}>
           <Text style={styles.forgotPasswordText}>Quên mật khẩu ?</Text>
         </View>
-        <TouchableOpacity style={styles.buttonContainer} onPress={handleHome}>
+        <TouchableOpacity style={styles.buttonContainer} onPress={handleLogin}>
           <View style={styles.button}>
             <Text style={styles.buttonText}>Đăng Nhập</Text>
           </View>
         </TouchableOpacity>
+        <Spinner
+          visible={loading}
+          textContent={'Đang đăng nhập...'}
+          textStyle={styles.spinnerText}
+        />
       </SafeAreaView>
     </ImageBackground>
   );
@@ -64,7 +100,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     paddingHorizontal: 20,
-    position: 'relative', // Đặt vị trí của container là tương đối
+    position: 'relative',
   },
   background: {
     flex: 1,
@@ -72,8 +108,8 @@ const styles = StyleSheet.create({
     resizeMode: 'cover',
   },
   overlay: {
-    ...StyleSheet.absoluteFillObject, // Làm cho View này chiếm toàn bộ không gian của ImageBackground
-    backgroundColor: 'rgba(0, 0, 0, 0.7)', // Màu đen với độ trong suốt 40%
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
   },
   welcome: {
     marginStart: '5%',
@@ -135,5 +171,8 @@ const styles = StyleSheet.create({
   buttonText: {
     color: '#000000',
     fontSize: 20,
+  },
+  spinnerText: {
+    color: '#FFFFFF',
   },
 });

@@ -12,71 +12,80 @@ import WelcomeScreen from './src/screens/start/WelcomeScreen';
 import ChangePassScreen from './src/screens/other/ChangePassScreen';
 import ProfileScreen from './src/screens/home/ProfileScreen';
 import TicketScreen from './src/screens/home/TicketScreen';
+import SuccessScreen from './src/screens/start/SuccessScreen ';
+import {AuthProvider} from './src/components/AuthProvider ';
 
 const Stack = createNativeStackNavigator();
 
 export default function App() {
   return (
-    <NavigationContainer>
-      <Stack.Navigator initialRouteName="Welcome">
-        <Stack.Screen
-          name="Home"
-          component={BottomNavication}
-          options={{headerShown: false}}
-        />
-        <Stack.Screen
-          name="Welcome"
-          component={WelcomeScreen}
-          options={{headerShown: false}}
-        />
-        <Stack.Screen
-          name="Login"
-          component={SignInScreen}
-          options={{headerShown: false}}
-        />
-        <Stack.Screen
-          name="SearchScreeen"
-          component={SearchScreen}
-          options={{headerShown: false}}
-        />
+    <AuthProvider>
+      <NavigationContainer>
+        <Stack.Navigator initialRouteName="Welcome">
+          <Stack.Screen
+            name="Home"
+            component={BottomNavication}
+            options={{headerShown: false}}
+          />
+          <Stack.Screen
+            name="Welcome"
+            component={WelcomeScreen}
+            options={{headerShown: false}}
+          />
+          <Stack.Screen
+            name="Login"
+            component={SignInScreen}
+            options={{headerShown: false}}
+          />
+          <Stack.Screen
+            name="SearchScreeen"
+            component={SearchScreen}
+            options={{headerShown: false}}
+          />
 
-        <Stack.Screen
-          name="MovieDetailScreen"
-          component={MovieDetailScreen}
-          options={{headerShown: false}}
-        />
-        <Stack.Screen
-          name="ChangePassScreen"
-          component={ChangePassScreen}
-          options={{headerShown: false}}
-        />
-        <Stack.Screen
-          name="ProfileScreen"
-          component={ProfileScreen}
-          options={{headerShown: false}}
-        />
-        <Stack.Screen
-          name="MyTickets"
-          component={MyTicketScreen}
-          options={{headerShown: false}}
-        />
-        <Stack.Screen
-          name="TicketScreen"
-          component={TicketScreen}
-          options={{headerShown: false}}
-        />
+          <Stack.Screen
+            name="MovieDetailScreen"
+            component={MovieDetailScreen}
+            options={{headerShown: false}}
+          />
+          <Stack.Screen
+            name="ChangePassScreen"
+            component={ChangePassScreen}
+            options={{headerShown: false}}
+          />
+          <Stack.Screen
+            name="ProfileScreen"
+            component={ProfileScreen}
+            options={{headerShown: false}}
+          />
+          <Stack.Screen
+            name="MyTickets"
+            component={MyTicketScreen}
+            options={{headerShown: false}}
+          />
+          <Stack.Screen
+            name="TicketScreen"
+            component={TicketScreen}
+            options={{headerShown: false}}
+          />
 
-        <Stack.Screen
-          name="Register"
-          component={SignUpScreen}
-          options={{headerShown: false}}
-        />
-        <Stack.Screen
-          name="Otp"
-          component={ComfirmOTP}
-          options={{headerShown: false}}
-        />
-      </Stack.Navigator>
-    </NavigationContainer>
+          <Stack.Screen
+            name="Register"
+            component={SignUpScreen}
+            options={{headerShown: false}}
+          />
+          <Stack.Screen
+            name="Otp"
+            component={ComfirmOTP}
+            options={{headerShown: false}}
+          />
+          <Stack.Screen
+            name="Ss"
+            component={SuccessScreen}
+            options={{headerShown: false}}
+          />
+        </Stack.Navigator>
+      </NavigationContainer>
+    </AuthProvider>
   );
 }
