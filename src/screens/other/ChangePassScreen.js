@@ -12,6 +12,7 @@ import {SvgXml} from 'react-native-svg';
 import iconsBack from '../../assets/icons/iconsBack';
 import axios from 'axios'; // Import axios
 import {useNavigation} from '@react-navigation/native';
+import { useAuth } from '../../components/AuthProvider ';
 
 const CHANGE_PASS_API_URL = 'http://139.180.132.97:3000/users/password';
 
@@ -20,6 +21,7 @@ const ChangePassScreen = () => {
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const {user} = useAuth();
 
   const updateUserPassData = async () => {
     try {
@@ -28,9 +30,8 @@ const ChangePassScreen = () => {
         return;
       }
 
-      const userID = '666fd219ee2f49b478863f44';
-      const token =
-        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2NjZmZDIxOWVlMmY0OWI0Nzg4NjNmNDQiLCJyb2xlIjoidXNlciIsImVtYWlsIjoicXVhbmprbDk4QGdtYWlsLmNvbSIsImlhdCI6MTcxODYzODMyMywiZXhwIjoxNzE5MjQzMTIzfQ.FvojXxh-YwbketVrgg6PiD-rIZFiXql_bK72Lu1lQ0A';
+      const userID = user.user._id;
+      const token = user.token.access_token;
 
       const requestData = {
         passwordOld: currentPassword,

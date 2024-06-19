@@ -22,6 +22,7 @@ import iconChangePassProfile from '../../assets/icons/iconProfile/iconChangePass
 import iconFaceIdProfile from '../../assets/icons/iconProfile/iconFaceIdProfile';
 import {SvgXml} from 'react-native-svg';
 import axios from 'axios';
+import {useAuth} from '../../components/AuthProvider ';
 
 const POSTS_API_URL = 'http://139.180.132.97:3000/users';
 const IMAGE_API_URL = 'http://139.180.132.97:3000/images/';
@@ -36,6 +37,9 @@ const ProfileScreen = ({navigation}) => {
   const [isLoading, setIsLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
 
+  const {user} = useAuth();
+
+
   useEffect(() => {
     fetchDataUser();
   }, []);
@@ -44,9 +48,9 @@ const ProfileScreen = ({navigation}) => {
     try {
       setIsLoading(true);
 
-      const userID = '666fe9e1f0849a6a8a904a4c';
-      const token =
-        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2NjZmZTllMWYwODQ5YTZhOGE5MDRhNGMiLCJyb2xlIjoidXNlciIsImVtYWlsIjoiZHV5a2hhbmhzdDFAZ21haWwuY29tIiwiaWF0IjoxNzE4NjEwNTUwLCJleHAiOjE3MTkyMTUzNTB9.V3N_5YzfYE5TtSPAlnm8MrK9rSza77ZhjpiAqhjkEQU';
+      const userID = user.user._id;
+      const token = user.token.access_token;
+ 
 
       const axiosInstance = axios.create({
         headers: {

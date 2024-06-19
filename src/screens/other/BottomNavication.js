@@ -15,31 +15,31 @@ import iconTicket from '../../assets/icons/iconTicket';
 import iconVideo from '../../assets/icons/iconVideo';
 import iconUser from '../../assets/icons/iconUser';
 import TicketScreen from '../home/TicketScreen';
+import ScanQrScreen from '../staff/ScanQrScreen';
 
 const Tab = createBottomTabNavigator();
 
 const BottomNavigation = () => {
   const {user} = useAuth();
-  console.log(user.token);
   const renderScreens = () => {
     if (user && user.user.role === 'staff') {
       return (
         <>
           <Tab.Screen
-            name="MyTickets"
-            component={MyTicketScreen}
+            name="ScanQrScreen"
+            component={ScanQrScreen}
             options={{
-              tabBarLabel: 'MyTickets',
+              tabBarLabel: 'ScanQrScreen',
               tabBarIcon: ({color, size}) => (
                 <SvgXml xml={iconTicket()} fill={color} />
               ),
             }}
           />
           <Tab.Screen
-            name="Thành công"
-            component={SuccessScreen}
+            name="ProfileScreen"
+            component={ProfileScreen}
             options={{
-              tabBarLabel: 'Thành Công',
+              tabBarLabel: 'ProfileScreen',
               tabBarIcon: ({color, size}) => (
                 <SvgXml xml={iconUser()} fill={color} />
               ),

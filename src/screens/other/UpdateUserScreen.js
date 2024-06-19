@@ -14,6 +14,7 @@ import {launchImageLibrary} from 'react-native-image-picker';
 import {SvgXml} from 'react-native-svg';
 import axios from 'axios';
 import iconsBack from '../../assets/icons/iconsBack';
+import {useAuth} from '../../components/AuthProvider ';
 
 const POSTS_API_URL = 'http://139.180.132.97:3000/users';
 const IMAGE_API_URL = 'http://139.180.132.97:3000/images/';
@@ -21,6 +22,7 @@ const placeholderImage = require('../../assets/images/logo.png');
 
 const UpdateUserScreen = ({navigation, route}) => {
   const {dataUserImage, dataUserName, dataUserPhone} = route.params;
+  const {user} = useAuth();
 
   const [profileImage, setProfileImage] = useState('');
   const [profileName, setProfileName] = useState(dataUserName);
@@ -39,9 +41,8 @@ const UpdateUserScreen = ({navigation, route}) => {
     try {
       setIsLoading(true);
 
-      const userID = '666fe9e1f0849a6a8a904a4c';
-      const token =
-        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2NjZmZTllMWYwODQ5YTZhOGE5MDRhNGMiLCJyb2xlIjoidXNlciIsImVtYWlsIjoiZHV5a2hhbmhzdDFAZ21haWwuY29tIiwiaWF0IjoxNzE4NjEwNTUwLCJleHAiOjE3MTkyMTUzNTB9.V3N_5YzfYE5TtSPAlnm8MrK9rSza77ZhjpiAqhjkEQU';
+      const userID = user.user._id;
+      const token = user.token.access_token;
       const formData = new FormData();
       if (profileImage) {
         formData.append('image', {

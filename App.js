@@ -20,7 +20,6 @@ import ScanQrScreen from './src/screens/staff/ScanQrScreen';
 import AuthScreen from './src/screens/staff/AuthScreen';
 import UpdateUserScreen from './src/screens/other/UpdateUserScreen';
 
-
 const Stack = createNativeStackNavigator();
 
 export default function App() {
@@ -75,39 +74,39 @@ export default function App() {
             options={{headerShown: false}}
           />
 
-
           <Stack.Screen
             name="Ss"
             component={SuccessScreen}
             options={{headerShown: false}}
           />
 
-        <Stack.Screen
-          name="Register"
-          component={SignUpScreen}
-          options={{headerShown: false}}
-        />
-        <Stack.Screen
-          name="Otp"
-          component={ComfirmOTP}
-          options={{headerShown: false}}
-        />
-        <Stack.Screen
-          name="ScanQrScreen"
-          component={ScanQrScreen}
-          options={{headerShown: false}}
-        />
-        <Stack.Screen
-          name="AuthScreen"
-          component={AuthScreen}
-          options={{headerShown: false}}
-        />
-        <Stack.Screen
-          name="UpdateUserScreen"
-          component={UpdateUserScreen}
-          options={{headerShown: false}}
-        />
-      </Stack.Navigator>
-    </NavigationContainer>
+          <Stack.Screen
+            name="Register"
+            component={SignUpScreen}
+            options={{headerShown: false}}
+          />
+          <Stack.Screen
+            name="Otp"
+            component={ComfirmOTP}
+            options={{headerShown: false}}
+          />
+          <Stack.Screen
+            name="ScanQrScreen"
+            component={ScanQrScreen}
+            options={{headerShown: false}}
+          />
+          <Stack.Screen
+            name="AuthScreen"
+            component={AuthScreen}
+            options={{headerShown: false}}
+          />
+          <Stack.Screen
+            name="UpdateUserScreen"
+            component={UpdateUserScreen}
+            options={{headerShown: false}}
+          />
+        </Stack.Navigator>
+      </NavigationContainer>
+    </AuthProvider>
   );
 }
