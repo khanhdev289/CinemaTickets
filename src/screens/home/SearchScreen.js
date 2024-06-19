@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import {
   Image,
   View,
@@ -9,85 +9,79 @@ import {
   StyleSheet,
   Dimensions,
 } from 'react-native';
-import {SvgXml} from 'react-native-svg';
+import { SvgXml } from 'react-native-svg';
+import axios from 'axios';  // Import axios for making HTTP requests
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import iconBack from '../../assets/icons/iconBack';
 import iconSearch from '../../assets/icons/iconSearch';
 import iconStar from '../../assets/icons/iconStar';
-import iconCalendar from '../../assets/icons/iconCalendar';
 import iconVideo from '../../assets/icons/iconVideo';
 import iconClock from '../../assets/icons/iconClock';
+import { IMAGE_API_URL, fetchGenreById, searchMovie } from '../../../api';
+
 const screenWidth = Dimensions.get('screen').width;
 const screenHeight = Dimensions.get('screen').height;
 
-const SearchScreeen = () => {
+
+const SearchScreen = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
 
-  const handleSearch = query => {
-    // Xử lý tìm kiếm và cập nhật kết quả tìm kiếm
-    const results = mockSearchFunction(query);
-    setSearchResults(results);
+
+  // Hàm xử lý tìm kiếm phim
+  const handleSearch = async (query) => {
+    try {
+      // Đường dẫn API để tìm kiếm phim theo tên
+      const response = await searchMovie(query);
+      setSearchResults(response.getmovie);
+      console.log(response)// Cập nhật kết quả tìm kiếm vào state
+    } catch (error) {
+      console.error('Error searching movies:', error);
+      // Xử lý lỗi nếu cần
+    }
   };
 
-  const mockSearchFunction = query => {
-    // Giả lập kết quả tìm kiếm (sẽ thay bằng API thực tế)
-    return [
-      {
-        id: '1',
-        title: 'AvengersAvengers - Infinity War',
-        poster: 'https://via.placeholder.com/150',
-      },
-      {id: '2', title: 'Movie 2', poster: 'https://via.placeholder.com/150'},
-      {id: '3', title: 'Movie 3', poster: 'https://via.placeholder.com/150'},
+  const renderSearchResult = async ({ item }) => {
+    const nameGenre = await fetchGenreById(item.genre);
 
-      // Thêm kết quả khác nếu cần
-    ];
+
+    return (
+      <View style={styles.resultItem}>
+        <TouchableOpacity onPress={() => alert(` ID: ${item._id}`)}>
+          <Image
+            style={{
+              width: '100%',
+              height: '75%',
+              aspectRatio: 3 / 4,
+              borderRadius: 10,
+            }}
+            source={{ uri: IMAGE_API_URL + item.image }}
+          />
+          <Text numberOfLines={2} style={styles.titleItem}>
+            {item.name}
+          </Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <SvgXml xml={iconStar()} width={14} height={14} />
+            <Text style={{ fontSize: 12, marginLeft: 5, color: '#DEDEDE' }}>
+              {item.rate}.0/5
+            </Text>
+          </View>
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <SvgXml xml={iconClock()} width={14} height={14} />
+            <Text style={{ fontSize: 12, marginLeft: 5, color: '#DEDEDE' }}>
+              {item.duration}
+            </Text>
+          </View>
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <SvgXml xml={iconVideo()} width={14} height={14} />
+            <Text style={{ fontSize: 12, marginLeft: 5, color: '#DEDEDE' }}>
+              {nameGenre.name}
+            </Text>
+          </View>
+        </TouchableOpacity>
+      </View>
+    );
   };
-
-  const listSearch = [
-    {
-      id: '4',
-      title: 'Avatar 2: The Way Of Water',
-      poster: 'https://via.placeholder.com/150',
-    },
-    {id: '5', title: 'Movie 5', poster: 'https://via.placeholder.com/150'},
-    {id: '6', title: 'Movie 6', poster: 'https://via.placeholder.com/150'},
-  ];
-
-  const renderSearchResult = ({item}) => (
-    <View style={styles.resultItem}>
-      <Image
-        style={{
-          width: '100%',
-          height: '75%',
-          aspectRatio: 3 / 4,
-          borderRadius: 10,
-        }}
-        source={{uri: item.poster}}
-      />
-      <Text numberOfLines={2} style={styles.titleItem}>
-        {item.title}
-      </Text>
-      <View style={{flexDirection: 'row', alignItems: 'center'}}>
-        <SvgXml xml={iconStar()} width={14} height={14} />
-        <Text style={{fontSize: 12, marginLeft: 5, color: '#DEDEDE'}}>
-          4.0 (982)
-        </Text>
-      </View>
-      <View style={{flexDirection: 'row', alignItems: 'center'}}>
-        <SvgXml xml={iconClock()} width={14} height={14} />
-        <Text style={{fontSize: 12, marginLeft: 5, color: '#DEDEDE'}}>
-          2 hour 5 minutes
-        </Text>
-      </View>
-      <View style={{flexDirection: 'row', alignItems: 'center'}}>
-        <SvgXml xml={iconVideo()} width={14} height={14} />
-        <Text style={{fontSize: 12, marginLeft: 5, color: '#DEDEDE'}}>
-          Action, Sci-fi
-        </Text>
-      </View>
-    </View>
-  );
 
   return (
     <View style={styles.container}>
@@ -106,12 +100,14 @@ const SearchScreeen = () => {
             style={styles.searchInput}
             placeholder="Tìm kiếm phim..."
             placeholderTextColor="#8C8C8C"
-            // onFocus={() => navigation.navigate('SearchScreeen')}
+            value={searchQuery}
+            onChangeText={text => setSearchQuery(text)}
+            onSubmitEditing={() => handleSearch(searchQuery)}
           />
         </View>
       </View>
       <FlatList
-        data={listSearch}
+        data={searchResults}
         renderItem={renderSearchResult}
         keyExtractor={item => item.id}
         numColumns={2}
@@ -143,7 +139,6 @@ const styles = StyleSheet.create({
     marginLeft: 8,
     color: 'white',
   },
-
   searchContainer: {
     paddingHorizontal: 10,
     marginBottom: 20,
@@ -181,4 +176,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default SearchScreeen;
+export default SearchScreen;
