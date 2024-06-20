@@ -16,6 +16,7 @@ import iconVideo from '../../assets/icons/iconVideo';
 import iconUser from '../../assets/icons/iconUser';
 import TicketScreen from '../home/TicketScreen';
 import ScanQrScreen from '../staff/ScanQrScreen';
+import AuthScreen from '../staff/AuthScreen';
 
 const Tab = createBottomTabNavigator();
 
@@ -27,7 +28,7 @@ const BottomNavigation = () => {
         <>
           <Tab.Screen
             name="ScanQrScreen"
-            component={ScanQrScreen}
+            component={AuthScreen}
             options={{
               tabBarLabel: 'ScanQrScreen',
               tabBarIcon: ({color, size}) => (

@@ -23,13 +23,8 @@ import iconMoneyMyTicket from '../../assets/icons/iconMyTicket/iconMoneyMyTicket
 import iconLocationMyTicket from '../../assets/icons/iconMyTicket/iconLocationMyTicket';
 import iconNoteMyTicket from '../../assets/icons/iconMyTicket/iconNoteMyTicket';
 import iconSuccess from '../../assets/icons/iconMyTicket/iconSuccess';
-import {
-  PDFDocument,
-  Page,
-  Text as PdfText,
-  Image as PdfImage,
-  rgb,
-} from 'react-native-pdf-lib';
+import RNPrint from 'react-native-print';
+import {useAuth} from '../../components/AuthProvider ';
 
 const placeholderImage = require('../../assets/images/image.png');
 const IMAGE_API_URL = 'http://139.180.132.97:3000/images/';
@@ -40,16 +35,15 @@ const AuthScreen = () => {
   const route = useRoute();
   const [ticketData, setTicketData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const {user} = useAuth();
 
   useEffect(() => {
-    fetchTicketData('66700c16f4605faf50aa72c3');
+    fetchTicketData('6673ee54db311efb6bcb457f');
   }, [route.params]);
 
   const fetchTicketData = async ticketId => {
     try {
-      const token =
-        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2NjZmZTllMWYwODQ5YTZhOGE5MDRhNGMiLCJyb2xlIjoidXNlciIsImVtYWlsIjoiZHV5a2hhbmhzdDFAZ21haWwuY29tIiwiaWF0IjoxNzE4NjEwNTUwLCJleHAiOjE3MTkyMTUzNTB9.V3N_5YzfYE5TtSPAlnm8MrK9rSza77ZhjpiAqhjkEQU';
-
+      const token = user.token.access_token;
       const axiosInstance = axios.create({
         headers: {
           Authorization: `Bearer ${token}`,
@@ -75,69 +69,116 @@ const AuthScreen = () => {
     navigation.goBack();
   };
 
-  const handlePrintTicket = async () => {
-    try {
-      const pdfPath = await createPdf(ticketData);
-      Alert.alert('PDF created', `Path: ${pdfPath}`);
-    } catch (error) {
-      console.error('Error creating PDF: ', error);
-      Alert.alert('Error', 'Unable to create PDF');
-    }
-  };
-
   const createPdf = async data => {
-    const page1 = Page.create()
-      .setMediaBox(200, 200)
-      .drawText(data.movie.name, {
-        x: 5,
-        y: 170,
-        size: 10,
-      })
-      .drawText(`Duration: ${data.movie.duration}`, {
-        x: 5,
-        y: 150,
-        size: 10,
-      })
-      .drawText(`Genre: ${data.movie.genre}`, {
-        x: 5,
-        y: 130,
-        size: 10,
-      })
-      .drawText(`Time: ${data.time.time}`, {
-        x: 5,
-        y: 110,
-        size: 10,
-      })
-      .drawText(`Date: ${new Date(data.showdate.date).toLocaleDateString()}`, {
-        x: 5,
-        y: 90,
-        size: 10,
-      })
-      .drawText(`Room: ${data.room.name}`, {
-        x: 5,
-        y: 70,
-        size: 10,
-      })
-      .drawText(`Seat: ${data.seat.map(item => item.name).join(', ')}`, {
-        x: 5,
-        y: 50,
-        size: 10,
-      })
-      .drawText(`Total: ${data.total} VND`, {
-        x: 5,
-        y: 30,
-        size: 10,
-      })
-      .drawText(`Cinema: ${data.cinema.name}`, {
-        x: 5,
-        y: 10,
-        size: 10,
-      });
+    const html = `
+    <html>
+      <head>
+        <style>
+          body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+          }
+          .container {
+            max-width: 600px;
+            margin: 0 auto;
+            border: 1px solid #ccc;
+            padding: 20px;
+            border-radius: 10px;
+            background-color: #f9f9f9;
+          }
+          .header, .footer {
+            text-align: center;
+            margin-bottom: 20px;
+          }
+          .movie-title {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 10px;
+          }
+          .movie-details {
+            font-size: 16px;
+            margin-bottom: 5px;
+          }
+          .ticket-info {
+            margin-top: 20px;
+          }
+          .info-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+          }
+          .info-item p {
+            margin: 0;
+          }
+          .qr-code {
+            text-align: center;
+            margin-top: 30px;
+          }
+          .success-message {
+            font-size: 18px;
+            font-weight: bold;
+            color: green;
+          }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <div class="header">
+            <h1>Movie Ticket</h1>
+          </div>
+          <div class="movie-poster">
+            <img src="${
+              IMAGE_API_URL + data.movie.image
+            }" alt="Movie Poster" style="width: 100%; height: auto; border-radius: 10px;">
+          </div>
+          <div class="ticket-info">
+            <div class="movie-title">${data.movie.name}</div>
+            <div class="info-item">
+              <p>Duration:</p>
+              <p>${data.movie.duration} minutes</p>
+            </div>
+            <div class="info-item">
+              <p>Genre:</p>
+              <p>${data.movie.genre.map(item => item.name).join(', ')}</p>
+            </div>
+            <div class="info-item">
+              <p>Time:</p>
+              <p>${data.time.time}</p>
+            </div>
+            <div class="info-item">
+              <p>Date:</p>
+              <p>${new Date(data.showdate.date).toLocaleDateString()}</p>
+            </div>
+            <div class="info-item">
+              <p>Room:</p>
+              <p>${data.room.name}</p>
+            </div>
+            <div class="info-item">
+              <p>Seat:</p>
+              <p>${data.seat.map(item => item.name).join(', ')}</p>
+            </div>
+            <div class="info-item">
+              <p>Total:</p>
+              <p>${data.total} VND</p>
+            </div>
+            <div class="info-item">
+              <p>Cinema:</p>
+              <p>${data.cinema.name}<br>${data.cinema.address}</p>
+            </div>
+          </div>
+          <div class="qr-code">
+            <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAA..." alt="QR Code">
+            <div class="success-message">Kiểm tra vé thành công<br>Nhân viên hướng dẫn khách vào rạp</div>
+          </div>
+          <div class="footer">
+            <p>Enjoy your movie!</p>
+          </div>
+        </div>
+      </body>
+    </html>
+  `;
 
-    const pdfDoc = PDFDocument.create('Ticket.pdf').addPages(page1);
-
-    const pdfPath = await pdfDoc.write();
-    return pdfPath;
+    await RNPrint.print({html});
   };
 
   if (loading) {
@@ -188,7 +229,12 @@ const AuthScreen = () => {
               <View style={styles.detailsContainerAndIcon}>
                 <SvgXml style={{color: 'black'}} xml={iconMovieMyTicket()} />
                 <Text style={styles.movieDetails}>
-                  {ticketData.movie.genre}
+                  {ticketData.movie.genre.map((item, index) => (
+                    <React.Fragment key={item._id}>
+                      {index > 0 && ', '}
+                      {item.name}
+                    </React.Fragment>
+                  ))}
                 </Text>
               </View>
             </View>
@@ -236,7 +282,9 @@ const AuthScreen = () => {
           </View>
         </View>
       </ScrollView>
-      <TouchableOpacity style={styles.printButton} onPress={handlePrintTicket}>
+      <TouchableOpacity
+        style={styles.printButton}
+        onPress={() => createPdf(ticketData)}>
         <Text style={styles.printText}>Xuất Vé</Text>
       </TouchableOpacity>
     </SafeAreaView>
@@ -287,6 +335,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   movieTitle: {
+    width: 200,
     alignItems: 'flex-start',
     fontSize: 20,
     fontWeight: 'bold',
