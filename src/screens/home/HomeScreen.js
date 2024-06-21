@@ -28,23 +28,6 @@ const screenWidth = Dimensions.get('screen').width;
 const screenHeight = Dimensions.get('screen').height;
 
 
-const categoryList = [
-  {
-    id: '1',
-    title: 'Hành Động',
-    imageUrl: 'https://via.placeholder.com/150',
-  },
-  {
-    id: '2',
-    title: 'Kinh Dị',
-    imageUrl: 'https://via.placeholder.com/150',
-  },
-  {
-    id: '3',
-    title: 'Tình Cảm',
-    imageUrl: 'https://via.placeholder.com/150',
-  },
-];
 
 const newsList = [
   { id: '7', title: 'News 1', poster: 'https://via.placeholder.com/150' },
@@ -110,7 +93,7 @@ const HomeScreen = () => {
         <StatusBar hidden />
         <Header />
         <SearchBar navigation={navigation} />
-        <Section title="Phim đang chiếu" onPress={() => alert('Xem tất cả clicked!')} />
+        <Section title="Phim đang chiếu" onPress={() => {navigation.navigate('MovieScreen')}} />
         <MovieList
           data={nowPlayingMoviesList}
           flatListRef={flatListRef}
@@ -126,7 +109,7 @@ const HomeScreen = () => {
           viewConfigRef={viewConfigRef}
         />
 
-        <Section title="Phim sắp chiếu" onPress={() => alert('Xem tất cả clicked!')} />
+        <Section title="Phim sắp chiếu" onPress={() => {navigation.navigate('MovieScreen')}} />
         <FlatList
           data={comingMoviesList}
           keyExtractor={item => item._id}
@@ -153,7 +136,7 @@ const HomeScreen = () => {
           keyExtractor={item => item._id}
           horizontal
           showsHorizontalScrollIndicator={false}
-          renderItem={({ item }) => <CategoryItem item={item} />}
+          renderItem={({ item }) => <CategoryItem item={item} navigation={navigation}/>}
         />
 
         <Section title="Tin mới" onPress={() => alert('Xem tất cả clicked!')} />
@@ -306,9 +289,11 @@ const DiscountItem = ({ item }) => (
   </View>
 );
 
-const CategoryItem = ({ item }) => (
+const CategoryItem = ({ item,navigation }) => (
   <View style={styles.categoryItem}>
-    <TouchableOpacity>
+    <TouchableOpacity  onPress={() => {
+        navigation.navigate('MovieByGenre', { genreId: item._id });
+      }}>
       <Image
         style={styles.categoryImage}
         source={{ uri: IMAGE_API_URL+item.image }}

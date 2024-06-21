@@ -29,7 +29,8 @@
     "react-native-screens": "^3.31.1",
     "react-native-svg": "^15.3.0",
     "react-native-svg-transformer": "^1.4.0",
-    "react-native-swiper-flatlist": "^3.2.4"
+    "react-native-swiper-flatlist": "^3.2.4",
+    "react-native-video": "^6.2.0"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",

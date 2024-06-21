@@ -1,6 +1,7 @@
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 export  const IMAGE_API_URL = 'http://139.180.132.97:3000/images/';
+export  const VIDEO_API_URL = 'http://139.180.132.97:3000/videos/';
 // Hàm để lấy token từ AsyncStorage
 const getAuthTokenFromSecureStorage = async () => {
   try {
@@ -41,6 +42,8 @@ export const fetchMovies = async () => {
     throw error;
   }
 };
+// Hàm fetch danh sách phim
+
 export const fetchMovieById = async (id) => {
   try {
     const api = await createApiInstance();
@@ -63,6 +66,17 @@ export const searchMovie = async (name) => {
     throw error;
   }
 };
+export const movieByGenre = async (genreId) => {
+  try {
+    const api = await createApiInstance();
+    const url = `/movies/genre?genre=${genreId}`; // Đường dẫn API để tìm kiếm phim theo tên
+    const response = await api.get(url);
+    return response.data;
+  } catch (error) {
+    console.error('Error searching movies:', error);
+    throw error;
+  }
+};
 
 export const fetchDiscounts= async () => {
   try {
@@ -75,7 +89,17 @@ export const fetchDiscounts= async () => {
     throw error;
   }
 };
-
+export const fetchCinemaByMovie = async (movieId) => {
+  try {
+    const api = await createApiInstance();
+    const url = '/rooms/movie/'+movieId; 
+    const response = await api.get(url);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching movies:', error);
+    throw error;
+  }
+};
 // Hàm fetch danh sách thể loại
 export const fetchGenres = async () => {
   try {
