@@ -19,7 +19,7 @@ import iconStar from '../../assets/icons/iconStar';
 import iconVideo from '../../assets/icons/iconVideo';
 import iconClock from '../../assets/icons/iconClock';
 import { IMAGE_API_URL, fetchGenreById, searchMovie } from '../../../api';
-import {useNavigation} from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 
 const screenWidth = Dimensions.get('screen').width;
 const screenHeight = Dimensions.get('screen').height;
@@ -52,17 +52,20 @@ const SearchScreen = () => {
     const nameGenre = await fetchGenreById(item.genre);
     return (
       <View style={styles.resultItem}>
-        <TouchableOpacity onPress={() => alert(` ID: ${item._id}`)}>
+      <TouchableOpacity
+      onPress={() => {
+        navigation.push('MovieDetailScreen', { movieId: item._id });
+      }}>
           <Image
             style={{
               width: '100%',
               height: '75%',
-              aspectRatio: 3 / 4,
               borderRadius: 10,
+              objectFit:'cover'
             }}
             source={{ uri: IMAGE_API_URL + item.image }}
           />
-          <Text numberOfLines={2} style={styles.titleItem}>
+          <Text numberOfLines={1} style={styles.titleItem}>
             {item.name}
           </Text>
           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
@@ -112,22 +115,23 @@ const SearchScreen = () => {
         </View>
       </View>
       {isLoading ? (
-       <View style={styles.loadingContainer}>
-       <ActivityIndicator size="large" color="#f7b731" />
-     </View>
-      ) : searchResults.length > 0 ? (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color="#f7b731" />
+        </View>
+      ) : (
         <FlatList
           data={searchResults}
           renderItem={renderSearchResult}
-          keyExtractor={item => item.id}
+          keyExtractor={item => item._id}
           numColumns={2}
           columnWrapperStyle={styles.row}
           contentContainerStyle={styles.resultList}
+          ListEmptyComponent={!searchQuery ? null : (
+            <View style={styles.noResults}>
+              <Text style={styles.noResultsText}>Không có kết quả</Text>
+            </View>
+          )}
         />
-      ) : (
-        <View style={styles.noResults}>
-          <Text style={styles.noResultsText}>Không có kết quả</Text>
-        </View>
       )}
     </View>
   );
@@ -171,6 +175,7 @@ const styles = StyleSheet.create({
     padding: 5,
     marginLeft: 10,
     color: 'white',
+    flex: 1,
   },
   searchWrapper: {
     flexDirection: 'row',

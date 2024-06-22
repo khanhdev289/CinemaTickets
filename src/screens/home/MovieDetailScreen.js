@@ -55,9 +55,21 @@ const MovieDetailScreen = ({ route }) => {
         styles.theaterContainer,
         selectedTheater === item.id ? { borderColor: '#FFD700' } : null,
       ]}
-    >
+    ><View style={{flexDirection:'row',alignItems:'center',justifyContent:'space-around'}}>
+      <View style={{flexDirection:'column'}}>
       <Text style={styles.theaterTitle}>{item.cinema.name}</Text>
       <Text style={styles.theaterAddress}>{item.cinema.address}</Text>
+      </View>
+      <Image
+        source={require('../../assets/images/logo.png')}
+      style={{
+        width: 80, // Điều chỉnh kích thước hình ảnh theo nhu cầu của bạn
+        height: 80, // Điều chỉnh kích thước hình ảnh theo nhu cầu của bạn
+      resizeMode:'stretch',
+        
+      }}
+    />
+      </View>
     </TouchableOpacity>
   );
 
@@ -304,7 +316,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'white',
     borderRadius: 5,
-    padding: 10,
+    padding: 5,
     marginBottom: 10,
   },
   theaterTitle: {

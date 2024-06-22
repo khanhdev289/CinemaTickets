@@ -15,6 +15,7 @@ npm install react-native-screens
 npm install react-native-safe-area-context
 npm i react-native-modal-dropdown
 npm i react-native-modern-datepicker
+npm i react-native-video
 
 ///
 

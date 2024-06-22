@@ -6,6 +6,7 @@ import {
   StyleSheet,
   Text,
   View,
+  TouchableOpacity
 } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import {SafeAreaView} from 'react-native-safe-area-context';
@@ -15,9 +16,11 @@ import iconCalendar from '../../assets/icons/iconCalendar';
 import iconVideo from '../../assets/icons/iconVideo';
 import iconClock from '../../assets/icons/iconClock';
 import { IMAGE_API_URL, fetchMovies } from '../../../api';
+import { useNavigation } from '@react-navigation/native';
 const screenWidth = Dimensions.get('screen').width;
 const screenHeight = Dimensions.get('screen').height;
 const NowPlayingScreen = () => {
+  const navigation = useNavigation();
   const [isLoading, setIsLoading] = useState(true);
   const [listMovie, setListMovie] = useState([]);
  const fetchData =async ()=>{
@@ -39,17 +42,22 @@ const NowPlayingScreen = () => {
 }, []);
 
   const renderItem = ({item}) => (
+
     <View style={styles.item}>
+       <TouchableOpacity
+          onPress={() => {
+            navigation.navigate('MovieDetailScreen', { movieId: item._id });
+          }}>
       <Image
         style={{
           width: '100%',
           height: '75%',
-          aspectRatio: 3 / 4,
+          objectFit:'cover',
           borderRadius: 10,
         }}
         source={{uri: IMAGE_API_URL+item.image}}
       />
-      <Text numberOfLines={2} style={styles.titleItem}>
+      <Text numberOfLines={1} style={styles.titleItem}>
         {item.name}
       </Text>
       <View style={{flexDirection: 'row', alignItems: 'center'}}>
@@ -70,6 +78,7 @@ const NowPlayingScreen = () => {
         {item.genre.map(g => g.name).join(', ')}
         </Text>
       </View>
+      </TouchableOpacity>
     </View>
   );
   if (isLoading) {

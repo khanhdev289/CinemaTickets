@@ -17,11 +17,17 @@ import iconStar from '../../assets/icons/iconStar';
 import iconVideo from '../../assets/icons/iconVideo';
 import iconClock from '../../assets/icons/iconClock';
 import { IMAGE_API_URL, fetchGenreById, movieByGenre, searchMovie } from '../../../api';
+import iconCalendar from '../../assets/icons/iconCalendar';
+import { useNavigation } from '@react-navigation/native';
 
 const screenWidth = Dimensions.get('screen').width;
 const screenHeight = Dimensions.get('screen').height;
 
 const MovieByGenre = ({ route }) => {
+  const navigation = useNavigation();
+  const handleBack = () => {
+    navigation.goBack();
+  };
   const { genreId } = route.params;
   const [searchQuery, setSearchQuery] = useState('');
   const [text, setText] = useState(null);
@@ -59,19 +65,27 @@ const MovieByGenre = ({ route }) => {
 
   // Render mỗi item phim trong danh sách
   const renderItem = ({ item }) => {
+    const formatDate = (dateString) => {
+      const [datePart] = dateString.split('T');
+      const [year, month, day] = datePart.split('-');
+      return `${day}/${month}/${year}`;
+    };
     return (
       <View style={styles.resultItem}>
-        <TouchableOpacity onPress={() => alert(` ID: ${item._id}`)}>
+        <TouchableOpacity
+          onPress={() => {
+            navigation.push('MovieDetailScreen', { movieId: item._id });
+          }}>
           <Image
             style={{
               width: '100%',
               height: '75%',
-              aspectRatio: 3 / 4,
+              objectFit: 'cover',
               borderRadius: 10,
             }}
             source={{ uri: IMAGE_API_URL + item.image }}
           />
-          <Text numberOfLines={2} style={styles.titleItem}>
+          <Text numberOfLines={1} style={styles.titleItem}>
             {item.name}
           </Text>
           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
@@ -87,9 +101,9 @@ const MovieByGenre = ({ route }) => {
             </Text>
           </View>
           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-            <SvgXml xml={iconVideo()} width={14} height={14} />
+            <SvgXml xml={iconCalendar()} width={14} height={14} />
             <Text style={{ fontSize: 12, marginLeft: 5, color: '#DEDEDE' }}>
-              {item.name}
+              {formatDate(item.release_date)}
             </Text>
           </View>
         </TouchableOpacity>
@@ -100,7 +114,7 @@ const MovieByGenre = ({ route }) => {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => alert('Back pressed')}>
+        <TouchableOpacity onPress={()=>handleBack()}>
           <SvgXml xml={iconBack()} />
         </TouchableOpacity>
         <View style={styles.titleContainer}>
