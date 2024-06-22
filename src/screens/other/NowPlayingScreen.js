@@ -1,70 +1,99 @@
 import {
+  ActivityIndicator,
   Dimensions,
   FlatList,
   Image,
   StyleSheet,
   Text,
   View,
+  TouchableOpacity
 } from 'react-native';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {SvgXml} from 'react-native-svg';
 import iconStar from '../../assets/icons/iconStar';
 import iconCalendar from '../../assets/icons/iconCalendar';
 import iconVideo from '../../assets/icons/iconVideo';
 import iconClock from '../../assets/icons/iconClock';
+import { IMAGE_API_URL, fetchMovies } from '../../../api';
+import { useNavigation } from '@react-navigation/native';
 const screenWidth = Dimensions.get('screen').width;
 const screenHeight = Dimensions.get('screen').height;
 const NowPlayingScreen = () => {
-  const listMovie = [
-    {
-      id: '4',
-      title: 'Avatar 2: The Way Of Water',
-      poster: 'https://via.placeholder.com/150',
-    },
-    {id: '5', title: 'Movie 5', poster: 'https://via.placeholder.com/150'},
-    {id: '6', title: 'Movie 6', poster: 'https://via.placeholder.com/150'},
-  ];
+  const navigation = useNavigation();
+  const [isLoading, setIsLoading] = useState(true);
+  const [listMovie, setListMovie] = useState([]);
+ const fetchData =async ()=>{
+  try {
+    const movieResponse=await fetchMovies();
+    const allMovies = movieResponse.getall;
+    const nowPlaying = allMovies.filter(movie => movie.release_status === 'dc');
+    setListMovie(nowPlaying);
+
+  } catch (error) {
+    
+  }
+ finally {
+  setIsLoading(false);
+}
+ }
+ useEffect(() => {
+  fetchData();
+}, []);
+
   const renderItem = ({item}) => (
+
     <View style={styles.item}>
+       <TouchableOpacity
+          onPress={() => {
+            navigation.navigate('MovieDetailScreen', { movieId: item._id });
+          }}>
       <Image
         style={{
           width: '100%',
           height: '75%',
-          aspectRatio: 3 / 4,
+          objectFit:'cover',
           borderRadius: 10,
         }}
-        source={{uri: item.poster}}
+        source={{uri: IMAGE_API_URL+item.image}}
       />
-      <Text numberOfLines={2} style={styles.titleItem}>
-        {item.title}
+      <Text numberOfLines={1} style={styles.titleItem}>
+        {item.name}
       </Text>
       <View style={{flexDirection: 'row', alignItems: 'center'}}>
         <SvgXml xml={iconStar()} width={14} height={14} />
         <Text style={{fontSize: 12, marginLeft: 5, color: '#DEDEDE'}}>
-          4.0 (982)
+         {item.rate}.0/5
         </Text>
       </View>
       <View style={{flexDirection: 'row', alignItems: 'center'}}>
         <SvgXml xml={iconClock()} width={14} height={14} />
         <Text style={{fontSize: 12, marginLeft: 5, color: '#DEDEDE'}}>
-          2 hour 5 minutes
+      {item.duration}
         </Text>
       </View>
       <View style={{flexDirection: 'row', alignItems: 'center'}}>
         <SvgXml xml={iconVideo()} width={14} height={14} />
         <Text style={{fontSize: 12, marginLeft: 5, color: '#DEDEDE'}}>
-          Action, Sci-fi
+        {item.genre.map(g => g.name).join(', ')}
         </Text>
       </View>
+      </TouchableOpacity>
     </View>
   );
+  if (isLoading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#f7b731" />
+      </View>
+    );
+  }
   return (
     <SafeAreaView style={styles.container}>
       <FlatList
         data={listMovie}
         renderItem={renderItem}
-        keyExtractor={item => item.id}
+        keyExtractor={item => item._id}
         numColumns={2}
         columnWrapperStyle={styles.row}
         contentContainerStyle={styles.resultList}
@@ -90,7 +119,8 @@ const styles = StyleSheet.create({
     margin: 10,
   },
   titleItem: {
-    fontSize: 12,
+    marginTop:10,
+    fontSize: 14,
     color: '#FCC434',
   },
   row: {
@@ -99,5 +129,11 @@ const styles = StyleSheet.create({
   },
   resultList: {
     paddingBottom: 16,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#000000',
   },
 });

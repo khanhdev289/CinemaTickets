@@ -3,6 +3,7 @@ import {Alert, TouchableOpacity, Text, View, StyleSheet} from 'react-native';
 import QRCodeScanner from 'react-native-qrcode-scanner';
 import {RNCamera} from 'react-native-camera';
 import {useNavigation} from '@react-navigation/native';
+
 import {PERMISSIONS, request} from 'react-native-permissions';
 
 const ScanQrScreen = () => {
@@ -22,6 +23,7 @@ const ScanQrScreen = () => {
 
   useEffect(() => {
     requestCameraPermission();
+
 
     const unsubscribe = navigation.addListener('focus', () => {
       setScanned(false);

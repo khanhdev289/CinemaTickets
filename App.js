@@ -12,6 +12,8 @@ import WelcomeScreen from './src/screens/start/WelcomeScreen';
 import ChangePassScreen from './src/screens/other/ChangePassScreen';
 import ProfileScreen from './src/screens/home/ProfileScreen';
 import TicketScreen from './src/screens/home/TicketScreen';
+import MovieScreen from './src/screens/home/MovieScreen';
+import MovieByGenre from './src/screens/home/MovieByGenre';
 
 import SuccessScreen from './src/screens/start/SuccessScreen ';
 import {AuthProvider} from './src/components/AuthProvider ';
@@ -74,6 +76,11 @@ export default function App() {
             options={{headerShown: false}}
           />
 
+          <Stack.Screen
+          name="MovieByGenre"
+          component={MovieByGenre}
+          options={{headerShown: false}}
+        />
           <Stack.Screen
             name="Ss"
             component={SuccessScreen}
