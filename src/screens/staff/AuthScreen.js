@@ -27,7 +27,6 @@ import iconSuccess from '../../assets/icons/iconMyTicket/iconSuccess';
 import RNPrint from 'react-native-print';
 import {useAuth} from '../../components/AuthProvider ';
 
-
 const placeholderImage = require('../../assets/images/image.png');
 const IMAGE_API_URL = 'http://139.180.132.97:3000/images/';
 const POSTS_API_URL = 'http://139.180.132.97:3000/tickets';
@@ -43,17 +42,10 @@ const AuthScreen = () => {
     if (route.params && route.params.ticketId) {
       fetchTicketData(route.params.ticketId);
     }
-
-
-
-  useEffect(() => {
-    fetchTicketData('6673ee54db311efb6bcb457f');
-
   }, [route.params]);
 
   const fetchTicketData = async ticketId => {
     try {
-
       const token = user.token.access_token;
       const axiosInstance = axios.create({
         headers: {
@@ -75,7 +67,6 @@ const AuthScreen = () => {
       setLoading(false);
     }
   };
-
 
   const handleBack = () => {
     navigation.goBack();
@@ -242,7 +233,6 @@ const AuthScreen = () => {
               <View style={styles.detailsContainerAndIcon}>
                 <SvgXml style={{color: 'black'}} xml={iconMovieMyTicket()} />
                 <Text style={styles.movieDetails}>
-
                   {ticketData.movie.genre.map((item, index) => (
                     <React.Fragment key={item._id}>
                       {index > 0 && ', '}
