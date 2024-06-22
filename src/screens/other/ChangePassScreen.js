@@ -1,3 +1,4 @@
+import React, {useState} from 'react';
 import {
   StyleSheet,
   Text,
@@ -5,27 +6,63 @@ import {
   SafeAreaView,
   TextInput,
   TouchableOpacity,
+  Alert,
 } from 'react-native';
-import React, {useState} from 'react';
 import {SvgXml} from 'react-native-svg';
 import iconsBack from '../../assets/icons/iconsBack';
-import CheckBox from '@react-native-community/checkbox';
-
+import axios from 'axios'; // Import axios
 import {useNavigation} from '@react-navigation/native';
+import { useAuth } from '../../components/AuthProvider ';
+
+const CHANGE_PASS_API_URL = 'http://139.180.132.97:3000/users/password';
 
 const ChangePassScreen = () => {
   const navigation = useNavigation();
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const {user} = useAuth();
 
+  const updateUserPassData = async () => {
+    try {
+      if (newPassword !== confirmPassword) {
+        alert('Mật khẩu mới và nhập lại mật khẩu mới không khớp');
+        return;
+      }
 
-  const handleOtp = () => {
-    navigation.navigate('Otp');
+      const userID = user.user._id;
+      const token = user.token.access_token;
+
+      const requestData = {
+        passwordOld: currentPassword,
+        passwordNew: newPassword,
+      };
+
+      const config = {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      };
+
+      const url = `${CHANGE_PASS_API_URL}/${userID}`;
+      const response = await axios.put(url, requestData, config);
+
+      const updatedUserData = response.data;
+      Alert.alert(updatedUserData);
+      console.log('Updated user data:', updatedUserData);
+
+      setCurrentPassword('');
+      setNewPassword('');
+      setConfirmPassword('');
+    } catch (error) {
+      console.error('Lỗi khi cập nhật mật khẩu người dùng: ', error);
+    }
   };
 
   const handleBack = () => {
-
     navigation.goBack();
-  }
-
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -46,6 +83,8 @@ const ChangePassScreen = () => {
             placeholder="Nhập mật khẩu hiện tại"
             placeholderTextColor="grey"
             secureTextEntry
+            value={currentPassword}
+            onChangeText={setCurrentPassword}
           />
         </View>
         <View style={styles.inputRegister}>
@@ -55,6 +94,8 @@ const ChangePassScreen = () => {
             placeholder="Nhập mật khẩu mới"
             placeholderTextColor="grey"
             secureTextEntry
+            value={newPassword}
+            onChangeText={setNewPassword}
           />
         </View>
         <View style={styles.inputRegister}>
@@ -64,10 +105,14 @@ const ChangePassScreen = () => {
             placeholder="Nhập lại mật khẩu mới"
             placeholderTextColor="grey"
             secureTextEntry
+            value={confirmPassword}
+            onChangeText={setConfirmPassword}
           />
         </View>
       </View>
-      <TouchableOpacity style={styles.buttonContainer} onPress={handleOtp}>
+      <TouchableOpacity
+        style={styles.buttonContainer}
+        onPress={updateUserPassData}>
         <View style={styles.button}>
           <Text style={styles.buttonText}>Đổi mật khẩu</Text>
         </View>
@@ -75,7 +120,6 @@ const ChangePassScreen = () => {
     </SafeAreaView>
   );
 };
-
 
 const styles = StyleSheet.create({
   container: {
@@ -108,9 +152,6 @@ const styles = StyleSheet.create({
   inputRegister: {
     marginBottom: '8%',
   },
-  inputPass: {
-    marginBottom: '10%',
-  },
   label: {
     fontSize: 14,
     color: '#FFFFFF',
@@ -124,11 +165,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#FFFFFF',
   },
-  checkBoxContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-
   buttonContainer: {
     marginHorizontal: '10%',
     margin: '5%',
@@ -136,7 +172,7 @@ const styles = StyleSheet.create({
   button: {
     backgroundColor: '#FCC434',
     borderRadius: 20,
-    paddingVertical: 15, // Đặt khoảng cách dọc giữa các yếu tố của nút
+    paddingVertical: 15,
     alignItems: 'center',
   },
   buttonText: {
