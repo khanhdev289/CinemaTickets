@@ -3,6 +3,7 @@ import {View, Text, StyleSheet, TouchableOpacity} from 'react-native';
 import {SvgXml} from 'react-native-svg';
 import iconSs from '../../assets/icons/iconSs';
 import {useNavigation, CommonActions} from '@react-navigation/native';
+
 const SuccessScreen = () => {
   const navigation = useNavigation();
 
