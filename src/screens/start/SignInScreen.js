@@ -14,16 +14,12 @@ import {useNavigation} from '@react-navigation/native';
 import Spinner from 'react-native-loading-spinner-overlay';
 import {useAuth} from '../../components/AuthProvider ';
 import axios from 'axios';
-<<<<<<< HEAD
 import {
   ALERT_TYPE,
   Dialog,
   AlertNotificationRoot,
   Toast,
 } from 'react-native-alert-notification';
-=======
->>>>>>> 8116c599b71cc070ca5c76b65d36c48ff7532db1
-
 const SignInScreen = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -39,7 +35,6 @@ const SignInScreen = () => {
         password: password,
       })
       .then(response => {
-<<<<<<< HEAD
         setLoading(false);
         if (!response.data || response.data.error) {
           console.error('Đăng nhập thất bại:', response.data.message);
@@ -50,14 +45,6 @@ const SignInScreen = () => {
             button: 'thử lại',
           });
         } else {
-=======
-        if (!response.data || response.data.error) {
-          setLoading(false);
-          console.error('Đăng nhập thất bại:', response.data.message);
-          alert('Đăng nhập thất bại: ' + response.data.message);
-        } else {
-          setLoading(false);
->>>>>>> 8116c599b71cc070ca5c76b65d36c48ff7532db1
           console.log('Đăng nhập thành công:', response.data);
           const userData = response.data;
           login(userData);
@@ -67,7 +54,6 @@ const SignInScreen = () => {
       .catch(error => {
         setLoading(false);
         console.error('Đăng nhập thất bại:', error);
-<<<<<<< HEAD
         Dialog.show({
           type: ALERT_TYPE.DANGER,
           title: 'Đăng nhập thất bại',
@@ -131,56 +117,6 @@ const SignInScreen = () => {
         </TouchableWithoutFeedback>
       </ImageBackground>
     </AlertNotificationRoot>
-=======
-      });
-  };
-  return (
-    <ImageBackground
-      source={require('../../assets/images/bgLogin.png')}
-      style={styles.background}>
-      <View style={styles.overlay} />
-      <SafeAreaView style={styles.container}>
-        <View style={styles.welcome}>
-          <Text style={styles.welcomeText}>Xin Chào,</Text>
-          <Text style={styles.subWelcomeText}>Chào mừng bạn quay lại</Text>
-        </View>
-        <View style={styles.inputForm}>
-          <View style={styles.inputEmail}>
-            <Text style={styles.label}>Email</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Nhập Email"
-              placeholderTextColor="#FFFFFF"
-              onChangeText={text => setEmail(text)}
-            />
-          </View>
-          <View style={styles.inputPass}>
-            <Text style={styles.label}>Mật Khẩu</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Nhập Mật Khẩu"
-              placeholderTextColor="#FFFFFF"
-              secureTextEntry
-              onChangeText={text => setPassword(text)}
-            />
-          </View>
-        </View>
-        <View style={styles.forgotPassword}>
-          <Text style={styles.forgotPasswordText}>Quên mật khẩu ?</Text>
-        </View>
-        <TouchableOpacity style={styles.buttonContainer} onPress={handleLogin}>
-          <View style={styles.button}>
-            <Text style={styles.buttonText}>Đăng Nhập</Text>
-          </View>
-        </TouchableOpacity>
-        <Spinner
-          visible={loading}
-          textContent={'Đang đăng nhập...'}
-          textStyle={styles.spinnerText}
-        />
-      </SafeAreaView>
-    </ImageBackground>
->>>>>>> 8116c599b71cc070ca5c76b65d36c48ff7532db1
   );
 };
 
@@ -238,7 +174,7 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 10,
     fontSize: 14,
-    color: '#FFFFFF', // Đặt màu văn bản là trắng
+    color: '#FFFFFF',
   },
   forgotPassword: {
     alignItems: 'flex-start',
@@ -255,7 +191,7 @@ const styles = StyleSheet.create({
   button: {
     backgroundColor: '#FCC434',
     borderRadius: 20,
-    paddingVertical: 15, // Đặt khoảng cách dọc giữa các yếu tố của nút
+    paddingVertical: 15,
     alignItems: 'center',
   },
   buttonText: {
@@ -265,7 +201,6 @@ const styles = StyleSheet.create({
   spinnerText: {
     color: '#FFFFFF',
   },
-<<<<<<< HEAD
   dialog_error: {
     position: 'absolute',
     top: 0,
@@ -273,6 +208,4 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
   },
-=======
->>>>>>> 8116c599b71cc070ca5c76b65d36c48ff7532db1
 });
