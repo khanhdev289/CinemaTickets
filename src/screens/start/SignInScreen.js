@@ -14,6 +14,12 @@ import {useNavigation} from '@react-navigation/native';
 import Spinner from 'react-native-loading-spinner-overlay';
 import {useAuth} from '../../components/AuthProvider ';
 import axios from 'axios';
+import {
+  ALERT_TYPE,
+  Dialog,
+  AlertNotificationRoot,
+  Toast,
+} from 'react-native-alert-notification';
 
 const SignInScreen = () => {
   const [email, setEmail] = useState('');
@@ -30,12 +36,16 @@ const SignInScreen = () => {
         password: password,
       })
       .then(response => {
+        setLoading(false);
         if (!response.data || response.data.error) {
-          setLoading(false);
           console.error('Đăng nhập thất bại:', response.data.message);
-          alert('Đăng nhập thất bại: ' + response.data.message);
+          Dialog.show({
+            type: ALERT_TYPE.WARNING,
+            title: 'Lỗi',
+            textBody: 'email và mật khẩu không trùng khớp',
+            button: 'thử lại',
+          });
         } else {
-          setLoading(false);
           console.log('Đăng nhập thành công:', response.data);
           const userData = response.data;
           login(userData);
@@ -45,61 +55,69 @@ const SignInScreen = () => {
       .catch(error => {
         setLoading(false);
         console.error('Đăng nhập thất bại:', error);
+        Dialog.show({
+          type: ALERT_TYPE.DANGER,
+          title: 'Đăng nhập thất bại',
+          textBody: 'Đã xảy ra lỗi khi đăng nhập. Vui lòng thử lại sau.',
+          button: 'Đóng',
+        });
       });
   };
   const dismissKeyboard = () => {
     Keyboard.dismiss();
   };
   return (
-    <ImageBackground
-      source={require('../../assets/images/bgLogin.png')}
-      style={styles.background}>
-      <TouchableWithoutFeedback onPress={dismissKeyboard}>
-        <SafeAreaView style={styles.container}>
-          <View style={styles.overlay} />
-          <View style={styles.welcome}>
-            <Text style={styles.welcomeText}>Xin Chào,</Text>
-            <Text style={styles.subWelcomeText}>Chào mừng bạn quay lại</Text>
-          </View>
-          <View style={styles.inputForm}>
-            <View style={styles.inputEmail}>
-              <Text style={styles.label}>Email</Text>
-              <TextInput
-                style={styles.input}
-                placeholder="Nhập Email"
-                placeholderTextColor="#FFFFFF"
-                onChangeText={text => setEmail(text)}
-              />
+    <AlertNotificationRoot style={styles.dialog_error}>
+      <ImageBackground
+        source={require('../../assets/images/bgLogin.png')}
+        style={styles.background}>
+        <TouchableWithoutFeedback onPress={dismissKeyboard}>
+          <SafeAreaView style={styles.container}>
+            <View style={styles.overlay} />
+            <View style={styles.welcome}>
+              <Text style={styles.welcomeText}>Xin Chào,</Text>
+              <Text style={styles.subWelcomeText}>Chào mừng bạn quay lại</Text>
             </View>
-            <View style={styles.inputPass}>
-              <Text style={styles.label}>Mật Khẩu</Text>
-              <TextInput
-                style={styles.input}
-                placeholder="Nhập Mật Khẩu"
-                placeholderTextColor="#FFFFFF"
-                secureTextEntry
-                onChangeText={text => setPassword(text)}
-              />
+            <View style={styles.inputForm}>
+              <View style={styles.inputEmail}>
+                <Text style={styles.label}>Email</Text>
+                <TextInput
+                  style={styles.input}
+                  placeholder="Nhập Email"
+                  placeholderTextColor="#FFFFFF"
+                  onChangeText={text => setEmail(text)}
+                />
+              </View>
+              <View style={styles.inputPass}>
+                <Text style={styles.label}>Mật Khẩu</Text>
+                <TextInput
+                  style={styles.input}
+                  placeholder="Nhập Mật Khẩu"
+                  placeholderTextColor="#FFFFFF"
+                  secureTextEntry
+                  onChangeText={text => setPassword(text)}
+                />
+              </View>
             </View>
-          </View>
-          <View style={styles.forgotPassword}>
-            <Text style={styles.forgotPasswordText}>Quên mật khẩu ?</Text>
-          </View>
-          <TouchableOpacity
-            style={styles.buttonContainer}
-            onPress={handleLogin}>
-            <View style={styles.button}>
-              <Text style={styles.buttonText}>Đăng Nhập</Text>
+            <View style={styles.forgotPassword}>
+              <Text style={styles.forgotPasswordText}>Quên mật khẩu ?</Text>
             </View>
-          </TouchableOpacity>
-          <Spinner
-            visible={loading}
-            textContent={'Đang đăng nhập...'}
-            textStyle={styles.spinnerText}
-          />
-        </SafeAreaView>
-      </TouchableWithoutFeedback>
-    </ImageBackground>
+            <TouchableOpacity
+              style={styles.buttonContainer}
+              onPress={handleLogin}>
+              <View style={styles.button}>
+                <Text style={styles.buttonText}>Đăng Nhập</Text>
+              </View>
+            </TouchableOpacity>
+            <Spinner
+              visible={loading}
+              textContent={'Đang đăng nhập...'}
+              textStyle={styles.spinnerText}
+            />
+          </SafeAreaView>
+        </TouchableWithoutFeedback>
+      </ImageBackground>
+    </AlertNotificationRoot>
   );
 };
 
@@ -183,5 +201,12 @@ const styles = StyleSheet.create({
   },
   spinnerText: {
     color: '#FFFFFF',
+  },
+  dialog_error: {
+    position: 'absolute',
+    top: 0,
+    bottom: 0,
+    left: 0,
+    right: 0,
   },
 });
