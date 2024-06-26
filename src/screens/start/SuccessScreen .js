@@ -2,13 +2,20 @@ import React from 'react';
 import {View, Text, StyleSheet, TouchableOpacity} from 'react-native';
 import {SvgXml} from 'react-native-svg';
 import iconSs from '../../assets/icons/iconSs';
-import {useNavigation} from '@react-navigation/native';
+import {useNavigation, CommonActions} from '@react-navigation/native';
+
 const SuccessScreen = () => {
   const navigation = useNavigation();
 
   const handleLogin = () => {
-    navigation.navigate('Login');
+    navigation.dispatch(
+      CommonActions.reset({
+        index: 1,
+        routes: [{name: 'Welcome'}, {name: 'Login'}],
+      }),
+    );
   };
+
   return (
     <View style={styles.container}>
       <View style={styles.mainer}>
@@ -25,7 +32,7 @@ const SuccessScreen = () => {
       </View>
       <TouchableOpacity style={styles.buttonContainer} onPress={handleLogin}>
         <View style={styles.button}>
-          <Text style={styles.buttonText}>Quay lại</Text>
+          <Text style={styles.buttonText}>Đi tới màn hình đăng nhập</Text>
         </View>
       </TouchableOpacity>
     </View>

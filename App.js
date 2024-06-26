@@ -75,12 +75,11 @@ export default function App() {
             component={TicketScreen}
             options={{headerShown: false}}
           />
-
           <Stack.Screen
-          name="MovieByGenre"
-          component={MovieByGenre}
-          options={{headerShown: false}}
-        />
+            name="MovieByGenre"
+            component={MovieByGenre}
+            options={{headerShown: false}}
+          />
           <Stack.Screen
             name="Ss"
             component={SuccessScreen}
