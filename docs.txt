@@ -10,14 +10,16 @@ npm i @react-navigation/material-top-tabs
 Npm I react-native-modal
 npm i axios
 npm install react-native-animatable
-
+npm install @react-native-async-storage/async-storage
 
 npm install react-native-svg-transformer
 npm install react-native-screens
 npm install react-native-safe-area-context
 npm i react-native-modal-dropdown
 npm i react-native-modern-datepicker
-
+npm i react-native-video
+npm i react-native-virtualized-view
+npm install react-native-linear-gradient
 ///
 
 Quy Tắc Viết Code

@@ -23,14 +23,12 @@ import iconMoneyMyTicket from '../../assets/icons/iconMyTicket/iconMoneyMyTicket
 import iconLocationMyTicket from '../../assets/icons/iconMyTicket/iconLocationMyTicket';
 import iconNoteMyTicket from '../../assets/icons/iconMyTicket/iconNoteMyTicket';
 
-
 const MyTicketScreen = () => {
   const navigation = useNavigation();
   const handleBack = () => {
     navigation.goBack();
   };
   return (
-
     <SafeAreaView style={styles.container}>
       <ScrollView>
         <View style={styles.header}>
@@ -102,27 +100,24 @@ const MyTicketScreen = () => {
             <View style={styles.detailsContainerAndIcon}>
               <SvgXml style={{color: 'black'}} xml={iconNoteMyTicket()} />
               <Text style={styles.instructionText}>
-                Xuất trình mã QR này cho quầy vé để nhận vé
+                Vui lòng đưa mã QR cho nhân viên để kiểm tra vé.
               </Text>
             </View>
           </View>
         </View>
       </ScrollView>
     </SafeAreaView>
-
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-
     flex: 1,
 
     padding: 20,
     backgroundColor: 'black',
   },
   header: {
-
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
@@ -173,28 +168,24 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-around',
     marginVertical: 20,
-
   },
   timeText: {
     fontSize: 16,
     fontWeight: 'bold',
 
     color: 'black',
-
   },
   dateText: {
     fontSize: 16,
     fontWeight: 'bold',
 
     color: 'black',
-
   },
   rapText: {
     fontSize: 16,
     fontWeight: 'bold',
 
     color: 'black',
-
   },
   seatText: {
     fontSize: 16,
@@ -218,7 +209,6 @@ const styles = StyleSheet.create({
     height: 1,
     backgroundColor: '#ccc',
     marginVertical: 16,
-
   },
   priceText: {
     fontSize: 18,
@@ -243,7 +233,6 @@ const styles = StyleSheet.create({
     marginTop: 5,
     color: 'black',
     marginLeft: 10,
-
   },
 });
 

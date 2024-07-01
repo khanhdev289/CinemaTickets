@@ -6,11 +6,13 @@ import {
   SafeAreaView,
   TextInput,
   TouchableOpacity,
+  Alert,
 } from 'react-native';
 import {SvgXml} from 'react-native-svg';
 import iconsBack from '../../assets/icons/iconsBack';
 import axios from 'axios'; // Import axios
 import {useNavigation} from '@react-navigation/native';
+import { useAuth } from '../../components/AuthProvider ';
 
 const CHANGE_PASS_API_URL = 'http://139.180.132.97:3000/users/password';
 
@@ -19,6 +21,7 @@ const ChangePassScreen = () => {
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const {user} = useAuth();
 
   const updateUserPassData = async () => {
     try {
@@ -27,12 +30,12 @@ const ChangePassScreen = () => {
         return;
       }
 
-      const userID = '666fe9e1f0849a6a8a904a4c';
-      const token =
-        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2NjZmZTllMWYwODQ5YTZhOGE5MDRhNGMiLCJyb2xlIjoidXNlciIsImVtYWlsIjoiZHV5a2hhbmhzdDFAZ21haWwuY29tIiwiaWF0IjoxNzE4NjEwNTUwLCJleHAiOjE3MTkyMTUzNTB9.V3N_5YzfYE5TtSPAlnm8MrK9rSza77ZhjpiAqhjkEQU';
+      const userID = user.user._id;
+      const token = user.token.access_token;
 
       const requestData = {
-        password: newPassword,
+        passwordOld: currentPassword,
+        passwordNew: newPassword,
       };
 
       const config = {
@@ -46,9 +49,12 @@ const ChangePassScreen = () => {
       const response = await axios.put(url, requestData, config);
 
       const updatedUserData = response.data;
+      Alert.alert(updatedUserData);
       console.log('Updated user data:', updatedUserData);
 
-      navigation.navigate('Home');
+      setCurrentPassword('');
+      setNewPassword('');
+      setConfirmPassword('');
     } catch (error) {
       console.error('Lỗi khi cập nhật mật khẩu người dùng: ', error);
     }

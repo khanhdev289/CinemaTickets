@@ -16,30 +16,32 @@ import iconSearch from '../../assets/icons/iconSearch';
 import iconStar from '../../assets/icons/iconStar';
 import iconVideo from '../../assets/icons/iconVideo';
 import iconClock from '../../assets/icons/iconClock';
-import { IMAGE_API_URL, fetchGenreById, fetchMovies, movieByGenre, searchMovie } from '../../../api';
+import { IMAGE_API_URL, fetchGenreById, movieByGenre, searchMovie } from '../../../api';
 import iconCalendar from '../../assets/icons/iconCalendar';
 import { useNavigation } from '@react-navigation/native';
 
 const screenWidth = Dimensions.get('screen').width;
 const screenHeight = Dimensions.get('screen').height;
 
-const MovieByGenre = () => {
+const MovieByGenre = ({ route }) => {
   const navigation = useNavigation();
   const handleBack = () => {
     navigation.goBack();
   };
- 
+  const { genreId } = route.params;
   const [searchQuery, setSearchQuery] = useState('');
+  const [text, setText] = useState(null);
   const [movieList, setMovieList] = useState([]);
   const [filteredMovieList, setFilteredMovieList] = useState([]);
 
   // Hàm lấy danh sách phim theo thể loại
-  const fetchData = async () => {
+  const fetchData = async (genreId) => {
     try {
-      const response = await fetchMovies(); // Gọi API lấy danh sách phim theo thể loại
-     
-      setMovieList(response.getall); // Lưu danh sách phim vào state movieList
-      setFilteredMovieList(response.getall); // Khởi tạo danh sách phim tìm kiếm với toàn bộ danh sách ban đầu
+      const response = await movieByGenre(genreId); // Gọi API lấy danh sách phim theo thể loại
+      const genreName = await fetchGenreById(genreId); // Gọi API lấy tên thể loại
+      setText(genreName.name); // Lưu tên thể loại vào state text
+      setMovieList(response.getmovie); // Lưu danh sách phim vào state movieList
+      setFilteredMovieList(response.getmovie); // Khởi tạo danh sách phim tìm kiếm với toàn bộ danh sách ban đầu
     } catch (error) {
       console.error('Error fetching movies by genre:', error);
       // Xử lý lỗi nếu cần
@@ -47,8 +49,8 @@ const MovieByGenre = () => {
   };
 
   useEffect(() => {
-    fetchData(); // Load danh sách phim khi component được mount và khi genreId thay đổi
-  }, []);
+    fetchData(genreId); // Load danh sách phim khi component được mount và khi genreId thay đổi
+  }, [genreId]);
 
   // Hàm xử lý tìm kiếm phim
   const handleSearch = (query) => {
@@ -63,7 +65,11 @@ const MovieByGenre = () => {
 
   // Render mỗi item phim trong danh sách
   const renderItem = ({ item }) => {
-    
+    const formatDate = (dateString) => {
+      const [datePart] = dateString.split('T');
+      const [year, month, day] = datePart.split('-');
+      return `${day}/${month}/${year}`;
+    };
     return (
       <View style={styles.resultItem}>
         <TouchableOpacity
@@ -95,9 +101,9 @@ const MovieByGenre = () => {
             </Text>
           </View>
           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-            <SvgXml xml={iconVideo()} width={14} height={14} />
+            <SvgXml xml={iconCalendar()} width={14} height={14} />
             <Text style={{ fontSize: 12, marginLeft: 5, color: '#DEDEDE' }}>
-            <Text style={styles.infoText}> {item.genre?.map(genre => genre.name).join(', ')}</Text>
+              {formatDate(item.release_date)}
             </Text>
           </View>
         </TouchableOpacity>
@@ -107,12 +113,12 @@ const MovieByGenre = () => {
 
   return (
     <View style={styles.container}>
-     <View style={styles.header}>
+       <View style={styles.header}>
       <TouchableOpacity onPress={handleBack} style={styles.backButton}>
         <SvgXml xml={iconBack()} />
       </TouchableOpacity>
       <View style={styles.titleContainer}>
-        <Text style={styles.title}>Tìm Kiếm</Text>
+        <Text style={styles.title}>{text}</Text>
       </View>
     </View>
       <View style={styles.searchContainer}>
@@ -153,10 +159,10 @@ const styles = StyleSheet.create({
   },
   backButton: {
     position: 'absolute',
-    left: 8,
+    left: 5,
   },
   titleContainer: {
-    width:screenWidth - 16, 
+    width:screenWidth - 10, 
     alignItems: 'center',
   },
   title: {

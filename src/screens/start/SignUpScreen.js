@@ -5,26 +5,39 @@ import {
   SafeAreaView,
   TextInput,
   TouchableOpacity,
+  ScrollView,
 } from 'react-native';
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {SvgXml} from 'react-native-svg';
 import iconsBack from '../../assets/icons/iconsBack';
 import CheckBox from '@react-native-community/checkbox';
 import {useNavigation} from '@react-navigation/native';
 import ModalDropdown from 'react-native-modal-dropdown';
 import DatePicker from 'react-native-modern-datepicker';
+import {useForm, Controller} from 'react-hook-form';
 
 const SignUpScreen = () => {
-  const [isChecked, setIsChecked] = useState(false);
+  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
+  const [password, setPassword] = useState('');
+  const [birthDate, setBirthDate] = useState('');
+
   const navigation = useNavigation();
+  const [isChecked, setIsChecked] = useState(false);
+  const {
+    control,
+    handleSubmit,
+    formState: {errors},
+  } = useForm();
 
   const [selectedGender, setSelectedGender] = useState('Chọn giới tính');
 
-  const [birthDate, setBirthDate] = useState('');
   const [showDatePicker, setShowDatePicker] = useState(false);
 
-  const handleOtp = () => {
-    navigation.navigate('Otp');
+  const onSubmit = data => {
+    console.log(data); // Handle form submission here
+    navigation.navigate('Otp'); // Navigate to OTP screen after successful submission
   };
 
   const handleBack = () => {
@@ -40,113 +53,222 @@ const SignUpScreen = () => {
     setBirthDate(date);
     setShowDatePicker(false);
   };
+
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <View style={styles.backContainer}>
-          <TouchableOpacity onPress={handleBack}>
-            <SvgXml style={styles.back} xml={iconsBack()} />
-          </TouchableOpacity>
+    <ScrollView
+      contentContainerStyle={{flexGrow: 1}}
+      showsVerticalScrollIndicator={false}
+      keyboardShouldPersistTaps="always">
+      <SafeAreaView style={styles.container}>
+        <View style={styles.header}>
+          <View style={styles.backContainer}>
+            <TouchableOpacity onPress={handleBack}>
+              <SvgXml style={styles.back} xml={iconsBack()} />
+            </TouchableOpacity>
+          </View>
+          <Text style={styles.title}>Đăng ký</Text>
+          <View style={styles.placeholder} />
         </View>
-        <Text style={styles.title}>Đăng ký</Text>
-        <View style={styles.placeholder} />
-      </View>
-      <View style={styles.inputForm}>
-        <View style={styles.inputRegister}>
-          <Text style={styles.label}>Tên tài khoản</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Nhập Tên tài khoản"
-            placeholderTextColor="#FFFFFF"
-          />
-        </View>
+        <View style={styles.inputForm}>
+          <View style={styles.inputRegister}>
+            <Text style={styles.label}>Tên tài khoản</Text>
+            <Controller
+              control={control}
+              render={({field}) => (
+                <TextInput
+                  {...field}
+                  style={styles.input}
+                  placeholder="Nhập Tên tài khoản"
+                  placeholderTextColor="#FFFFFF"
+                  onChangeText={text => {
+                    setUsername(text);
+                    field.onChange(text);
+                  }}
+                />
+              )}
+              name="username"
+              rules={{required: 'Bạn cần nhập tên tài khoản'}}
+              defaultValue=""
+            />
+            {errors.username && (
+              <Text style={styles.texterr}>{errors.username.message}</Text>
+            )}
+          </View>
 
-        <View style={styles.inputRegister}>
-          <Text style={styles.label}>Email</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Nhập Email"
-            placeholderTextColor="#FFFFFF"
-          />
-        </View>
+          <View style={styles.inputRegister}>
+            <Text style={styles.label}>Email</Text>
+            <Controller
+              control={control}
+              render={({field}) => (
+                <TextInput
+                  {...field}
+                  style={styles.input}
+                  placeholder="Nhập Email"
+                  placeholderTextColor="#FFFFFF"
+                  onChangeText={text => {
+                    setEmail(text);
+                    field.onChange(text);
+                  }}
+                />
+              )}
+              name="email"
+              rules={{
+                required: 'Email không hợp lệ',
+                pattern: {
+                  value: /^\S+@\S+$/i,
+                  message: 'Email không hợp lệ',
+                },
+              }}
+              defaultValue=""
+            />
+            {errors.email && (
+              <Text style={styles.texterr}>{errors.email.message}</Text>
+            )}
+          </View>
 
-        <View style={styles.inputRegister}>
-          <Text style={styles.label}>Số điện thoại</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Nhập số điện thoại"
-            placeholderTextColor="#FFFFFF"
-          />
-        </View>
+          <View style={styles.inputRegister}>
+            <Text style={styles.label}>Số điện thoại</Text>
+            <Controller
+              control={control}
+              render={({field}) => (
+                <TextInput
+                  {...field}
+                  style={styles.input}
+                  placeholder="Nhập số điện thoại"
+                  placeholderTextColor="#FFFFFF"
+                  onChangeText={text => {
+                    setPhone(text);
+                    field.onChange(text);
+                  }}
+                />
+              )}
+              name="phone"
+              rules={{required: 'Bạn cần nhập số điện thoại'}}
+              defaultValue=""
+            />
+            {errors.phone && (
+              <Text style={styles.texterr}>{errors.phone.message}</Text>
+            )}
+          </View>
 
-        <View style={styles.inputRegister}>
-          <Text style={styles.label}>Mật Khẩu</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Nhập Mật Khẩu"
-            placeholderTextColor="#FFFFFF"
-            secureTextEntry
-          />
-        </View>
+          <View style={styles.inputRegister}>
+            <Text style={styles.label}>Mật Khẩu</Text>
+            <Controller
+              control={control}
+              render={({field}) => (
+                <TextInput
+                  {...field}
+                  style={styles.input}
+                  placeholder="Nhập Mật khẩu"
+                  placeholderTextColor="#FFFFFF"
+                  secureTextEntry
+                  onChangeText={text => {
+                    setPassword(text);
+                    field.onChange(text);
+                  }}
+                />
+              )}
+              name="password"
+              rules={{
+                required: 'Mật khẩu cần ít nhất 6 ký tự',
+                minLength: {value: 6, message: 'Mật khẩu cần ít nhất 6 ký tự'},
+              }}
+              defaultValue=""
+            />
+            {errors.password && (
+              <Text style={styles.texterr}>{errors.password.message}</Text>
+            )}
+          </View>
 
-        <View style={styles.inputRegister}>
-          <Text style={styles.label}>Ngày tháng năm sinh</Text>
-          <TouchableOpacity
-            onPress={() => setShowDatePicker(!showDatePicker)}
-            style={styles.input}>
-            <Text style={{color: '#FFFFFF'}}>
-              {birthDate || 'Chọn ngày tháng năm sinh'}
+          <View style={styles.inputRegister}>
+            <Text style={styles.label}>Ngày tháng năm sinh</Text>
+            <Controller
+              control={control}
+              render={({field}) => (
+                <TouchableOpacity
+                  onPress={() => setShowDatePicker(!showDatePicker)}
+                  style={styles.input}>
+                  <Text style={{color: '#FFFFFF'}}>
+                    {birthDate || 'Chọn ngày tháng năm sinh'}
+                  </Text>
+                </TouchableOpacity>
+              )}
+              name="birthDate"
+              rules={{required: 'Bạn cần chọn ngày tháng năm sinh'}}
+              defaultValue=""
+            />
+            {showDatePicker && (
+              <View style={styles.datePickerContainer}>
+                <DatePicker
+                  mode="calendar"
+                  onDateChange={handleDateChange}
+                  options={{
+                    backgroundColor: '#FFFFFF',
+                    textHeaderColor: '#000000',
+                    textDefaultColor: '#000000',
+                    selectedTextColor: '#000000',
+                    mainColor: '#D9D9D9',
+                    textSecondaryColor: '#D9D9D9',
+                  }}
+                  style={styles.datePicker}
+                />
+              </View>
+            )}
+            {errors.birthDate && (
+              <Text style={styles.texterr}>{errors.birthDate.message}</Text>
+            )}
+          </View>
+
+          <View style={styles.inputRegister}>
+            <Text style={styles.label}>Giới tính</Text>
+            <Controller
+              control={control}
+              render={({field}) => (
+                <ModalDropdown
+                  options={genderOptions}
+                  onSelect={(index, value) => {
+                    setSelectedGender(value);
+                    field.onChange(value);
+                  }}
+                  defaultValue={selectedGender}
+                  textStyle={styles.dropdownText}
+                  dropdownStyle={styles.dropdownStyle}
+                  saveScrollPosition={false}
+                />
+              )}
+              name="selectedGender"
+              rules={{required: 'Bạn cần chọn giới tính'}}
+              defaultValue=""
+            />
+            {errors.selectedGender && (
+              <Text style={styles.texterr}>
+                {errors.selectedGender.message}
+              </Text>
+            )}
+          </View>
+
+          <View style={styles.checkBoxContainer}>
+            <CheckBox
+              value={isChecked}
+              onValueChange={() => setIsChecked(!isChecked)}
+              style={styles.checkBox}
+              tintColors={{true: '#FFFFFF', false: '#FFFFFF'}}
+              boxType="circle"
+            />
+            <Text style={[styles.checkBoxText, {color: '#FF9C00'}]}>
+              Chấp nhận các quyền riêng tư
             </Text>
-          </TouchableOpacity>
-          {showDatePicker && (
-            <View style={styles.datePickerContainer}>
-              <DatePicker
-                mode="calendar"
-                onDateChange={handleDateChange}
-                options={{
-                  backgroundColor: '#FFFFFF',
-                  textHeaderColor: '#000000',
-                  textDefaultColor: '#000000',
-                  selectedTextColor: '#000000',
-                  mainColor: '#D9D9D9',
-                  textSecondaryColor: '#D9D9D9',
-                }}
-                style={styles.datePicker}
-              />
-            </View>
-          )}
+          </View>
         </View>
-        <View style={styles.inputRegister}>
-          <Text style={styles.label}>Giới tính</Text>
-          <ModalDropdown
-            options={genderOptions}
-            onSelect={handleOptionSelect}
-            defaultValue={selectedGender}
-            textStyle={styles.dropdownText}
-            dropdownStyle={styles.dropdownStyle}
-            saveScrollPosition={false}
-          />
-        </View>
-
-        <View style={styles.checkBoxContainer}>
-          <CheckBox
-            value={isChecked}
-            onValueChange={() => setIsChecked(!isChecked)}
-            style={styles.checkBox}
-            tintColors={{true: '#FFFFFF', false: '#FFFFFF'}}
-            boxType="circle"
-          />
-          <Text style={[styles.checkBoxText, {color: '#FF9C00'}]}>
-            Chấp nhận các quyền riêng tư
-          </Text>
-        </View>
-      </View>
-      <TouchableOpacity style={styles.buttonContainer} onPress={handleOtp}>
-        <View style={styles.button}>
-          <Text style={styles.buttonText}>Hoàn thành</Text>
-        </View>
-      </TouchableOpacity>
-    </SafeAreaView>
+        <TouchableOpacity
+          style={styles.buttonContainer}
+          onPress={handleSubmit(onSubmit)}>
+          <View style={styles.button}>
+            <Text style={styles.buttonText}>Hoàn thành</Text>
+          </View>
+        </TouchableOpacity>
+      </SafeAreaView>
+    </ScrollView>
   );
 };
 
@@ -164,7 +286,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     width: '100%',
     paddingHorizontal: 16,
-    marginBottom: '10%',
+    marginBottom: 10,
   },
   backContainer: {
     position: 'absolute',
@@ -243,10 +365,11 @@ const styles = StyleSheet.create({
     width: '75%',
     height: '150',
     alignSelf: 'center',
+    position: 'absolute',
   },
   datePickerContainer: {
     position: 'absolute',
-    bottom: 50,
+    bottom: 30,
     left: 0,
     right: 0,
     zIndex: 1,
@@ -254,5 +377,13 @@ const styles = StyleSheet.create({
   datePicker: {
     borderRadius: 10,
     marginTop: 10,
+    width: '90%',
+    height: '80%', // Adjust the width
+    alignSelf: 'center',
+  },
+  texterr: {
+    marginTop: '2%',
+    color: 'red',
+    fontSize: 14,
   },
 });

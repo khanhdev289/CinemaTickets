@@ -9,7 +9,7 @@ import {
   Image,
 } from 'react-native';
 import {SvgXml} from 'react-native-svg';
-import SwiperFlatList from 'react-native-swiper-flatlist'; // Thay đổi import
+import SwiperFlatList from 'react-native-swiper-flatlist';
 import iconLanguage from '../../assets/icons/iconLanguage';
 import {useNavigation} from '@react-navigation/native';
 
