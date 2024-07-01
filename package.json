@@ -12,20 +12,30 @@
   "dependencies": {
     "@react-native-async-storage/async-storage": "^1.23.1",
     "@react-native-community/checkbox": "^0.5.17",
+    "@react-native-community/datetimepicker": "^8.1.1",
+    "@react-native-picker/picker": "^2.7.7",
     "@react-navigation/bottom-tabs": "^6.5.20",
     "@react-navigation/material-top-tabs": "^6.6.13",
     "@react-navigation/native-stack": "^6.9.26",
     "axios": "^1.7.2",
+
     "expo-linear-gradient": "^13.0.2",
     "linear-gradient": "^1.0.6",
+
+
+    "date-fns": "^3.6.0",
     "react": "18.2.0",
     "react-hook-form": "^7.52.0",
     "react-native": "0.74.2",
+    "react-native-alert-notification": "^0.4.0",
+
     "react-native-camera": "^4.2.1",
     "react-native-confirmation-code-field": "^7.4.0",
     "react-native-html-to-pdf": "^0.12.0",
     "react-native-image-picker": "^7.1.2",
+
     "react-native-linear-gradient": "^2.8.3",
+
     "react-native-loading-spinner-overlay": "^3.0.1",
     "react-native-modal": "^13.0.1",
     "react-native-modal-dropdown": "^1.0.2",
@@ -41,8 +51,13 @@
     "react-native-svg": "^15.3.0",
     "react-native-svg-transformer": "^1.4.0",
     "react-native-swiper-flatlist": "^3.2.4",
-    "react-native-video": "^6.2.0",
+
+
     "react-native-virtualized-view": "^1.0.0"
+
+    "react-native-video": "^6.3.0",
+    "yup": "^1.4.0"
+
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",

@@ -24,13 +24,14 @@ import UpdateUserScreen from './src/screens/other/UpdateUserScreen';
 import SelectSeatScreen from './src/screens/home/SelectSeatScreen';
 import PaymentScreen from './src/screens/home/PaymentScreen';
 
+
 const Stack = createNativeStackNavigator();
 
 export default function App() {
   return (
     <AuthProvider>
       <NavigationContainer>
-        <Stack.Navigator initialRouteName="Home">
+        <Stack.Navigator initialRouteName="Welcome">
           <Stack.Screen
             name="Home"
             component={BottomNavication}
@@ -107,6 +108,7 @@ export default function App() {
           />
 
           <Stack.Screen
+
             name="Register"
             component={SignUpScreen}
             options={{headerShown: false}}

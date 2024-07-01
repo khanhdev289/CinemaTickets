@@ -11,6 +11,9 @@ import {
   StatusBar,
   ScrollView,
   RefreshControl,
+
+  Alert,
+
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import Modal from 'react-native-modal';
@@ -24,6 +27,10 @@ import {SvgXml} from 'react-native-svg';
 import axios from 'axios';
 import {useAuth} from '../../components/AuthProvider ';
 
+import iconMailProfile from '../../assets/icons/iconProfile/iconMailProfile';
+import iconPhoneProfile from '../../assets/icons/iconProfile/iconPhoneProfile';
+
+
 const POSTS_API_URL = 'http://139.180.132.97:3000/users';
 const IMAGE_API_URL = 'http://139.180.132.97:3000/images/';
 const placeholderImage = require('../../assets/images/logo.png');
@@ -32,13 +39,17 @@ const ProfileScreen = ({navigation}) => {
   const [isEnabled, setIsEnabled] = useState(false);
   const [profileImage, setProfileImage] = useState('');
   const [profileEmail, setProfileEmail] = useState('');
+
+  const [profileRole, setProfileRole] = useState('');
+
   const [profileName, setProfileName] = useState('');
   const [profilePhone, setProfilePhone] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
 
-  const {user} = useAuth();
 
+  const {user} = useAuth();
+  const {logout} = useAuth();
 
   useEffect(() => {
     fetchDataUser();
@@ -50,7 +61,6 @@ const ProfileScreen = ({navigation}) => {
 
       const userID = user.user._id;
       const token = user.token.access_token;
- 
 
       const axiosInstance = axios.create({
         headers: {
@@ -66,11 +76,23 @@ const ProfileScreen = ({navigation}) => {
       setProfileName(userData.name);
       setProfilePhone(userData.number_phone);
       setProfileEmail(userData.email);
+      setProfileRole(userData.role);
+
 
       setIsLoading(false);
     } catch (error) {
       console.error('Lỗi khi tải dữ liệu người dùng: ', error);
       setIsLoading(false);
+    }
+
+  };
+  const getRoleText = () => {
+    if (profileRole === 'user') {
+      return 'Người dùng';
+    } else if (profileRole === 'staff') {
+      return 'Nhân viên';
+    } else {
+      return 'Null';
     }
   };
 
@@ -80,7 +102,29 @@ const ProfileScreen = ({navigation}) => {
     setRefreshing(false);
   };
 
-  const toggleSwitch = () => setIsEnabled(previousState => !previousState);
+  const tapOnLogOut = () => {
+    Alert.alert(
+      'Đăng xuất',
+      'Bạn có chắc chắn muốn đăng xuất không?',
+      [
+        {
+          text: 'Hủy',
+          onPress: () => console.log('Đăng xuất bị hủy'),
+          style: 'cancel',
+        },
+        {
+          text: 'Đăng xuất',
+          onPress: () => {
+            navigation.navigate('Welcome');
+            logout();
+          },
+          style: 'destructive',
+        },
+      ],
+      {cancelable: false},
+    );
+  };
+
 
   const toggleUpdateUser = () => {
     navigation.navigate('UpdateUserScreen', {
@@ -116,38 +160,46 @@ const ProfileScreen = ({navigation}) => {
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }>
         <View style={styles.profileHeader}>
-          <Image
-            source={
-              profileImage
-                ? {uri: IMAGE_API_URL + profileImage}
-                : placeholderImage
-            }
-            style={styles.profileImage}
-          />
+
+          <View>
+            <Image
+              source={
+                profileImage
+                  ? {uri: IMAGE_API_URL + profileImage}
+                  : placeholderImage
+              }
+              style={styles.profileImage}
+            />
+            <View style={styles.roleView}>
+              <Text style={styles.roleProfileInfo}>{getRoleText()}</Text>
+            </View>
+          </View>
+
           <View style={styles.profileContent}>
             <View style={styles.headerRow}>
               <Text style={styles.profileName}>
                 {profileName || 'Tên người dùng'}
               </Text>
-              <TouchableOpacity
-                style={styles.editButton}
-                onPress={toggleUpdateUser}>
-                <SvgXml xml={iconEditProfile()} />
-              </TouchableOpacity>
+
             </View>
-            <Text style={styles.profileInfo}>
-              {profilePhone || 'Số điện thoại'}
-            </Text>
-            <Text style={styles.profileInfo}>{profileEmail || 'Email'}</Text>
+            <View style={styles.headerRow}>
+              <SvgXml xml={iconPhoneProfile()} style={styles.menuIcon} />
+              <Text style={styles.profileInfo}>
+                {profilePhone || 'Số điện thoại'}
+              </Text>
+            </View>
+
+            <View style={styles.headerRow}>
+              <SvgXml xml={iconMailProfile()} style={styles.menuIcon} />
+              <Text style={styles.profileInfo}>{profileEmail || 'Email'}</Text>
+            </View>
           </View>
         </View>
-        <TouchableOpacity
-          style={styles.menuItem}
-          onPress={() => {
-            navigation.navigate('AuthScreen');
-          }}>
+        <View style={{borderBottomColor: '#444', borderBottomWidth: 1}}></View>
+        <TouchableOpacity style={styles.menuItem} onPress={toggleUpdateUser}>
           <SvgXml xml={iconMyTicketProfile()} style={styles.menuIcon} />
-          <Text style={styles.menuText}>Vé của tôi</Text>
+          <Text style={styles.menuText}>Chỉnh sửa thông tin</Text>
+
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.menuItem}
@@ -157,18 +209,10 @@ const ProfileScreen = ({navigation}) => {
           <SvgXml xml={iconChangePassProfile()} style={styles.menuIcon} />
           <Text style={styles.menuText}>Đổi mật khẩu</Text>
         </TouchableOpacity>
-        <View style={styles.menuItem}>
-          <SvgXml xml={iconFaceIdProfile()} style={styles.menuIcon} />
-          <Text style={styles.menuText}>Face ID / Touch ID</Text>
-          <Switch
-            trackColor={{false: '#767577', true: '#81b0ff'}}
-            thumbColor={isEnabled ? '#f5dd4b' : '#f4f3f4'}
-            onValueChange={toggleSwitch}
-            value={isEnabled}
-            style={styles.switch}
-          />
-        </View>
-        <TouchableOpacity style={styles.logoutButton}>
+
+
+        <TouchableOpacity style={styles.logoutButton} onPress={tapOnLogOut}>
+
           <Text style={styles.logoutText}>Đăng Xuất</Text>
         </TouchableOpacity>
       </ScrollView>
@@ -196,6 +240,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 20,
     flexDirection: 'row',
+    marginTop: 30,
   },
   profileContent: {
     alignItems: 'flex-start',
@@ -207,11 +252,27 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
   },
+
+  roleView: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    borderColor: '#f7b731',
+    borderWidth: 2,
+    padding: 3,
+    marginTop: 5,
+    borderRadius: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+
   profileImage: {
     width: 100,
     height: 100,
     borderRadius: 50,
     marginBottom: 10,
+    borderWidth: 2,
+    borderColor: '#f7b731',
   },
   profileName: {
     color: '#fff',
@@ -222,6 +283,12 @@ const styles = StyleSheet.create({
     color: '#aaa',
     fontSize: 14,
   },
+  roleProfileInfo: {
+    color: '#f7b731',
+    fontSize: 14,
+    fontWeight: 'bold',
+  },
+
   menuItem: {
     flexDirection: 'row',
     alignItems: 'center',

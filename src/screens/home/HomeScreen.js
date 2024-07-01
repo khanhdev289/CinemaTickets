@@ -115,7 +115,9 @@ const HomeScreen = () => {
           keyExtractor={item => item._id}
           horizontal
           showsHorizontalScrollIndicator={false}
+
           renderItem={({ item }) => <UpcomingMovieItem item={item}    navigation={navigation} />}
+
         />
 
         <Section title="Khuyến mãi" onPress={() => alert('Xem tất cả clicked!')} />
@@ -208,7 +210,9 @@ const MovieItem = ({ item, index, visibleIndex, navigation }) => {
   return (
     <TouchableOpacity
       onPress={() => {
+
         navigation.navigate('MovieDetailScreen', { movieId: item._id });
+
       }}>
       <View
         style={[
@@ -256,6 +260,7 @@ const formatDate = (dateString) => {
   return `${day}/${month}/${year}`;
 };
 
+
 const UpcomingMovieItem = ({ item,navigation }) => {
   const formattedDate = formatDate(item.release_date);
   return(
@@ -264,6 +269,7 @@ const UpcomingMovieItem = ({ item,navigation }) => {
       onPress={() => {
         navigation.navigate('MovieDetailScreen', { movieId: item._id });
       }}>
+
       <Image
         style={styles.upcomingMovieImage}
         source={{ uri: IMAGE_API_URL + item.image }}

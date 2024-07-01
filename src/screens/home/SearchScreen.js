@@ -1,4 +1,6 @@
+
 import React, { useEffect, useState } from 'react';
+
 import {
   Image,
   View,
@@ -8,30 +10,37 @@ import {
   FlatList,
   StyleSheet,
   Dimensions,
+  ActivityIndicator,
 } from 'react-native';
 import { SvgXml } from 'react-native-svg';
+
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import iconBack from '../../assets/icons/iconBack';
 import iconSearch from '../../assets/icons/iconSearch';
 import iconStar from '../../assets/icons/iconStar';
 import iconVideo from '../../assets/icons/iconVideo';
 import iconClock from '../../assets/icons/iconClock';
+
 import { IMAGE_API_URL, fetchGenreById, fetchMovies, movieByGenre, searchMovie } from '../../../api';
 import iconCalendar from '../../assets/icons/iconCalendar';
+
 import { useNavigation } from '@react-navigation/native';
 
 const screenWidth = Dimensions.get('screen').width;
 const screenHeight = Dimensions.get('screen').height;
 
+
 const MovieByGenre = () => {
+
   const navigation = useNavigation();
   const handleBack = () => {
     navigation.goBack();
   };
- 
+
   const [searchQuery, setSearchQuery] = useState('');
   const [movieList, setMovieList] = useState([]);
   const [filteredMovieList, setFilteredMovieList] = useState([]);
+
 
   // Hàm lấy danh sách phim theo thể loại
   const fetchData = async () => {
@@ -70,12 +79,15 @@ const MovieByGenre = () => {
           onPress={() => {
             navigation.push('MovieDetailScreen', { movieId: item._id });
           }}>
+
           <Image
             style={{
               width: '100%',
               height: '75%',
+
               objectFit: 'cover',
               borderRadius: 10,
+
             }}
             source={{ uri: IMAGE_API_URL + item.image }}
           />
@@ -97,7 +109,9 @@ const MovieByGenre = () => {
           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
             <SvgXml xml={iconVideo()} width={14} height={14} />
             <Text style={{ fontSize: 12, marginLeft: 5, color: '#DEDEDE' }}>
+
             <Text style={styles.infoText}> {item.genre?.map(genre => genre.name).join(', ')}</Text>
+
             </Text>
           </View>
         </TouchableOpacity>
@@ -107,22 +121,25 @@ const MovieByGenre = () => {
 
   return (
     <View style={styles.container}>
+
      <View style={styles.header}>
       <TouchableOpacity onPress={handleBack} style={styles.backButton}>
         <SvgXml xml={iconBack()} />
       </TouchableOpacity>
       <View style={styles.titleContainer}>
         <Text style={styles.title}>Tìm Kiếm</Text>
+
       </View>
     </View>
       <View style={styles.searchContainer}>
         <View style={styles.searchWrapper}>
-          <SvgXml xml={iconSearch()} />
+          <SvgXml xml={iconSearch()} onPress={() => handleSearch(searchQuery)} />
           <TextInput
             style={styles.searchInput}
             placeholder="Tìm kiếm phim..."
             placeholderTextColor="#8C8C8C"
             value={searchQuery}
+
             onChangeText={handleSearch} // Xử lý thay đổi nội dung tìm kiếm
           />
         </View>
@@ -135,11 +152,18 @@ const MovieByGenre = () => {
         columnWrapperStyle={styles.row}
         contentContainerStyle={styles.resultList}
       />
+
     </View>
   );
 };
 
 const styles = StyleSheet.create({
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#000000',
+  },
   container: {
     flex: 1,
     padding: 16,
@@ -175,6 +199,7 @@ const styles = StyleSheet.create({
     padding: 5,
     marginLeft: 10,
     color: 'white',
+    flex: 1,
   },
   searchWrapper: {
     flexDirection: 'row',
@@ -199,6 +224,17 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#FCC434',
   },
+  noResults: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  noResultsText: {
+    fontSize: 18,
+    color: '#DEDEDE',
+  },
 });
 
+
 export default MovieByGenre;
+

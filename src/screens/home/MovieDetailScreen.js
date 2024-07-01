@@ -1,15 +1,19 @@
 import React, { useEffect, useState } from 'react';
+
 import { StyleSheet, Text, View, Image, Dimensions, TouchableOpacity, FlatList, ActivityIndicator, Modal } from 'react-native';
+
 import { SvgXml } from 'react-native-svg';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Video from 'react-native-video';
 import iconStar from '../../assets/icons/iconStar';
 import iconStarWhite from '../../assets/icons/iconStarWhite';
 import iconPlay from '../../assets/icons/iconPlay';
+
 import { ScrollView } from 'react-native-virtualized-view'
 import { IMAGE_API_URL, VIDEO_API_URL, fetchCinemaByMovie, fetchMovieById } from '../../../api';
 import iconBack from '../../assets/icons/iconBack';
 import { useNavigation } from '@react-navigation/native';
+
 const screenWidth = Dimensions.get('screen').width;
 const screenHeight = Dimensions.get('screen').height;
 
@@ -21,6 +25,7 @@ const MovieDetailScreen = ({ route }) => {
   const [selectedTheater, setSelectedTheater] = useState(null);
   const [isExpanded, setIsExpanded] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+
   const navigation = useNavigation();
   useEffect(() => {
     const fetchData = async () => {
@@ -35,6 +40,7 @@ const MovieDetailScreen = ({ route }) => {
         setIsLoading(false);
       }
     };
+
 
     fetchData();
   }, [movieId]);
@@ -101,12 +107,14 @@ const MovieDetailScreen = ({ route }) => {
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView>
+
          <TouchableOpacity
           style={styles.backButton}
           onPress={() => navigation.goBack()}
         >
           <SvgXml xml={iconBack()}/>
         </TouchableOpacity>
+
         <Image style={styles.poster} source={{ uri: IMAGE_API_URL + movie.image }} />
         <View style={styles.infoOverlay}>
           <View style={styles.infoContainer}>
@@ -179,7 +187,9 @@ const MovieDetailScreen = ({ route }) => {
           renderItem={renderTheater}
           contentContainerStyle={{ paddingHorizontal: 10 }}
         />
+
         <TouchableOpacity style={styles.button} onPress={() => {navigation.navigate('SelectSeatScreen')}}>
+
           <Text style={styles.buttonText}>Tiếp tục</Text>
         </TouchableOpacity>
       </ScrollView>
@@ -212,6 +222,7 @@ const styles = StyleSheet.create({
     width: '100%',
     height: screenHeight * 0.25,
     resizeMode: 'stretch',
+
   },
   backButton: {
     position: 'absolute',
@@ -219,6 +230,7 @@ const styles = StyleSheet.create({
     left: 20,
    
     zIndex: 1,
+
   },
   infoOverlay: {
     marginTop: -50,
@@ -331,7 +343,9 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'white',
     borderRadius: 5,
+
     margin: 16,
+
   },
   theaterTitle: {
     color: 'white',

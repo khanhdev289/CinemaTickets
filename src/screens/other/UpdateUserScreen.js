@@ -114,6 +114,9 @@ const UpdateUserScreen = ({navigation, route}) => {
         <Text style={styles.title}>Cập nhật thông tin</Text>
         <View style={styles.placeholder} />
       </View>
+
+      <View style={{borderBottomColor: '#444', borderBottomWidth: 1}}></View>
+
       {isLoading && (
         <View style={styles.loadingOverlay}>
           <ActivityIndicator size="large" color="#f7b731" />
@@ -130,7 +133,11 @@ const UpdateUserScreen = ({navigation, route}) => {
           }}>
           <Text style={styles.categoryTitle}>Ảnh đại diện</Text>
           <TouchableOpacity onPress={selectImage}>
-            <Text style={{textAlign: 'center', color: 'white'}}>Chọn ảnh </Text>
+
+            <Text style={{textAlign: 'center', color: '#FCC434'}}>
+              Chọn ảnh{' '}
+            </Text>
+
           </TouchableOpacity>
         </View>
         <View style={styles.container}>
@@ -139,6 +146,8 @@ const UpdateUserScreen = ({navigation, route}) => {
             style={styles.modalProfileImage}
           />
         </View>
+
+        <View style={{borderBottomColor: '#444', borderBottomWidth: 1}}></View>
 
         <View
           style={{
@@ -150,12 +159,18 @@ const UpdateUserScreen = ({navigation, route}) => {
           }}>
           <Text style={styles.categoryTitle}>Thông tin khác</Text>
         </View>
+
+
+
         <TextInput
           style={styles.modalInput}
           value={profileName}
           onChangeText={setProfileName}
           placeholder="Nhập tên"
         />
+
+
+
         <TextInput
           style={styles.modalInput}
           value={profilePhone}
@@ -163,6 +178,8 @@ const UpdateUserScreen = ({navigation, route}) => {
           placeholder="Nhập số điện thoại"
           keyboardType="phone-pad"
         />
+
+        <View style={{borderBottomColor: '#444', borderBottomWidth: 1}}></View>
 
         <TouchableOpacity style={styles.modalButton} onPress={updateUserData}>
           <Text style={styles.logoutText}>Thay đổi</Text>
@@ -243,6 +260,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderRadius: 10,
     marginHorizontal: 15,
+
+    marginTop: 30,
+
   },
   logoutText: {
     color: '#000',

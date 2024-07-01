@@ -17,6 +17,7 @@ const getAuthTokenFromSecureStorage = async () => {
 const createApiInstance = async () => {
   try {
     const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2NjZmZDIxOWVlMmY0OWI0Nzg4NjNmNDQiLCJyb2xlIjoidXNlciIsImVtYWlsIjoicXVhbmprbDk4QGdtYWlsLmNvbSIsImlhdCI6MTcxOTM4NTAxNCwiZXhwIjoxNzE5OTg5ODE0fQ.lutKtSQpLW8pDSQlZw0mu43bTu4YQWexPuhHJOlvuXM";
+
     return axios.create({
       baseURL: 'http://139.180.132.97:3000', // Thay thế bằng URL của API của bạn
       headers: {
@@ -136,3 +137,4 @@ export const fetchNews = async () => {
     throw error;
   }
 };
+
