@@ -28,7 +28,9 @@ const BottomNavigation = () => {
         <>
           <Tab.Screen
             name="ScanQrScreen"
+
             component={ScanQrScreen}
+
             options={{
               tabBarLabel: 'ScanQrScreen',
               tabBarIcon: ({color, size}) => (

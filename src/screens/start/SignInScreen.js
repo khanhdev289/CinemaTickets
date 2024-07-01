@@ -14,12 +14,14 @@ import {useNavigation} from '@react-navigation/native';
 import Spinner from 'react-native-loading-spinner-overlay';
 import {useAuth} from '../../components/AuthProvider ';
 import axios from 'axios';
+
 import {
   ALERT_TYPE,
   Dialog,
   AlertNotificationRoot,
   Toast,
 } from 'react-native-alert-notification';
+
 const SignInScreen = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -35,6 +37,7 @@ const SignInScreen = () => {
         password: password,
       })
       .then(response => {
+
         setLoading(false);
         if (!response.data || response.data.error) {
           console.error('Đăng nhập thất bại:', response.data.message);
@@ -45,6 +48,7 @@ const SignInScreen = () => {
             button: 'thử lại',
           });
         } else {
+
           console.log('Đăng nhập thành công:', response.data);
           const userData = response.data;
           login(userData);
@@ -54,6 +58,7 @@ const SignInScreen = () => {
       .catch(error => {
         setLoading(false);
         console.error('Đăng nhập thất bại:', error);
+
         Dialog.show({
           type: ALERT_TYPE.DANGER,
           title: 'Đăng nhập thất bại',
@@ -117,6 +122,7 @@ const SignInScreen = () => {
         </TouchableWithoutFeedback>
       </ImageBackground>
     </AlertNotificationRoot>
+
   );
 };
 
@@ -201,6 +207,7 @@ const styles = StyleSheet.create({
   spinnerText: {
     color: '#FFFFFF',
   },
+
   dialog_error: {
     position: 'absolute',
     top: 0,
@@ -208,4 +215,5 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
   },
+
 });

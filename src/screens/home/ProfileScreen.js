@@ -11,7 +11,9 @@ import {
   StatusBar,
   ScrollView,
   RefreshControl,
+
   Alert,
+
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import Modal from 'react-native-modal';
@@ -24,8 +26,10 @@ import iconFaceIdProfile from '../../assets/icons/iconProfile/iconFaceIdProfile'
 import {SvgXml} from 'react-native-svg';
 import axios from 'axios';
 import {useAuth} from '../../components/AuthProvider ';
+
 import iconMailProfile from '../../assets/icons/iconProfile/iconMailProfile';
 import iconPhoneProfile from '../../assets/icons/iconProfile/iconPhoneProfile';
+
 
 const POSTS_API_URL = 'http://139.180.132.97:3000/users';
 const IMAGE_API_URL = 'http://139.180.132.97:3000/images/';
@@ -35,11 +39,14 @@ const ProfileScreen = ({navigation}) => {
   const [isEnabled, setIsEnabled] = useState(false);
   const [profileImage, setProfileImage] = useState('');
   const [profileEmail, setProfileEmail] = useState('');
+
   const [profileRole, setProfileRole] = useState('');
+
   const [profileName, setProfileName] = useState('');
   const [profilePhone, setProfilePhone] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
+
 
   const {user} = useAuth();
   const {logout} = useAuth();
@@ -71,11 +78,13 @@ const ProfileScreen = ({navigation}) => {
       setProfileEmail(userData.email);
       setProfileRole(userData.role);
 
+
       setIsLoading(false);
     } catch (error) {
       console.error('Lỗi khi tải dữ liệu người dùng: ', error);
       setIsLoading(false);
     }
+
   };
   const getRoleText = () => {
     if (profileRole === 'user') {
@@ -116,6 +125,7 @@ const ProfileScreen = ({navigation}) => {
     );
   };
 
+
   const toggleUpdateUser = () => {
     navigation.navigate('UpdateUserScreen', {
       dataUserImage: profileImage,
@@ -150,6 +160,7 @@ const ProfileScreen = ({navigation}) => {
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }>
         <View style={styles.profileHeader}>
+
           <View>
             <Image
               source={
@@ -163,11 +174,13 @@ const ProfileScreen = ({navigation}) => {
               <Text style={styles.roleProfileInfo}>{getRoleText()}</Text>
             </View>
           </View>
+
           <View style={styles.profileContent}>
             <View style={styles.headerRow}>
               <Text style={styles.profileName}>
                 {profileName || 'Tên người dùng'}
               </Text>
+
             </View>
             <View style={styles.headerRow}>
               <SvgXml xml={iconPhoneProfile()} style={styles.menuIcon} />
@@ -186,8 +199,8 @@ const ProfileScreen = ({navigation}) => {
         <TouchableOpacity style={styles.menuItem} onPress={toggleUpdateUser}>
           <SvgXml xml={iconMyTicketProfile()} style={styles.menuIcon} />
           <Text style={styles.menuText}>Chỉnh sửa thông tin</Text>
-        </TouchableOpacity>
 
+        </TouchableOpacity>
         <TouchableOpacity
           style={styles.menuItem}
           onPress={() => {
@@ -197,7 +210,9 @@ const ProfileScreen = ({navigation}) => {
           <Text style={styles.menuText}>Đổi mật khẩu</Text>
         </TouchableOpacity>
 
+
         <TouchableOpacity style={styles.logoutButton} onPress={tapOnLogOut}>
+
           <Text style={styles.logoutText}>Đăng Xuất</Text>
         </TouchableOpacity>
       </ScrollView>
@@ -237,6 +252,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
   },
+
   roleView: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -249,6 +265,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+
   profileImage: {
     width: 100,
     height: 100,

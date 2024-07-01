@@ -19,7 +19,9 @@ npm i react-native-modal-dropdown
 npm i react-native-modern-datepicker
 npm i react-native-video
 
-///
+npm i react-native-virtualized-view
+npm install react-native-linear-gradient
+
 
 Quy Tắc Viết Code
 1. Tuân Thủ Quy Ước Về Tên

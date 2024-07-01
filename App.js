@@ -21,6 +21,9 @@ import {AuthProvider} from './src/components/AuthProvider ';
 import ScanQrScreen from './src/screens/staff/ScanQrScreen';
 import AuthScreen from './src/screens/staff/AuthScreen';
 import UpdateUserScreen from './src/screens/other/UpdateUserScreen';
+import SelectSeatScreen from './src/screens/home/SelectSeatScreen';
+import PaymentScreen from './src/screens/home/PaymentScreen';
+
 
 const Stack = createNativeStackNavigator();
 
@@ -51,10 +54,27 @@ export default function App() {
           />
 
           <Stack.Screen
+            name="MovieScreen"
+            component={MovieScreen}
+            options={{headerShown: false}}
+          />
+          <Stack.Screen
             name="MovieDetailScreen"
             component={MovieDetailScreen}
             options={{headerShown: false}}
           />
+           <Stack.Screen
+            name="SelectSeatScreen"
+            component={SelectSeatScreen}
+            options={{headerShown: false}}
+          />
+            <Stack.Screen
+            name="PaymentScreen"
+            component={PaymentScreen}
+            options={{headerShown: false}}
+          />
+          
+
           <Stack.Screen
             name="ChangePassScreen"
             component={ChangePassScreen}
@@ -75,11 +95,12 @@ export default function App() {
             component={TicketScreen}
             options={{headerShown: false}}
           />
+
           <Stack.Screen
-            name="MovieByGenre"
-            component={MovieByGenre}
-            options={{headerShown: false}}
-          />
+          name="MovieByGenre"
+          component={MovieByGenre}
+          options={{headerShown: false}}
+        />
           <Stack.Screen
             name="Ss"
             component={SuccessScreen}
@@ -87,6 +108,7 @@ export default function App() {
           />
 
           <Stack.Screen
+
             name="Register"
             component={SignUpScreen}
             options={{headerShown: false}}
