@@ -27,11 +27,14 @@ import {
 } from 'react-native-alert-notification';
 
 const CELL_COUNT = 6;
-const PUT_API_URL = 'http://139.180.132.97:3000/auth/register/verify';
+const VERIFY_REGISTER_API_URL =
+  'http://139.180.132.97:3000/auth/register/verify';
+const VERIFY_FORGOT_PASSWORD_API_URL =
+  'http://139.180.132.97:3000/auth/forgot-password/verify';
 
 const ConfirmOTP = () => {
   const route = useRoute();
-  const {token, email} = route.params;
+  const {token, email, action} = route.params;
 
   const [value, setValue] = useState('');
   const ref = useBlurOnFulfill({value, cellCount: CELL_COUNT});
@@ -87,15 +90,35 @@ const ConfirmOTP = () => {
           Authorization: `Bearer ${token}`,
         },
       });
+      let apiUrl;
+      switch (action) {
+        case 'register':
+          apiUrl = VERIFY_REGISTER_API_URL;
+          break;
+        case 'forgotPassword':
+          apiUrl = VERIFY_FORGOT_PASSWORD_API_URL;
+          break;
 
-      const response = await axiosInstance.put(PUT_API_URL, {
+        default:
+          throw new Error('Unknown action');
+      }
+      const response = await axiosInstance.put(apiUrl, {
         email: email,
         code: code,
       });
       setIsLoading(false);
 
       if (response.status === 200) {
-        navigation.navigate('Ss');
+        switch (action) {
+          case 'register':
+            navigation.navigate('Ss');
+            break;
+          case 'forgotPassword':
+            navigation.navigate('NewPassScreen', {token});
+            break;
+          default:
+            throw new Error('Unknown action');
+        }
       }
     } catch (error) {
       setIsLoading(false);
