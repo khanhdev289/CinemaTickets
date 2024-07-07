@@ -27,7 +27,6 @@ import iconSuccess from '../../assets/icons/iconMyTicket/iconSuccess';
 import RNPrint from 'react-native-print';
 import {useAuth} from '../../components/AuthProvider ';
 
-
 const placeholderImage = require('../../assets/images/image.png');
 const IMAGE_API_URL = 'http://139.180.132.97:3000/images/';
 const POSTS_API_URL = 'http://139.180.132.97:3000/tickets';
@@ -37,17 +36,17 @@ const AuthScreen = () => {
   const route = useRoute();
   const [ticketData, setTicketData] = useState(null);
   const [loading, setLoading] = useState(true);
-
+  console.log(route);
   const {user} = useAuth();
+
   useEffect(() => {
-    if (route.params && route.params.ticketId) {
-      fetchTicketData(route.params.ticketId);
+    if (route.params && route.params._id) {
+      fetchTicketData(route.params._id);
     }
   }, [route.params]);
 
   const fetchTicketData = async ticketId => {
     try {
-
       const token = user.token.access_token;
       const axiosInstance = axios.create({
         headers: {
@@ -57,19 +56,18 @@ const AuthScreen = () => {
       const url = `${POSTS_API_URL}/${ticketId}`;
       const response = await axiosInstance.get(url);
       const data = response.data.getTicket;
-      if (data && data.movie) {
-        setTicketData(data);
-      } else {
-        console.error('Dữ liệu vé không có thuộc tính `movie`');
-      }
-
-      setLoading(false);
+      console.log(data);
+      setTicketData({
+        ...data,
+        showdate: {
+          ...data.showdate,
+          date: data.showdate.date.split('T')[0],
+        },
+      });
     } catch (error) {
       console.error('Error fetching ticket data: ', error);
-      setLoading(false);
     }
   };
-
 
   const handleBack = () => {
     navigation.goBack();
@@ -85,7 +83,7 @@ const AuthScreen = () => {
             padding: 20px;
           }
           .container {
-            max-width: 600px;
+            max-width: 300px;
             margin: 0 auto;
             border: 1px solid #ccc;
             padding: 20px;
@@ -100,6 +98,7 @@ const AuthScreen = () => {
             font-size: 24px;
             font-weight: bold;
             margin-bottom: 10px;
+            text-align: center;
           }
           .movie-details {
             font-size: 16px;
@@ -130,54 +129,48 @@ const AuthScreen = () => {
       <body>
         <div class="container">
           <div class="header">
-            <h1>Movie Ticket</h1>
-          </div>
-          <div class="movie-poster">
-            <img src="${
-              IMAGE_API_URL + data.movie.image
-            }" alt="Movie Poster" style="width: 100%; height: auto; border-radius: 10px;">
+            <h1>VÉ XEM PHIM</h1>
           </div>
           <div class="ticket-info">
             <div class="movie-title">${data.movie.name}</div>
             <div class="info-item">
-              <p>Duration:</p>
+              <p>Thời lượng:</p>
               <p>${data.movie.duration} minutes</p>
             </div>
             <div class="info-item">
-              <p>Genre:</p>
+              <p>Thể loại:</p>
               <p>${data.movie.genre.map(item => item.name).join(', ')}</p>
             </div>
             <div class="info-item">
-              <p>Time:</p>
+              <p>Thời gian:</p>
               <p>${data.time.time}</p>
             </div>
             <div class="info-item">
-              <p>Date:</p>
+              <p>Ngày:</p>
               <p>${new Date(data.showdate.date).toLocaleDateString()}</p>
             </div>
             <div class="info-item">
-              <p>Room:</p>
+              <p>Phòng:</p>
               <p>${data.room.name}</p>
             </div>
             <div class="info-item">
-              <p>Seat:</p>
+              <p>Ghế:</p>
               <p>${data.seat.map(item => item.name).join(', ')}</p>
             </div>
             <div class="info-item">
-              <p>Total:</p>
+              <p>Tổng tiền:</p>
               <p>${data.total} VND</p>
             </div>
             <div class="info-item">
-              <p>Cinema:</p>
+              <p>Rạp:</p>
               <p>${data.cinema.name}<br>${data.cinema.address}</p>
             </div>
           </div>
           <div class="qr-code">
-            <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAA..." alt="QR Code">
             <div class="success-message">Kiểm tra vé thành công<br>Nhân viên hướng dẫn khách vào rạp</div>
           </div>
           <div class="footer">
-            <p>Enjoy your movie!</p>
+                 <p>MD-Cinema Enjoy your movie!</p>
           </div>
         </div>
       </body>
@@ -187,25 +180,18 @@ const AuthScreen = () => {
     await RNPrint.print({html});
   };
 
-  if (loading) {
+  if (!ticketData) {
     return (
-      <View style={[styles.container, styles.loadingContainer]}>
-        <ActivityIndicator size="large" color="#ffffff" />
-      </View>
+      <SafeAreaView style={styles.container}>
+        <View style={styles.loadingContainer}>
+          <Text style={styles.loadingText}>Loading...</Text>
+        </View>
+      </SafeAreaView>
     );
   }
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <View style={styles.backContainer}>
-          <TouchableOpacity onPress={handleBack}>
-            <SvgXml style={styles.back} xml={iconsBack()} />
-          </TouchableOpacity>
-        </View>
-        <Text style={styles.title}>Kiểm tra vé</Text>
-        <View style={styles.placeholder} />
-      </View>
       <ScrollView>
         <View style={styles.ticketContainer}>
           <View
@@ -236,7 +222,6 @@ const AuthScreen = () => {
               <View style={styles.detailsContainerAndIcon}>
                 <SvgXml style={{color: 'black'}} xml={iconMovieMyTicket()} />
                 <Text style={styles.movieDetails}>
-
                   {ticketData.movie.genre.map((item, index) => (
                     <React.Fragment key={item._id}>
                       {index > 0 && ', '}
@@ -354,8 +339,11 @@ const styles = StyleSheet.create({
   movieDetails: {
     fontSize: 13,
     textAlign: 'center',
+    justifyContent: 'center',
+    alignSelf: 'center',
     marginTop: 5,
     color: 'black',
+    marginHorizontal: 5,
   },
   timeLocationContainer: {
     flexDirection: 'row',
@@ -431,7 +419,7 @@ const styles = StyleSheet.create({
     marginLeft: 10,
   },
   printButton: {
-    marginTop: 30,
+    marginTop: 10,
     backgroundColor: '#f7b731',
     paddingVertical: 15,
     alignItems: 'center',

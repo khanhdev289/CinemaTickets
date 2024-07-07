@@ -36,7 +36,7 @@ const ScanQrScreen = () => {
     try {
       const jsonData = JSON.parse(data);
       if (jsonData && jsonData._id) {
-        navigation.navigate('AuthScreen', {ticketId: jsonData._id});
+        navigation.navigate('CheckSuccess', {_id: jsonData._id});
         setScanned(true);
       } else {
         Alert.alert(
