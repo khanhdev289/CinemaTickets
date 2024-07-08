@@ -1,84 +1,129 @@
-import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Button, Alert, SafeAreaView, ScrollView, Dimensions, FlatList } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, Alert, SafeAreaView, ScrollView, Dimensions, FlatList } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import { useNavigation } from '@react-navigation/native';
-import iconBack from '../../assets/icons/iconBack';
 import { SvgXml } from 'react-native-svg';
+
+import { fetchRoom, fetchSeatByRoom, fetchStatusSeats, fetchTimeByShowTime } from '../../../api';
+import iconBack from '../../assets/icons/iconBack';
 import iconLine from '../../assets/icons/iconLine';
-const rows = 'ABCDEFGHIJ'.split('');
-const cols = Array.from({ length: 12 }, (_, i) => i + 1);
+import iconsBack from '../../assets/icons/iconsBack';
+const rows = 'ABCDEFGH'.split('');
+const cols = Array.from({ length: 9 }, (_, i) => i + 1);
 const screenWidth = Dimensions.get('screen').width;
 const screenHeight = Dimensions.get('screen').height;
-const generateDate = () => {
-  const date = new Date();
-  let weekday = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'];
-  let weekdays = [];
-  for (let i = 0; i < 7; i++) {
-    let tempDate = {
-      date: new Date(date.getTime() + i * 24 * 60 * 60 * 1000).getDate(),
-      day: weekday[new Date(date.getTime() + i * 24 * 60 * 60 * 1000).getDay()],
-      fullDate: new Date(date.getTime() + i * 24 * 60 * 60 * 1000).toLocaleDateString('vi-VN', { day: 'numeric', month: 'long', year: 'numeric' })
-    };
-    weekdays.push(tempDate);
-  }
-  return weekdays;
-};
-const timeArray = [
-  '10:30',
-  '12:30',
-  '14:30',
-  '15:00',
-  '19:30',
-  '21:00',
-];
 
 
-const SelectSeatScreen = () => {
+const SelectSeatScreen = ({ route }) => {
   const navigation = useNavigation();
+  const { roomId } = route.params;
   const handleBack = () => {
     navigation.goBack();
   };
-  const [dateArray, setDateArray] = useState(generateDate());
+  const [dateArray, setDateArray] = useState([]);
+  const [timeArray, setTimeArray] = useState([]);
   const [selectedDateIndex, setSelectedDateIndex] = useState(null);
   const [selectedTimeIndex, setSelectedTimeIndex] = useState(null);
   const [selectedDate, setSelectedDate] = useState(null);
-
-  const [seats, setSeats] = useState(
-    Array(10).fill().map((_, row) =>
-      Array(12).fill().map((_, col) => {
-        if (row === 0 && col < 3) return 'booked';
-        if (row === 1 && col < 2) return 'pending';
-        return 'available';
-      })
-    )
-  );
+  const [seats, setSeats] = useState([]);
 
   const [selectedSeats, setSelectedSeats] = useState([]);
 
-  const handleSeatPress = (row, col) => {
-    const updatedSeats = seats.map((seatRow, r) =>
-      seatRow.map((seat, c) => {
-        if (r === row && c === col && seat === 'available') {
-          setSelectedSeats([...selectedSeats, { row, col }]);
-          return 'selected';
-        } else if (r === row && c === col && seat === 'selected') {
-          setSelectedSeats(selectedSeats.filter(s => s.row !== row || s.col !== col));
-          return 'available';
-        }
-        return seat;
-      })
-    );
-    setSeats(updatedSeats);
+  useEffect(() => {
+    fetchRoomData(roomId);
+    fetchSeatData(roomId);
+
+  }, [roomId]);
+
+  useEffect(() => {
+    if (selectedDateIndex !== null) {
+      fetchTimeData(dateArray[selectedDateIndex]._id);
+    }
+  }, [selectedDateIndex]);
+
+  useEffect(() => {
+    if (selectedDateIndex !== null && selectedTimeIndex !== null) {
+      const showtimeId = dateArray[selectedDateIndex]._id;
+      const timeId = timeArray[selectedTimeIndex]._id;
+      fetchStatusSeat(roomId, showtimeId, timeId);
+    }
+  
+  }, [selectedDateIndex, selectedTimeIndex, roomId]);
+
+  const fetchRoomData = async (roomId) => {
+    try {
+      const data = await fetchRoom(roomId);
+
+      const showtimes = data.getRoom.showtime.map(show => ({
+        ...show,
+        date: new Date(show.date)
+      }));
+      showtimes.sort((a, b) => a.date - b.date);
+      setDateArray(showtimes);
+    } catch (error) {
+      console.error(error);
+      Alert.alert('Error', 'Unable to fetch room data');
+    }
+  };
+  const fetchSeatData = async (roomId) => {
+    try {
+      const seatData = await fetchSeatByRoom(roomId);
+      const formattedSeats = seatData.map(seat => ({
+        _id: seat._id,
+        name: seat.name,
+        price: seat.price,
+        status:"available"
+      
+      }));
+      formattedSeats.sort((a, b) => a.name.localeCompare(b.name));
+      setSeats(formattedSeats);
+    } catch (error) {
+      console.error(error);
+      Alert.alert('Error', 'Unable to fetch seat data');
+    }
   };
 
-  const renderSeat = (seat, row, col) => {
+
+  const fetchTimeData = async (showtimeId) => {
+    try {
+      const timeData = await fetchTimeByShowTime(showtimeId); // Gọi hàm fetchTimeByShowTime để lấy dữ liệu từ API
+      setTimeArray(timeData.getShowtime.time);  // Cập nhật mảng timeArray với danh sách thời gian từ API
+    } catch (error) {
+      console.error('Error fetching time data:', error);
+      throw new Error('Unable to fetch time data');
+    }
+  };
+
+  const handleSeatPress = (seatId) => {
+    if (selectedDateIndex === null || selectedTimeIndex === null) {
+      Alert.alert('Error', 'Vui lòng chọn suất chiếu trước khi chọn ghế');
+      return;
+    }
+
+    const updatedSeats = seats.map(seat =>
+      seat._id === seatId
+        ? { ...seat, status: seat.status === 'available' ? 'selected' : seat.status === 'selected' ? 'available' : seat.status }
+        : seat
+    );
+    setSeats(updatedSeats);
+
+    const selectedSeat = updatedSeats.find(seat => seat._id === seatId);
+    if (selectedSeat.status === 'selected') {
+      setSelectedSeats([...selectedSeats, selectedSeat]);
+    } else {
+      setSelectedSeats(selectedSeats.filter(seat => seat._id !== seatId));
+    }
+  };
+
+
+  const renderSeat = (seat) => {
     let seatStyle;
     let seatTextStyle = styles.seatText;
-    switch (seat) {
+    switch (seat.status) {
       case 'available':
         seatStyle = styles.availableSeat;
         break;
-      case 'pending':
+      case 'waiting':
         seatStyle = styles.pendingSeat;
         seatTextStyle = [styles.seatText, { color: '#FCC434' }];
         break;
@@ -96,15 +141,46 @@ const SelectSeatScreen = () => {
 
     return (
       <TouchableOpacity
-        key={`${row}-${col}`}
+        key={seat._id}
         style={[styles.seat, seatStyle]}
-        onPress={() => handleSeatPress(row, col)}
-        disabled={seat !== 'available'}
+        onPress={() => handleSeatPress(seat._id)}
+        disabled={seat.status === 'waiting' }
       >
-      <Text style={seatTextStyle}>{`${rows[row]}${cols[col]}`}</Text>
+        <Text style={seatTextStyle}>{seat.name}</Text>
       </TouchableOpacity>
     );
   };
+
+  const calculateTotal = () => {
+    return selectedSeats.reduce((total, seat) => total + seat.price, 0);
+  };
+
+  const fetchStatusSeat = async (roomId, showtimeId, timeId) => {
+    try {
+      const data = await fetchStatusSeats(roomId, showtimeId, timeId);
+      if (data) {
+        updateSeatStatus(data);
+
+      } else {
+        console.warn('Empty seat status data or invalid response:', data);
+      }
+    } catch (error) {
+      console.error('Error fetching seat status:', error);
+      Alert.alert('Error', 'Unable to fetch seat status');
+    }
+  };
+
+  const updateSeatStatus = (seatStatusData) => {
+    const updatedSeats = seats.map(seat => {
+      const seatData = seatStatusData.find(s => s.seat._id === seat._id);
+      if (seatData) {
+        return { ...seat, status: seatData.status };
+      }
+    return { ...seat, status:'available' };; 
+    });
+    setSeats(updatedSeats);
+  };
+
 
   const renderLegend = () => (
     <View style={styles.legendContainer}>
@@ -127,107 +203,98 @@ const SelectSeatScreen = () => {
     </View>
   );
 
-  const calculateTotal = () => {
-    const pricePerSeat = 100; // giả sử giá vé là 100
-    return selectedSeats.length * pricePerSeat;
-  };
-
   return (
     <SafeAreaView style={styles.container}>
-      {/* Header */}
       <ScrollView>
         <View style={styles.header}>
           <TouchableOpacity onPress={handleBack} style={styles.backButton}>
-            <SvgXml xml={iconBack()} />
+            <SvgXml xml={iconsBack()} />
           </TouchableOpacity>
           <View style={styles.titleContainer}>
             <Text style={styles.title}>Chọn Ghế</Text>
           </View>
         </View>
 
-        {/* Gradient Line */}
         <View style={{ flexDirection: 'column', justifyContent: 'center', margin: 16, alignSelf: 'center', height: screenHeight * 0.1 }}>
           <SvgXml xml={iconLine()} />
-          <LinearGradient
-            colors={['#FCC434', '#00000000']}
-            style={styles.gradientLine}
-          />
-        </View>
-        {/* Seat selection */}
-        <View style={styles.seatContainer}>
-          {seats.map((seatRow, row) => (
-            <View key={row} style={styles.row}>
-              {seatRow.map((seat, col) => renderSeat(seat, row, col))}
-            </View>
-          ))}
+          <LinearGradient colors={['#FCC434', '#00000000']} style={styles.gradientLine} />
         </View>
 
-        {/* Legend */}
+        <View style={styles.seatContainer}>
+          {seats.map(seat => renderSeat(seat))}
+        </View>
+
+
         {renderLegend()}
 
-        {/* Show Time Info */}
-       
-          <Text style={{ color: 'white', marginVertical: 15, textAlign: 'center' }}>{selectedDate}</Text>
-    
+        <Text style={{ color: 'white', marginVertical: 15, textAlign: 'center' }}>{selectedDate}</Text>
+
         <FlatList
           data={dateArray}
-          keyExtractor={item => item.date.toString()}
+          keyExtractor={(item) => item._id}
           horizontal
           bounces={false}
           contentContainerStyle={styles.containerGap24}
-          renderItem={({ item, index }) => (
+          renderItem={({ item }) => (
             <TouchableOpacity
-            onPress={() => {
-              setSelectedDateIndex(index);
-              setSelectedDate(`${item.day} Ngày ${item.fullDate}`);
-            }}
-          >
+              onPress={() => {
+                setSelectedDateIndex(dateArray.indexOf(item));
+                setSelectedTimeIndex(null); 
+                setSelectedDate(item.date.toLocaleDateString('vi-VN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }));
+              }}
+            >
               <View
                 style={[
                   styles.dateContainer,
-                  index === 0 ? { marginLeft: screenWidth * 0.03 } : index === dateArray.length - 1 ? { marginRight: screenWidth * 0.03 } : {},
-                  index === selectedDateIndex ? { backgroundColor: "#FCC434" } : {},
+                  item._id === dateArray[selectedDateIndex]?._id ? { backgroundColor: "#FCC434" } : {},
+                ]}
+                key={item._id}
+              >
+                <Text style={[
+                  styles.dayText,
+                  item._id === dateArray[selectedDateIndex]?._id ? { color: 'black' } : { color: 'white' }
                 ]}>
-                <Text style={styles.dayText}>{item.day}</Text>
+                  {item.date.toLocaleDateString('vi-VN', { weekday: 'long' })}
+                </Text>
                 <View style={{
                   width: screenHeight * 0.04, height: screenHeight * 0.04, borderRadius: screenHeight * 0.02, backgroundColor: '#3B3B3B',
                   justifyContent: 'center', alignItems: 'center'
-                }} >
-                  <Text style={styles.dateText}>{item.date}</Text>
+                }}>
+                  <Text style={styles.dateText}>{item.date.getDate()}</Text>
                 </View>
               </View>
             </TouchableOpacity>
           )}
         />
+
         <View style={styles.OutterContainer}>
           <FlatList
             data={timeArray}
-            keyExtractor={item => item}
+            keyExtractor={item => item._id}
             horizontal
             bounces={false}
             contentContainerStyle={styles.containerGap24}
             renderItem={({ item, index }) => (
-              <TouchableOpacity onPress={() => setSelectedTimeIndex(index)}>
+              <TouchableOpacity onPress={() => setSelectedTimeIndex(timeArray.indexOf(item))}>
                 <View
                   style={[
                     styles.timeContainer,
                     index === 0 ? { marginLeft: 24 } : index === timeArray.length - 1 ? { marginRight: 24 } : {},
-                    index === selectedTimeIndex ? { backgroundColor: '#261D08', borderColor: '#FCC434' } : {},
+                    item._id === timeArray[selectedTimeIndex]?._id ? { backgroundColor: '#261D08', borderColor: '#FCC434' } : {},
                   ]}>
-                  <Text style={styles.timeText}>{item}</Text>
+                  <Text style={styles.timeText}>{item.time}</Text>
                 </View>
               </TouchableOpacity>
             )}
-          /></View>
+          />
+        </View>
 
-
-        {/* Footer */}
         <View style={styles.footer}>
           <View style={{ flexDirection: 'column' }}>
             <Text style={styles.totalText1}>Tổng:</Text>
             <Text style={styles.totalText}>{calculateTotal()} VND</Text>
           </View>
-          <TouchableOpacity style={styles.button} onPress={()=>{navigation.navigate('PaymentScreen')}} >
+          <TouchableOpacity style={styles.button} onPress={() => { navigation.navigate('PaymentScreen') }} >
             <Text style={styles.buttonText}>Mua Vé</Text>
           </TouchableOpacity>
         </View>
@@ -267,24 +334,25 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     margin: 5,
-    padding: 5
+    padding: 5,
+    flexDirection:'row',
+
   },
   row: {
     flexDirection: 'row',
   },
   seat: {
-    width: screenWidth * 0.06,
-    height: screenWidth * 0.06,
+    
+    width: screenWidth * 0.08,
+    height: screenWidth * 0.08,
     margin: screenWidth * 0.01,
     borderRadius: 5,
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 1,
   },
-
   availableSeat: {
     backgroundColor: '#1C1C1C',
-
   },
   pendingSeat: {
     backgroundColor: '#261D08',
@@ -294,11 +362,10 @@ const styles = StyleSheet.create({
   },
   selectedSeat: {
     backgroundColor: '#FCC434',
-    color:'black'
+    color: 'black'
   },
   seatText: {
     fontSize: 10,
-   
     color: '#BFBFBF'
   },
   legendContainer: {
@@ -312,7 +379,6 @@ const styles = StyleSheet.create({
   },
   legendText: {
     color: 'white', fontSize: 14,
-   
   },
   legendColor: {
     width: 20,
@@ -323,9 +389,9 @@ const styles = StyleSheet.create({
   containerGap24: {
     gap: screenWidth * 0.04,
   },
-  dateContainer: {
-    width: screenWidth * 0.1,
-    height: screenHeight * 0.1,
+  dateContainer: {marginLeft:5,
+    width: screenWidth * 0.12,
+    height: screenHeight * 0.12,
     borderRadius: 20,
     backgroundColor: "#1C1C1C",
     alignItems: 'center',
@@ -337,7 +403,7 @@ const styles = StyleSheet.create({
   },
   dayText: {
     fontSize: 12,
-    color: "#F2F2F2"
+    color: "#000000"
   },
   OutterContainer: {
     marginVertical: 12,
@@ -347,6 +413,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     paddingHorizontal: 16,
     borderRadius: 25,
+   
     backgroundColor: "#1C1C1C",
     alignItems: 'center',
     justifyContent: 'center',
@@ -359,7 +426,6 @@ const styles = StyleSheet.create({
     padding: 5,
     alignItems: 'center',
   },
-
   footer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -379,14 +445,14 @@ const styles = StyleSheet.create({
     color: '#FCC434'
   },
   button: {
-    backgroundColor: '#FCC434', // màu nền
-    paddingHorizontal:32,
-    paddingVertical:12,
-    borderRadius: 10, // bo góc
+    backgroundColor: '#FCC434',
+    paddingHorizontal: 32,
+    paddingVertical: 12,
+    borderRadius: 10,
     alignItems: 'center',
   },
   buttonText: {
-    color: '#000000', // màu chữ
+    color: '#000000',
     fontSize: 18,
   },
 });
