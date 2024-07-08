@@ -1,6 +1,6 @@
 import {StyleSheet, Text, View} from 'react-native';
 import React from 'react';
-import MyTicketScreen from '../home/MyTicketScreen';
+import MyTicketScreen from '../ticket/MyTicketScreen';
 import MovieScreen from '../home/MovieScreen';
 import ProfileScreen from '../home/ProfileScreen';
 import {NavigationContainer} from '@react-navigation/native';
@@ -14,9 +14,12 @@ import iconHome from '../../assets/icons/iconHome';
 import iconTicket from '../../assets/icons/iconTicket';
 import iconVideo from '../../assets/icons/iconVideo';
 import iconUser from '../../assets/icons/iconUser';
-import TicketScreen from '../home/TicketScreen';
+
 import ScanQrScreen from '../staff/ScanQrScreen';
 import AuthScreen from '../staff/AuthScreen';
+import TicketScreen from '../ticket/TicketsScreen';
+import ListTicketScreen from '../home/ListTicketScreen';
+import CheckSuccess from '../staff/CheckSuccess';
 
 const Tab = createBottomTabNavigator();
 
@@ -28,9 +31,7 @@ const BottomNavigation = () => {
         <>
           <Tab.Screen
             name="ScanQrScreen"
-
             component={ScanQrScreen}
-
             options={{
               tabBarLabel: 'ScanQrScreen',
               tabBarIcon: ({color, size}) => (

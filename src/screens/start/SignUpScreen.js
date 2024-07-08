@@ -7,44 +7,39 @@ import {
   TextInput,
   TouchableOpacity,
   ScrollView,
-
   TouchableWithoutFeedback,
+  Keyboard,
 } from 'react-native';
-
 import {SvgXml} from 'react-native-svg';
 import iconsBack from '../../assets/icons/iconsBack';
 import {useForm, Controller} from 'react-hook-form';
 import CheckBox from '@react-native-community/checkbox';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import {Picker} from '@react-native-picker/picker';
 import {useNavigation} from '@react-navigation/native';
-
 import {format} from 'date-fns';
 import axios from 'axios';
 import Spinner from 'react-native-loading-spinner-overlay';
+import ModalSelector from 'react-native-modal-selector';
 
 const POSTS_API_URL = 'http://139.180.132.97:3000/auth/register';
 
 const SignUpScreen = () => {
   const navigation = useNavigation();
-
   const {
     control,
     handleSubmit,
     formState: {errors},
+    setValue,
   } = useForm();
-
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [loading, setLoading] = useState(false);
-
 
   const onSubmit = async data => {
     if (!termsAccepted) {
       alert('Bạn phải chấp nhận các điều khoản và điều kiện');
       return;
     }
-
 
     const formattedData = {
       ...data,
@@ -60,7 +55,11 @@ const SignUpScreen = () => {
         const {access_token} = response.data.token;
         const {email} = response.data.user;
 
-        navigation.navigate('Otp', {token: access_token, email});
+        navigation.navigate('Otp', {
+          token: access_token,
+          email,
+          action: 'register',
+        });
       })
       .catch(error => {
         console.error('Error:', error);
@@ -68,7 +67,6 @@ const SignUpScreen = () => {
       .finally(() => {
         setLoading(false);
       });
-
   };
 
   const handleBack = () => {
@@ -82,7 +80,6 @@ const SignUpScreen = () => {
   const dismissKeyboard = () => {
     Keyboard.dismiss();
   };
-
 
   return (
     <TouchableWithoutFeedback onPress={dismissKeyboard}>
@@ -264,19 +261,26 @@ const SignUpScreen = () => {
               <Controller
                 control={control}
                 name="gender"
-                rules={{required: 'Vui lòng chọn giới tính'}}
+                defaultValue=""
                 render={({field: {onChange, value}}) => (
-                  <View style={styles.pickerContainer}>
-                    <Picker
-                      selectedValue={value}
-                      onValueChange={itemValue => onChange(itemValue)}
-                      style={styles.input}>
-                      <Picker.Item label="Chọn Giới Tính" value="" />
-                      <Picker.Item label="Nam" value="Nam" />
-                      <Picker.Item label="Nữ" value="Nữ" />
-                    </Picker>
-                  </View>
+                  <ModalSelector
+                    data={[
+                      {key: 1, label: 'Nam', value: 'Nam'},
+                      {key: 2, label: 'Nữ', value: 'Nữ'},
+                    ]}
+                    initValue={value ? value : 'Chọn Giới Tính'}
+                    onChange={option => {
+                      setValue('gender', option.value);
+                      onChange(option.value);
+                    }}
+                    style={styles.pickerContainer}
+                    cancelText="Huỷ"
+                    optionTextStyle={styles.optionText}
+                    optionContainerStyle={styles.optionContainer}
+                    cancelStyle={styles.cancelButton}
+                  />
                 )}
+                rules={{required: 'Vui lòng chọn giới tính'}}
               />
               {errors.gender && (
                 <Text style={styles.error}>{errors.gender.message}</Text>
@@ -311,7 +315,6 @@ const SignUpScreen = () => {
         </SafeAreaView>
       </ScrollView>
     </TouchableWithoutFeedback>
-
   );
 };
 
@@ -421,7 +424,6 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     marginTop: 10,
     width: '90%',
-
     height: '80%',
     alignSelf: 'center',
   },
@@ -438,6 +440,23 @@ const styles = StyleSheet.create({
     borderWidth: 1.5,
     borderColor: '#FFFFFF',
     borderRadius: 10,
-
+  },
+  optionContainer: {
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1.5,
+    borderColor: '#000000',
+    borderRadius: 10,
+  },
+  optionText: {
+    fontSize: 16,
+    color: '#000000',
+  },
+  cancelButton: {
+    backgroundColor: '#FCC434',
+    borderRadius: 10,
+    marginVertical: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 10,
   },
 });

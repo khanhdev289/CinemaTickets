@@ -33,6 +33,7 @@
     "react-native-loading-spinner-overlay": "^3.0.1",
     "react-native-modal": "^13.0.1",
     "react-native-modal-dropdown": "^1.0.2",
+    "react-native-modal-selector": "^2.1.2",
     "react-native-modern-datepicker": "^1.0.0-beta.91",
     "react-native-pager-view": "^6.3.1",
     "react-native-pdf": "^6.7.5",
