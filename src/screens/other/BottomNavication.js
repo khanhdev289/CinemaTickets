@@ -66,7 +66,7 @@ const BottomNavigation = () => {
           />
           <Tab.Screen
             name="Vé"
-            component={TicketScreen}
+            component={ListTicketScreen}
             options={{
               tabBarLabel: 'Vé',
               tabBarIcon: ({color, size}) => (

@@ -71,23 +71,24 @@ const MyTicketScreenFood = () => {
     );
   }
 
-  const qrData = JSON.stringify({
-    _id: ticketData._id,
-    auth: ticketData.auth,
-  });
-
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView>
         <View style={styles.ticketContainer}>
+          <Text style={styles.movieTitle}>{ticketData.movie.name}</Text>
+          <View style={styles.foodItem1}>
+            <Text style={styles.foodName}>Tên</Text>
+            <Text style={styles.foodQuantity}>Số lượng</Text>
+            <Text style={styles.foodPrice}>Đơn giá</Text>
+          </View>
           <FlatList
             data={ticketData.food}
             keyExtractor={item => item._id}
             renderItem={({item}) => (
               <View style={styles.foodItem}>
-                <Text style={styles.foodName}>{item.name}</Text>
-                <Text style={styles.foodQuantity}>x1</Text>
-                <Text style={styles.foodPrice}>{item.price} VND</Text>
+                <Text style={styles.foodName}>{item.foodId.name}</Text>
+                <Text style={styles.foodQuantity}>x{item.quantity}</Text>
+                <Text style={styles.foodPrice}>{item.foodId.price} VND</Text>
               </View>
             )}
           />
@@ -96,7 +97,7 @@ const MyTicketScreenFood = () => {
           <View style={styles.detailsContainer}>
             <View style={styles.detailsContainerAndIcon}>
               <SvgXml xml={iconMoneyMyTicket()} />
-              <Text style={styles.priceText}>{ticketData.total} VND</Text>
+              <Text style={styles.priceText}>{ticketData.total_food} VND</Text>
             </View>
             <View style={styles.detailsContainerAndIcon}>
               <SvgXml xml={iconLocationMyTicket()} />
@@ -157,6 +158,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: 'black',
     marginBottom: 10,
+    textAlign: 'center',
   },
   detailsContainerAndIcon: {
     flexDirection: 'row',
@@ -240,6 +242,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-around',
     marginVertical: 10,
+  },
+  foodItem1: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    marginVertical: 10,
+    borderWidth: 1,
   },
 });
 
