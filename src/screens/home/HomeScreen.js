@@ -23,6 +23,7 @@ import iconVideo from '../../assets/icons/iconVideo';
 import iconCalendar from '../../assets/icons/iconCalendar';
 import { IMAGE_API_URL, fetchDiscounts, fetchGenres, fetchMovies } from '../../../api';
 import SwiperFlatList from 'react-native-swiper-flatlist';
+import { useAuth } from '../../components/AuthProvider ';
 
 const screenWidth = Dimensions.get('screen').width;
 const screenHeight = Dimensions.get('screen').height;
@@ -36,6 +37,8 @@ const newsList = [
 ];
 
 const HomeScreen = () => {
+  const {user} = useAuth();
+  
   const navigation = useNavigation();
   const [isLoading, setIsLoading] = useState(true);
   const [nowPlayingMoviesList, setNowPlayingMoviesList] = useState([]);
@@ -91,7 +94,7 @@ const HomeScreen = () => {
     <SafeAreaView style={styles.container}>
       <ScrollView style={styles.container} bounces={false}>
         <StatusBar hidden />
-        <Header />
+        <Header user={user} />
         <SearchBar navigation={navigation} />
         <Section title="Phim đang chiếu" onPress={() => {navigation.navigate('MovieScreen')}} />
         <MovieList
@@ -154,9 +157,9 @@ const HomeScreen = () => {
   );
 };
 
-const Header = () => (
+const Header = ({user}) => (
   <View style={styles.headerContainer}>
-    <Text style={styles.greetingText}>Xin Chào, Khải Lê 👋</Text>
+    <Text style={styles.greetingText}>Xin Chào, {user.user.name} 👋</Text>
     <TouchableOpacity onPress={() => alert('Notification clicked!')}>
       <SvgXml xml={iconNotification()} />
     </TouchableOpacity>
@@ -347,7 +350,7 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   greetingText: {
-    fontSize: 20,
+    fontSize: 16,
     color: '#F2F2F2',
   },
   searchContainer: {

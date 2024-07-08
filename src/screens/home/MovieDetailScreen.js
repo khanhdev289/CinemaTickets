@@ -33,7 +33,7 @@ const MovieDetailScreen = ({ route }) => {
         const movieResponse = await fetchMovieById(movieId);
         const theaterResponse = await fetchCinemaByMovie(movieId);
         setMovie(movieResponse.getmovie);
-        setTheaters(theaterResponse.getRoombymovie);
+        setTheaters(theaterResponse.cinemas);
       } catch (error) {
         console.error('Error fetching data:', error);
       } finally {
@@ -58,25 +58,25 @@ const MovieDetailScreen = ({ route }) => {
 
   const renderTheater = ({ item }) => (
     <TouchableOpacity
-      onPress={() => setSelectedTheater(item.id)}
+      onPress={() => setSelectedTheater(item._id)}
       style={[
         styles.theaterContainer,
-        selectedTheater === item.id ? { borderColor: '#FFD700' } : null,
+        selectedTheater === item._id ? { borderColor: '#FFD700' } : null,
       ]}
-    ><View style={{flexDirection:'row',alignItems:'center',justifyContent:'space-around'}}>
-      <View style={{flexDirection:'column'}}>
-      <Text style={styles.theaterTitle}>{item.cinema.name}</Text>
-      <Text style={styles.theaterAddress}>{item.cinema.address}</Text>
-      </View>
-      <Image
-        source={require('../../assets/images/logo.png')}
-      style={{
-        width: 80, // Điều chỉnh kích thước hình ảnh theo nhu cầu của bạn
-        height: 80, // Điều chỉnh kích thước hình ảnh theo nhu cầu của bạn
-      resizeMode:'stretch',
-        
-      }}
-    />
+    ><View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-around' }}>
+        <View style={{ flexDirection: 'column' }}>
+          <Text style={styles.theaterTitle}>{item.cinema.name}</Text>
+          <Text style={styles.theaterAddress}>{item.cinema.address}</Text>
+        </View>
+        <Image
+          source={require('../../assets/images/logo.png')}
+          style={{
+            width: 80, // Điều chỉnh kích thước hình ảnh theo nhu cầu của bạn
+            height: 80, // Điều chỉnh kích thước hình ảnh theo nhu cầu của bạn
+            resizeMode: 'stretch',
+
+          }}
+        />
       </View>
     </TouchableOpacity>
   );
@@ -108,11 +108,11 @@ const MovieDetailScreen = ({ route }) => {
     <SafeAreaView style={styles.container}>
       <ScrollView>
 
-         <TouchableOpacity
+        <TouchableOpacity
           style={styles.backButton}
           onPress={() => navigation.goBack()}
         >
-          <SvgXml xml={iconBack()}/>
+          <SvgXml xml={iconBack()} />
         </TouchableOpacity>
 
         <Image style={styles.poster} source={{ uri: IMAGE_API_URL + movie.image }} />
@@ -188,10 +188,20 @@ const MovieDetailScreen = ({ route }) => {
           contentContainerStyle={{ paddingHorizontal: 10 }}
         />
 
-        <TouchableOpacity style={styles.button} onPress={() => {navigation.navigate('SelectSeatScreen')}}>
-
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => {
+            if (selectedTheater) {
+              navigation.navigate('SelectSeatScreen', { roomId: selectedTheater });
+            } else {
+              // Xử lý trường hợp không có rạp nào được chọn
+              alert('Vui lòng chọn một rạp chiếu');
+            }
+          }}
+        >
           <Text style={styles.buttonText}>Tiếp tục</Text>
         </TouchableOpacity>
+
       </ScrollView>
       <Modal visible={isModalVisible} transparent={true} animationType="slide">
         <View style={styles.modalContainer}>
@@ -228,7 +238,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 20,
     left: 20,
-   
+
     zIndex: 1,
 
   },

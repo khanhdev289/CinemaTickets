@@ -25,6 +25,8 @@ import ForgotPassScreen from './src/screens/start/ForgotPassScreen';
 import NewPassScreen from './src/screens/start/NewPassScreen';
 import TicketScreen from './src/screens/ticket/TicketsScreen';
 import CheckSuccess from './src/screens/staff/CheckSuccess';
+import SelectSeatScreen from './src/screens/home/SelectSeatScreen';
+import PaymentScreen from './src/screens/home/PaymentScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -57,6 +59,16 @@ export default function App() {
           <Stack.Screen
             name="MovieDetailScreen"
             component={MovieDetailScreen}
+            options={{headerShown: false}}
+          />
+          <Stack.Screen
+            name="SelectSeatScreen"
+            component={SelectSeatScreen}
+            options={{headerShown: false}}
+          />
+           <Stack.Screen
+            name="PaymentScreen"
+            component={PaymentScreen}
             options={{headerShown: false}}
           />
           <Stack.Screen

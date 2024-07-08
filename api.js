@@ -1,24 +1,14 @@
-import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
+
 export  const IMAGE_API_URL = 'http://139.180.132.97:3000/images/';
 export  const VIDEO_API_URL = 'http://139.180.132.97:3000/videos/';
-// Hàm để lấy token từ AsyncStorage
-const getAuthTokenFromSecureStorage = async () => {
-  try {
-    const token = await AsyncStorage.getItem('authToken');
-    return token;
-  } catch (error) {
-    console.error('Error retrieving token:', error);
-    return null;
-  }
-};
 
-// Tạo instance của Axios với token Authorization
-const createApiInstance = async () => {
-  try {
-    const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2NjZmZDIxOWVlMmY0OWI0Nzg4NjNmNDQiLCJyb2xlIjoidXNlciIsImVtYWlsIjoicXVhbmprbDk4QGdtYWlsLmNvbSIsImlhdCI6MTcxOTM4NTAxNCwiZXhwIjoxNzE5OTg5ODE0fQ.lutKtSQpLW8pDSQlZw0mu43bTu4YQWexPuhHJOlvuXM";
 
-    return axios.create({
+ export const createApiInstance = async () => {
+  try {
+    const token = await AsyncStorage.getItem('token');
+   return axios.create({
       baseURL: 'http://139.180.132.97:3000', // Thay thế bằng URL của API của bạn
       headers: {
         'Content-Type': 'application/json',
@@ -93,7 +83,7 @@ export const fetchDiscounts= async () => {
 export const fetchCinemaByMovie = async (movieId) => {
   try {
     const api = await createApiInstance();
-    const url = '/rooms/movie/'+movieId; 
+    const url = '/rooms/cinema/'+movieId; 
     const response = await api.get(url);
     return response.data;
   } catch (error) {
@@ -101,6 +91,50 @@ export const fetchCinemaByMovie = async (movieId) => {
     throw error;
   }
 };
+export const fetchRoom = async (roomId) => {
+  try {
+    const api = await createApiInstance();
+    const url = '/rooms/'+roomId; 
+    const response = await api.get(url);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching rooms:', error);
+    throw error;
+  }
+};
+export const fetchSeatByRoom = async (roomId) => {
+  try {
+    const api = await createApiInstance();
+    const url = '/seats/room/'+roomId; // Đường dẫn API để lấy danh sách phim
+    const response = await api.get(url);
+    return response.data;
+  } catch (error) {
+    console.error('Error seatbyRoom movies:', error);
+    throw error;
+  }
+};
+export const fetchTimeByShowTime = async (showtimeId) => {
+  try {
+    const api = await createApiInstance();
+    const url = '/showtimes/'+showtimeId; 
+    const response = await api.get(url);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching showtimeId:', error);
+    throw error;
+  }
+};
+export const fetchStatusSeats = async (roomId, showtimeId, timeId) => {
+  try {  const api = await createApiInstance();
+    const url = `/seatstatus/seat?roomId=${roomId}&showtimeId=${showtimeId}&timeId=${timeId}`;
+    const response = await api.get(url);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching seat status:', error);
+    throw error;
+  }
+};
+
 // Hàm fetch danh sách thể loại
 export const fetchGenres = async () => {
   try {
