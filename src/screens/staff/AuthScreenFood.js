@@ -57,7 +57,7 @@ const AuthScreenFood = () => {
           ...data.showdate,
           date: data.showdate.date.split('T')[0],
         },
-      });
+      });``
     } catch (error) {
       console.error('Error fetching ticket data: ', error);
     }
