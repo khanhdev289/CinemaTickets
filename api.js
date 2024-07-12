@@ -91,6 +91,19 @@ export const fetchCinemaByMovie = async (movieId) => {
     throw error;
   }
 };
+
+export const fetchCinemaById = async (cinemaId) => {
+  try {
+    const api = await createApiInstance();
+    const url = '/cinemas/'+cinemaId; 
+    const response = await api.get(url);
+    return response.data.getCinema;
+  } catch (error) {
+    console.error('Error fetching movies:', error);
+    throw error;
+  }
+};
+
 export const fetchRoom = async (roomId) => {
   try {
     const api = await createApiInstance();
@@ -119,6 +132,28 @@ export const fetchTimeByShowTime = async (showtimeId) => {
     const url = '/showtimes/'+showtimeId; 
     const response = await api.get(url);
     return response.data;
+  } catch (error) {
+    console.error('Error fetching showtimeId:', error);
+    throw error;
+  }
+};
+export const fetchShowTimeById = async (showtimeId) => {
+  try {
+    const api = await createApiInstance();
+    const url = '/showtimes/'+showtimeId; 
+    const response = await api.get(url);
+    return response.data.getShowtime;
+  } catch (error) {
+    console.error('Error fetching showtimeId:', error);
+    throw error;
+  }
+};
+export const fetchTimeById = async (timeId) => {
+  try {
+    const api = await createApiInstance();
+    const url = '/times/'+timeId; 
+    const response = await api.get(url);
+    return response.data.getTime;
   } catch (error) {
     console.error('Error fetching showtimeId:', error);
     throw error;
@@ -159,6 +194,18 @@ export const fetchGenreById = async (id) => {
   }
 };
 
+export const fetchSeatById = async (seatID) => {
+  try {
+    const api = await createApiInstance();
+    const url = '/seats/'+seatID; // Đường dẫn API để lấy danh sách thể loại
+    const response = await api.get(url);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching categories:', error);
+    throw error;
+  }
+};
+
 // Hàm fetch danh sách tin tức
 export const fetchNews = async () => {
   try {
@@ -171,4 +218,48 @@ export const fetchNews = async () => {
     throw error;
   }
 };
+
+export const fetchCombo = async () => {
+  try {
+    const api = await createApiInstance();
+    const url = '/foods'; // Đường dẫn API để lấy danh sách tin tức
+    const response = await api.get(url);
+    return response.data.getall;
+  } catch (error) {
+    console.error('Error fetching foods:', error);
+    throw error;
+  }
+}
+// tạo vé
+export const createTicket = async (seatIds, userId, showdateId, showtimeId, total) => {
+  try {
+    const api = await createApiInstance();
+    const url = '/tickets'; 
+    const response = await api.post(url, { seat: seatIds, user: userId, showdate: showdateId, showtime: showtimeId, total });
+    return response.data;
+  } catch (error) {
+    console.error('Error creating ticket:', error);
+    throw error;
+  }
+};
+// Hàm cập nhật thông tin vé
+export const updateTicket = async (ticketId, discountId, foodItems, total_food, total) => {
+  try {
+    const api = await createApiInstance();
+    const url = `/tickets/food/${ticketId}`; 
+
+    const response = await api.put(url, {
+      discountId: discountId, // Có thể là null
+      food: foodItems, // Danh sách các đối tượng food với id và quantity
+      total_food: total_food, // Tổng số tiền của food
+      total: total // Tổng số tiền
+    });
+
+    return response.data;
+  } catch (error) {
+    console.error('Error updating ticket:', error);
+    throw error;
+  }
+};
+
 

@@ -4,10 +4,11 @@ import LinearGradient from 'react-native-linear-gradient';
 import { useNavigation } from '@react-navigation/native';
 import { SvgXml } from 'react-native-svg';
 
-import { fetchRoom, fetchSeatByRoom, fetchStatusSeats, fetchTimeByShowTime } from '../../../api';
+import { createTicket, fetchRoom, fetchSeatByRoom, fetchStatusSeats, fetchTimeByShowTime } from '../../../api';
 import iconBack from '../../assets/icons/iconBack';
 import iconLine from '../../assets/icons/iconLine';
 import iconsBack from '../../assets/icons/iconsBack';
+import { useAuth } from '../../components/AuthProvider ';
 const rows = 'ABCDEFGH'.split('');
 const cols = Array.from({ length: 9 }, (_, i) => i + 1);
 const screenWidth = Dimensions.get('screen').width;
@@ -29,6 +30,9 @@ const SelectSeatScreen = ({ route }) => {
 
   const [selectedSeats, setSelectedSeats] = useState([]);
 
+  const {user} = useAuth();
+  const userID = user.user._id;
+
   useEffect(() => {
     fetchRoomData(roomId);
     fetchSeatData(roomId);
@@ -47,7 +51,7 @@ const SelectSeatScreen = ({ route }) => {
       const timeId = timeArray[selectedTimeIndex]._id;
       fetchStatusSeat(roomId, showtimeId, timeId);
     }
-  
+
   }, [selectedDateIndex, selectedTimeIndex, roomId]);
 
   const fetchRoomData = async (roomId) => {
@@ -72,8 +76,8 @@ const SelectSeatScreen = ({ route }) => {
         _id: seat._id,
         name: seat.name,
         price: seat.price,
-        status:"available"
-      
+        status: "available"
+
       }));
       formattedSeats.sort((a, b) => a.name.localeCompare(b.name));
       setSeats(formattedSeats);
@@ -115,6 +119,22 @@ const SelectSeatScreen = ({ route }) => {
     }
   };
 
+  const handleTicket = async () => {
+    if (selectedSeats.length === 0) {
+      Alert.alert('Error', 'Bạn chưa chọn ghế nào. Vui lòng chọn ghế trước khi tiếp tục.');
+      return;
+    }
+  
+    const seatIds = selectedSeats.map(seat => seat._id);
+    const showtimeId = dateArray[selectedDateIndex]._id;
+    const timeId = timeArray[selectedTimeIndex]._id;
+
+    const ticketData = await createTicket(seatIds,userID, showtimeId, timeId,calculateTotal());
+    if (ticketData) {
+      console.log('Ticket created successfully:', ticketData);
+      navigation.navigate('PaymentScreen', { ticketData: ticketData.create});
+    }
+  };
 
   const renderSeat = (seat) => {
     let seatStyle;
@@ -144,7 +164,7 @@ const SelectSeatScreen = ({ route }) => {
         key={seat._id}
         style={[styles.seat, seatStyle]}
         onPress={() => handleSeatPress(seat._id)}
-        disabled={seat.status === 'waiting' }
+        disabled={seat.status !== 'available' && seat.status !== 'selected'}
       >
         <Text style={seatTextStyle}>{seat.name}</Text>
       </TouchableOpacity>
@@ -176,7 +196,7 @@ const SelectSeatScreen = ({ route }) => {
       if (seatData) {
         return { ...seat, status: seatData.status };
       }
-    return { ...seat, status:'available' };; 
+      return { ...seat, status: 'available' };;
     });
     setSeats(updatedSeats);
   };
@@ -239,7 +259,7 @@ const SelectSeatScreen = ({ route }) => {
             <TouchableOpacity
               onPress={() => {
                 setSelectedDateIndex(dateArray.indexOf(item));
-                setSelectedTimeIndex(null); 
+                setSelectedTimeIndex(null);
                 setSelectedDate(item.date.toLocaleDateString('vi-VN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }));
               }}
             >
@@ -294,7 +314,13 @@ const SelectSeatScreen = ({ route }) => {
             <Text style={styles.totalText1}>Tổng:</Text>
             <Text style={styles.totalText}>{calculateTotal()} VND</Text>
           </View>
-          <TouchableOpacity style={styles.button} onPress={() => { navigation.navigate('PaymentScreen') }} >
+          <TouchableOpacity
+            style={[styles.button, { backgroundColor: selectedSeats.length === 0 ? '#999' : '#FCC434' }]}
+            onPress={() => {
+            handleTicket()
+            }}
+
+          >
             <Text style={styles.buttonText}>Mua Vé</Text>
           </TouchableOpacity>
         </View>
@@ -335,14 +361,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     margin: 5,
     padding: 5,
-    flexDirection:'row',
+    flexDirection: 'row',
 
   },
   row: {
     flexDirection: 'row',
   },
   seat: {
-    
+
     width: screenWidth * 0.08,
     height: screenWidth * 0.08,
     margin: screenWidth * 0.01,
@@ -389,7 +415,8 @@ const styles = StyleSheet.create({
   containerGap24: {
     gap: screenWidth * 0.04,
   },
-  dateContainer: {marginLeft:5,
+  dateContainer: {
+    marginLeft: 5,
     width: screenWidth * 0.12,
     height: screenHeight * 0.12,
     borderRadius: 20,
@@ -413,7 +440,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     paddingHorizontal: 16,
     borderRadius: 25,
-   
+
     backgroundColor: "#1C1C1C",
     alignItems: 'center',
     justifyContent: 'center',
