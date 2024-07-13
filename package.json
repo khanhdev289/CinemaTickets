@@ -17,6 +17,7 @@
     "@react-navigation/bottom-tabs": "^6.5.20",
     "@react-navigation/material-top-tabs": "^6.6.13",
     "@react-navigation/native-stack": "^6.9.26",
+    "@stripe/stripe-react-native": "^0.38.1",
     "axios": "^1.7.2",
     "date-fns": "^3.6.0",
     "expo-linear-gradient": "^13.0.2",

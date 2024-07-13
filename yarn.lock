@@ -2555,6 +2555,11 @@
   dependencies:
     "@sinonjs/commons" "^3.0.0"
 
+"@stripe/stripe-react-native@^0.38.1":
+  version "0.38.1"
+  resolved "https://registry.npmjs.org/@stripe/stripe-react-native/-/stripe-react-native-0.38.1.tgz"
+  integrity sha512-FpwoazLMooJMoMTJiICdoW8SZY5PeJsqbRKCO+yjbMkYfbCOQfXHPzsaPSA3AAPo9cVa1Z7dzoUDILndE6Y7Kg==
+
 "@svgr/babel-plugin-add-jsx-attribute@8.0.0":
   version "8.0.0"
   resolved "https://registry.npmjs.org/@svgr/babel-plugin-add-jsx-attribute/-/babel-plugin-add-jsx-attribute-8.0.0.tgz"
@@ -4591,7 +4596,7 @@ expo-modules-core@1.12.18:
   dependencies:
     invariant "^2.2.4"
 
-expo@*:
+expo@*, expo@>=46.0.9:
   version "51.0.17"
   resolved "https://registry.npmjs.org/expo/-/expo-51.0.17.tgz"
   integrity sha512-VqLrdVMLdjCUhNuWWGdexqkiscnudY7OACafBrfqIFOejAeKceEaBU5YQIlNlOsKuB7PBMqDkhdZ+dG93Ul4ig==

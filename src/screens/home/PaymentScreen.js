@@ -1,23 +1,54 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, Dimensions, TouchableOpacity, Image, TextInput, Button, Modal, FlatList, Alert, ActivityIndicator } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import React, {useEffect, useState} from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  Dimensions,
+  TouchableOpacity,
+  Image,
+  TextInput,
+  Button,
+  Modal,
+  FlatList,
+  Alert,
+  ActivityIndicator,
+} from 'react-native';
+import {useNavigation} from '@react-navigation/native';
+import {SafeAreaView} from 'react-native-safe-area-context';
 import iconBack from '../../assets/icons/iconBack';
-import { SvgXml } from 'react-native-svg';
+import {SvgXml} from 'react-native-svg';
 import BackgroundTimer from 'react-native-background-timer';
 import iconPlay from '../../assets/icons/iconPlay';
 import iconPlayVideo from '../../assets/icons/iconPlayVideo';
 import iconLocation from '../../assets/icons/iconLocation';
 import iconClock from '../../assets/icons/iconClock';
 import iconDiscount from '../../assets/icons/iconDiscount';
-import { ScrollView } from 'react-native-virtualized-view';
-import { IMAGE_API_URL, checkDiscount, fetchCinemaById, fetchCombo, fetchMovieById, fetchSeatById, fetchShowTimeById, fetchTimeById, updateTicket } from '../../../api';
-import { set } from 'date-fns';
+import {ScrollView} from 'react-native-virtualized-view';
+import {
+  IMAGE_API_URL,
+  checkDiscount,
+  fetchCinemaById,
+  fetchCombo,
+  fetchMovieById,
+  fetchSeatById,
+  fetchShowTimeById,
+  fetchTimeById,
+  updateTicket,
+} from '../../../api';
+import {set} from 'date-fns';
+import {id} from 'date-fns/locale';
+import {useStripe} from '@stripe/stripe-react-native';
+import axios from 'axios';
+import {useAuth} from '../../components/AuthProvider ';
+
 const screenWidth = Dimensions.get('screen').width;
 const screenHeight = Dimensions.get('screen').height;
-const PaymentScreen = ({ route }) => {
+const POSTS_API_URL1 = 'http://139.180.132.97:3000/tickets/status';
 
-  const { ticketData } = route.params;
+const PaymentScreen = ({route}) => {
+  const stripe = useStripe();
+  const {user} = useAuth();
+  const {ticketData} = route.params;
 
   const navigation = useNavigation();
   const handleBack = () => {
@@ -42,8 +73,16 @@ const PaymentScreen = ({ route }) => {
   };
 
   // State and functions for combo quantities and checkboxes
-  const [comboQuantities, setComboQuantities] = useState({ combo1: 1, combo2: 1, combo3: 1 });
-  const [comboChecked, setComboChecked] = useState({ combo1: false, combo2: false, combo3: false });
+  const [comboQuantities, setComboQuantities] = useState({
+    combo1: 1,
+    combo2: 1,
+    combo3: 1,
+  });
+  const [comboChecked, setComboChecked] = useState({
+    combo1: false,
+    combo2: false,
+    combo3: false,
+  });
   const [countdown, setCountdown] = useState(1 * 60); // 15 minutes in seconds
   useEffect(() => {
     fetchData();
@@ -63,11 +102,10 @@ const PaymentScreen = ({ route }) => {
     }
   }, [countdown, countdownExpired]);
 
-
   const calculateTotalAmount = () => {
-    const ticketTotal = parseFloat(ticketData.total-discountAmountT);
-    const comboTotal = parseFloat(getTotalPrice()-discountAmountF);
-    return ticketTotal + comboTotal ;
+    const ticketTotal = parseFloat(ticketData.total - discountAmountT);
+    const comboTotal = parseFloat(getTotalPrice() - discountAmountF);
+    return ticketTotal + comboTotal;
   };
 
   const fetchData = async () => {
@@ -76,9 +114,11 @@ const PaymentScreen = ({ route }) => {
       const cinemaResponse = await fetchCinemaById(ticketData.cinema);
       const showtimeResponse = await fetchShowTimeById(ticketData.showdate);
       const timeResponse = await fetchTimeById(ticketData.time);
-      const seatResponses = await Promise.all(ticketData.seat.map(async (seatId) => {
-        return await fetchSeatById(seatId);
-      }));
+      const seatResponses = await Promise.all(
+        ticketData.seat.map(async seatId => {
+          return await fetchSeatById(seatId);
+        }),
+      );
       const comboRespose = await fetchCombo();
 
       setCombo(comboRespose);
@@ -87,42 +127,39 @@ const PaymentScreen = ({ route }) => {
       setDateInfo(showtimeResponse);
       setTimeInfo(timeResponse);
       setSeatInfor(seatResponses);
-
-
-
     } catch (error) {
       console.error('Error fetching data:', error);
     } finally {
       setIsLoading(flase);
     }
-
-  }
+  };
 
   // Function to format countdown to mm:ss
-  const formatCountdown = (seconds) => {
+  const formatCountdown = seconds => {
     const minutes = Math.floor(seconds / 60);
     const remainingSeconds = seconds % 60;
-    return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
+    return `${minutes.toString().padStart(2, '0')}:${remainingSeconds
+      .toString()
+      .padStart(2, '0')}`;
   };
 
   const increaseQuantity = (combo, price) => {
-    setComboQuantities((prevQuantities) => ({
+    setComboQuantities(prevQuantities => ({
       ...prevQuantities,
       [combo]: prevQuantities[combo] + 1,
     }));
   };
 
-  const decreaseQuantity = (combo) => {
+  const decreaseQuantity = combo => {
     if (comboQuantities[combo] > 1) {
-      setComboQuantities((prevQuantities) => ({
+      setComboQuantities(prevQuantities => ({
         ...prevQuantities,
         [combo]: prevQuantities[combo] - 1,
       }));
     }
   };
 
-
-  const toggleComboCheckbox = (combo) => {
+  const toggleComboCheckbox = combo => {
     setComboChecked({
       ...comboChecked,
       [combo]: !comboChecked[combo],
@@ -141,8 +178,7 @@ const PaymentScreen = ({ route }) => {
     return total;
   };
 
-
-  const formatDate = (dateString) => {
+  const formatDate = dateString => {
     const date = new Date(dateString);
     const day = String(date.getDate()).padStart(2, '0');
     const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -169,7 +205,13 @@ const PaymentScreen = ({ route }) => {
         }));
 
       // Update ticket with new data
-      await updateTicket(ticketData._id, null, selectedCombos, getTotalPrice(), calculateTotalAmount());
+      await updateTicket(
+        ticketData._id,
+        null,
+        selectedCombos,
+        getTotalPrice(),
+        calculateTotalAmount(),
+      );
 
       // Navigate to next screen or show a success message
       // navigation.navigate('NextScreen'); // Thay đổi tên màn hình tiếp theo
@@ -187,38 +229,107 @@ const PaymentScreen = ({ route }) => {
       } else if (discountData.type === 'food') {
         setDiscountAmountF(discountData.percent * parseFloat(getTotalPrice()));
       } else {
-        Alert.alert('thông báo','Mã code của bạn không hợp lệ');
+        Alert.alert('thông báo', 'Mã code của bạn không hợp lệ');
       }
     } catch (error) {
       Alert.alert('Mã code của bạn không hợp lệ');
     }
   };
+  const subscribe = async () => {
+    try {
+      handleContinue();
+      const token = user.token.access_token;
 
-  const renderComboItem = ({ item, index }) => {
+      const response = await axios.put(
+        `${POSTS_API_URL1}/${ticketData._id}`,
+        {
+          name: 'khanh',
+          amount: calculateTotalAmount(),
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json', // Đảm bảo đúng loại dữ liệu gửi đi
+          },
+        },
+      );
+
+      if (!selectedPaymentMethod) {
+        Alert.alert('Thông báo', 'Bạn cần chọn phương thức thanh toán');
+        return;
+      }
+
+      const clientSecret = response.data.payment;
+
+      const {error: initError} = await stripe.initPaymentSheet({
+        paymentIntentClientSecret: clientSecret,
+        googlePay: true,
+        merchantDisplayName: 'MD-Cinema',
+      });
+
+      if (initError) {
+        console.error(initError);
+        return Alert.alert('Lỗi', initError.message);
+      }
+
+      const {error: presentError} = await stripe.presentPaymentSheet({
+        clientSecret,
+      });
+
+      if (presentError) {
+        console.error(presentError);
+        return Alert.alert('Lỗi', presentError.message);
+      }
+
+      Alert.alert('Thanh toán thành công, cảm ơn bạn!');
+    } catch (err) {
+      console.error(err);
+      Alert.alert('Có lỗi xảy ra, vui lòng thử lại sau!');
+    }
+  };
+
+  const renderComboItem = ({item, index}) => {
     const comboKey = `combo${index + 1}`;
     const totalPrice = comboQuantities[comboKey] * item.price;
 
     return (
       <View key={index} style={styles.comboModal}>
-        <Image style={styles.imageCombo} source={{ uri: IMAGE_API_URL + item.image }} />
+        <Image
+          style={styles.imageCombo}
+          source={{uri: IMAGE_API_URL + item.image}}
+        />
         <View style={styles.modalCombo}>
           <View style={styles.comboItem}>
             <Text style={styles.comboTitle}>{item.name}</Text>
-            <Text style={styles.comboPrice}>{totalPrice.toLocaleString()} VND</Text>
+            <Text style={styles.comboPrice}>
+              {totalPrice.toLocaleString()} VND
+            </Text>
             <View style={styles.quantityContainer}>
-              <TouchableOpacity style={styles.quantityButton} onPress={() => decreaseQuantity(comboKey)}>
+              <TouchableOpacity
+                style={styles.quantityButton}
+                onPress={() => decreaseQuantity(comboKey)}>
                 <Text style={styles.buttonText}>-</Text>
               </TouchableOpacity>
-              <Text style={styles.comboQuantity}>{comboQuantities[comboKey]}</Text>
-              <TouchableOpacity style={styles.quantityButton} onPress={() => increaseQuantity(comboKey, item.price)}>
+              <Text style={styles.comboQuantity}>
+                {comboQuantities[comboKey]}
+              </Text>
+              <TouchableOpacity
+                style={styles.quantityButton}
+                onPress={() => increaseQuantity(comboKey, item.price)}>
                 <Text style={styles.buttonText}>+</Text>
               </TouchableOpacity>
             </View>
           </View>
           <View style={styles.checkboxContainer}>
             <TouchableOpacity onPress={() => toggleComboCheckbox(comboKey)}>
-              <View style={[styles.checkbox, comboChecked[comboKey] && styles.checked]}>
-                {comboChecked[comboKey] && <Text style={styles.checkmark}>✓</Text>}
+              <View
+                style={[
+                  styles.checkbox,
+                  comboChecked[comboKey] && styles.checked,
+                ]}>
+                {comboChecked[comboKey] && (
+                  <Text style={styles.checkmark}>✓</Text>
+                )}
               </View>
             </TouchableOpacity>
           </View>
@@ -245,36 +356,67 @@ const PaymentScreen = ({ route }) => {
           </View>
         </View>
         <View style={styles.movieInfo}>
-          <Image style={styles.image} source={{ uri: IMAGE_API_URL + movieInfo.image }} />
-          <View style={{ flexDirection: 'column', margin: 10 }}>
+          <Image
+            style={styles.image}
+            source={{uri: IMAGE_API_URL + movieInfo.image}}
+          />
+          <View style={{flexDirection: 'column', margin: 10}}>
             <Text style={styles.movieTitle}>{movieInfo.name}</Text>
-            <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 10 }}>
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                marginTop: 10,
+              }}>
               <SvgXml xml={iconPlayVideo()} width={16} height={16} />
-              <Text style={styles.genre}>  {movieInfo.genre?.map(genre => genre.name).join(', ')}</Text>
+              <Text style={styles.genre}>
+                {' '}
+                {movieInfo.genre?.map(genre => genre.name).join(', ')}
+              </Text>
             </View>
-            <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 5 }}>
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                marginTop: 5,
+              }}>
               <SvgXml xml={iconLocation()} width={16} height={16} />
               <Text style={styles.genre}> {cinemaInfo.name}</Text>
             </View>
-            <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 5 }}>
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                marginTop: 5,
+              }}>
               <SvgXml xml={iconClock()} width={16} height={16} />
-              <Text style={styles.genre}> {formatDate(dateInfo.date)} • {timeInfo.time}</Text>
+              <Text style={styles.genre}>
+                {' '}
+                {formatDate(dateInfo.date)} • {timeInfo.time}
+              </Text>
             </View>
           </View>
         </View>
         <View style={styles.ticketInfo}>
           <Text style={styles.orderId}>Oder ID: {ticketData._id}</Text>
-          <View style={{ flexDirection: 'row' }}>
-            <Text style={styles.orderId}>Ghế:  </Text>
-            {seatInfo && seatInfo.map((seat, index) => (
-              <Text key={index} style={styles.orderId}>
-                {index > 0 ? ', ' : ''}
-                {seat.name}
-              </Text>
-            ))}</View>
+          <View style={{flexDirection: 'row'}}>
+            <Text style={styles.orderId}>Ghế: </Text>
+            {seatInfo &&
+              seatInfo.map((seat, index) => (
+                <Text key={index} style={styles.orderId}>
+                  {index > 0 ? ', ' : ''}
+                  {seat.name}
+                </Text>
+              ))}
+          </View>
         </View>
         <View style={styles.customInputContainer}>
-          <SvgXml xml={iconDiscount()} width={24} height={24} style={styles.icon} />
+          <SvgXml
+            xml={iconDiscount()}
+            width={24}
+            height={24}
+            style={styles.icon}
+          />
           <TextInput
             style={styles.textInput}
             placeholder="Mã khuyến mãi"
@@ -282,71 +424,100 @@ const PaymentScreen = ({ route }) => {
             onChangeText={setDiscountCode}
             placeholderTextColor="#949494"
           />
-          <TouchableOpacity style={styles.applyButton} onPress={handleApplyDiscount}>
+          <TouchableOpacity
+            style={styles.applyButton}
+            onPress={handleApplyDiscount}>
             <Text style={styles.applyButtonText}>Áp dụng</Text>
           </TouchableOpacity>
         </View>
 
-        <View style={{ flexDirection: 'row', justifyContent: 'space-between', margin: 10 }}>
-          <Text style={{ color: 'white' }}>Vé</Text>
-          <Text style={{ color: 'white', fontSize: 20 }}>{ticketData.total-discountAmountT} VND</Text>
+        <View
+          style={{
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            margin: 10,
+          }}>
+          <Text style={{color: 'white'}}>Vé</Text>
+          <Text style={{color: 'white', fontSize: 20}}>
+            {ticketData.total - discountAmountT} VND
+          </Text>
         </View>
         <View style={styles.line} />
 
-        <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+        <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
           <Text style={styles.comboTitle}> Chọn Combo</Text>
           <TouchableOpacity onPress={toggleModal}>
             <Text style={styles.viewAllText}>Xem tất cả </Text>
           </TouchableOpacity>
         </View>
         <View style={styles.combo}>
-
           <FlatList
             data={combo}
             renderItem={renderComboItem}
             keyExtractor={(item, index) => item._id}
-            contentContainerStyle={{ paddingBottom: 20 }}
+            contentContainerStyle={{paddingBottom: 20}}
           />
         </View>
         <View style={styles.line} />
-        <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
-          <Text style={styles.comboTotalPrice}>{getTotalPrice()-discountAmountF} VND</Text>
+        <View style={{flexDirection: 'row', justifyContent: 'flex-end'}}>
+          <Text style={styles.comboTotalPrice}>
+            {getTotalPrice() - discountAmountF} VND
+          </Text>
         </View>
-        <Text style={{ color: 'white', margin: 5, fontSize: 20 }}>Phương Thức Thanh Toán</Text>
+        <Text style={{color: 'white', margin: 5, fontSize: 20}}>
+          Phương Thức Thanh Toán
+        </Text>
         <TouchableOpacity
           style={[
             styles.paymentMethod,
-            selectedPaymentMethod === 'visa' && { borderColor: '#FFD700' } // Cập nhật màu viền nếu được chọn
+            selectedPaymentMethod === 'visa' && {borderColor: '#FFD700'}, // Cập nhật màu viền nếu được chọn
           ]}
           onPress={() => setSelectedPaymentMethod('visa')} // Đặt phương thức thanh toán đã chọn
         >
-
           <Image
             source={require('../../assets/images/Visa.png')}
             style={{
               width: '30%',
               resizeMode: 'contain',
-
             }}
           />
-          <View style={{ marginLeft: 20 }}>
-            <Text style={{ color: 'white' }}>VISA International payments </Text>
-            <Text style={styles.paymentMethodValue}>(Visa, Master, JCB, Amex)</Text>
+          <View style={{marginLeft: 20}}>
+            <Text style={{color: 'white'}}>VISA International payments </Text>
+            <Text style={styles.paymentMethodValue}>
+              (Visa, Master, JCB, Amex)
+            </Text>
           </View>
-
         </TouchableOpacity>
-        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', margin: 10 }}>
-          <Text style={{ color: 'white' }}>Tổng</Text>
-          <Text style={styles.totalAmountValue}>{calculateTotalAmount()} VND</Text>
+        <View
+          style={{
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            margin: 10,
+          }}>
+          <Text style={{color: 'white'}}>Tổng</Text>
+          <Text style={styles.totalAmountValue}>
+            {calculateTotalAmount()} VND
+          </Text>
         </View>
-        <View style={{
-          flexDirection: 'row', padding: 10, borderRadius: 5,
-          justifyContent: 'space-around', alignItems: 'center', margin: 10, backgroundColor: '#261D08'
-        }}>
-          <Text style={{ color: 'white' }}>Hoàn thành thanh toán của bạn trong</Text>
-          <Text style={styles.countdownValue}>{formatCountdown(countdown)}</Text>
+        <View
+          style={{
+            flexDirection: 'row',
+            padding: 10,
+            borderRadius: 5,
+            justifyContent: 'space-around',
+            alignItems: 'center',
+            margin: 10,
+            backgroundColor: '#261D08',
+          }}>
+          <Text style={{color: 'white'}}>
+            Hoàn thành thanh toán của bạn trong
+          </Text>
+          <Text style={styles.countdownValue}>
+            {formatCountdown(countdown)}
+          </Text>
         </View>
-        <TouchableOpacity onPress={handleContinue}>
+        <TouchableOpacity onPress={subscribe}>
           <View style={styles.confirmButton}>
             <Text style={styles.confirmButtonLabel}>Tiếp tục</Text>
           </View>
@@ -374,12 +545,8 @@ const PaymentScreen = ({ route }) => {
           </View>
         </View>
       </Modal> */}
-
-
     </SafeAreaView>
-
   );
-
 };
 
 const styles = StyleSheet.create({
@@ -392,7 +559,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: 'black'
+    backgroundColor: 'black',
   },
   header: {
     height: screenHeight * 0.05,
@@ -411,26 +578,26 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#fff'
+    color: '#fff',
   },
   movieInfo: {
-
     flexDirection: 'row',
     height: screenHeight * 0.15,
     borderRadius: 16,
-    backgroundColor: '#1C1C1C'
+    backgroundColor: '#1C1C1C',
   },
   image: {
     width: '25%',
     height: '100%',
     objectFit: 'cover',
-    borderRadius: 16
+    borderRadius: 16,
   },
   imageCombo: {
     width: '20%',
     height: '100%',
     objectFit: 'cover',
-    borderRadius: 8, borderWidth: 1,
+    borderRadius: 8,
+    borderWidth: 1,
     borderColor: 'white',
   },
   line: {
@@ -446,7 +613,6 @@ const styles = StyleSheet.create({
   comboPrice: {
     fontSize: 16,
     color: 'green',
-
   },
   quantityContainer: {
     flexDirection: 'row',
@@ -462,16 +628,16 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
     alignItems: 'center',
     justifyContent: 'center',
-    marginHorizontal: 5
+    marginHorizontal: 5,
   },
   buttonText: {
     fontSize: 14,
     fontWeight: 'bold',
-    color: 'black'
+    color: 'black',
   },
   comboTotalPrice: {
     fontSize: 20,
-    color: 'white'
+    color: 'white',
   },
   movieTitle: {
     fontSize: 18,
@@ -480,7 +646,7 @@ const styles = StyleSheet.create({
   },
   genre: {
     fontSize: 10,
-    color: '#E6E6E6'
+    color: '#E6E6E6',
   },
 
   ticketInfo: {
@@ -488,7 +654,7 @@ const styles = StyleSheet.create({
   },
   orderId: {
     fontSize: 14,
-    color: '#F2F2F2'
+    color: '#F2F2F2',
   },
 
   customInputContainer: {
@@ -502,7 +668,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 10,
   },
   textInput: {
-flex:1,
+    flex: 1,
     color: '#949494',
   },
   applyButton: {
@@ -545,15 +711,15 @@ flex:1,
   comboTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: 'white'
+    color: 'white',
   },
   comboPrice: {
     fontSize: 14,
-    color: 'white'
+    color: 'white',
   },
   comboQuantity: {
     fontSize: 14,
-    color: 'white'
+    color: 'white',
   },
   checkboxContainer: {
     flexDirection: 'row',
@@ -594,16 +760,17 @@ flex:1,
     fontSize: 10,
     fontStyle: 'italic',
     color: 'white',
-
   },
   paymentMethod: {
     height: 0.1 * screenHeight,
     backgroundColor: '#1C1C1C',
-    margin: 5, padding: 5,
-    borderRadius: 10, flexDirection: 'row',
+    margin: 5,
+    padding: 5,
+    borderRadius: 10,
+    flexDirection: 'row',
     alignItems: 'center',
-    borderColor: 'black', borderWidth: 1,
-
+    borderColor: 'black',
+    borderWidth: 1,
   },
   totalAmountValue: {
     fontSize: 20,
@@ -624,13 +791,11 @@ flex:1,
   confirmButtonLabel: {
     color: 'black',
     fontSize: 18,
-
   },
   modalContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-
   },
   footer: {
     width: '100%',
@@ -643,12 +808,12 @@ flex:1,
   },
   totalText1: {
     fontSize: 12,
-    color: '#F2F2F2'
+    color: '#F2F2F2',
   },
   totalText: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#FCC434'
+    color: '#FCC434',
   },
   button: {
     backgroundColor: '#FCC434',
@@ -667,13 +832,13 @@ flex:1,
     borderRadius: 10,
     padding: 20,
     alignItems: 'center',
-    backgroundColor: '#1A1A1A'
+    backgroundColor: '#1A1A1A',
   },
   modalTitle: {
     fontSize: 20,
     fontWeight: 'bold',
     marginBottom: 10,
-    color: 'white'
+    color: 'white',
   },
   modalCombo: {
     flexDirection: 'row',
@@ -698,7 +863,5 @@ flex:1,
     color: 'black',
     fontSize: 16,
   },
-
-
 });
 export default PaymentScreen;

@@ -31,6 +31,13 @@ const ListTicketScreen = () => {
   useEffect(() => {
     fetchDataUser();
   }, []);
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', () => {
+      fetchDataUser();
+    });
+
+    return unsubscribe;
+  }, [navigation]);
 
   const fetchDataUser = async () => {
     try {
@@ -74,6 +81,11 @@ const ListTicketScreen = () => {
 
   return (
     <SafeAreaView style={{flex: 1, backgroundColor: 'black'}}>
+       {isLoading && (
+        <View style={styles.loadingOverlay}>
+          <ActivityIndicator size="large" color="#f7b731" />
+        </View>
+      )}
       <StatusBar
         barStyle="light-content"
         backgroundColor="#000"
@@ -159,5 +171,12 @@ const styles = StyleSheet.create({
   ticketLocation: {
     fontSize: 14,
     color: 'white',
+  },
+  loadingOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 1,
   },
 });

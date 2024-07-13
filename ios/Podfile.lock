@@ -938,6 +938,8 @@ PODS:
   - React-Mapbuffer (0.74.2):
     - glog
     - React-debug
+  - react-native-background-timer (2.4.1):
+    - React-Core
   - react-native-camera (4.2.1):
     - React-Core
     - react-native-camera/RCT (= 4.2.1)
@@ -1304,6 +1306,42 @@ PODS:
   - RNSVG (15.3.0):
     - React-Core
   - SocketRocket (0.7.0)
+  - Stripe (23.27.6):
+    - StripeApplePay (= 23.27.6)
+    - StripeCore (= 23.27.6)
+    - StripePayments (= 23.27.6)
+    - StripePaymentsUI (= 23.27.6)
+    - StripeUICore (= 23.27.6)
+  - stripe-react-native (0.38.1):
+    - React-Core
+    - Stripe (~> 23.27.0)
+    - StripeApplePay (~> 23.27.0)
+    - StripeFinancialConnections (~> 23.27.0)
+    - StripePayments (~> 23.27.0)
+    - StripePaymentSheet (~> 23.27.0)
+    - StripePaymentsUI (~> 23.27.0)
+  - StripeApplePay (23.27.6):
+    - StripeCore (= 23.27.6)
+  - StripeCore (23.27.6)
+  - StripeFinancialConnections (23.27.6):
+    - StripeCore (= 23.27.6)
+    - StripeUICore (= 23.27.6)
+  - StripePayments (23.27.6):
+    - StripeCore (= 23.27.6)
+    - StripePayments/Stripe3DS2 (= 23.27.6)
+  - StripePayments/Stripe3DS2 (23.27.6):
+    - StripeCore (= 23.27.6)
+  - StripePaymentSheet (23.27.6):
+    - StripeApplePay (= 23.27.6)
+    - StripeCore (= 23.27.6)
+    - StripePayments (= 23.27.6)
+    - StripePaymentsUI (= 23.27.6)
+  - StripePaymentsUI (23.27.6):
+    - StripeCore (= 23.27.6)
+    - StripePayments (= 23.27.6)
+    - StripeUICore (= 23.27.6)
+  - StripeUICore (23.27.6):
+    - StripeCore (= 23.27.6)
   - Yoga (0.0.0)
 
 DEPENDENCIES:
@@ -1340,6 +1378,7 @@ DEPENDENCIES:
   - React-jsitracing (from `../node_modules/react-native/ReactCommon/hermes/executor/`)
   - React-logger (from `../node_modules/react-native/ReactCommon/logger`)
   - React-Mapbuffer (from `../node_modules/react-native/ReactCommon`)
+  - react-native-background-timer (from `../node_modules/react-native-background-timer`)
   - react-native-camera (from `../node_modules/react-native-camera`)
   - react-native-html-to-pdf (from `../node_modules/react-native-html-to-pdf`)
   - react-native-image-picker (from `../node_modules/react-native-image-picker`)
@@ -1378,12 +1417,21 @@ DEPENDENCIES:
   - RNPermissions (from `../node_modules/react-native-permissions`)
   - RNScreens (from `../node_modules/react-native-screens`)
   - RNSVG (from `../node_modules/react-native-svg`)
+  - "stripe-react-native (from `../node_modules/@stripe/stripe-react-native`)"
   - Yoga (from `../node_modules/react-native/ReactCommon/yoga`)
 
 SPEC REPOS:
   trunk:
     - BEMCheckBox
     - SocketRocket
+    - Stripe
+    - StripeApplePay
+    - StripeCore
+    - StripeFinancialConnections
+    - StripePayments
+    - StripePaymentSheet
+    - StripePaymentsUI
+    - StripeUICore
 
 EXTERNAL SOURCES:
   boost:
@@ -1449,6 +1497,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon/logger"
   React-Mapbuffer:
     :path: "../node_modules/react-native/ReactCommon"
+  react-native-background-timer:
+    :path: "../node_modules/react-native-background-timer"
   react-native-camera:
     :path: "../node_modules/react-native-camera"
   react-native-html-to-pdf:
@@ -1525,6 +1575,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-screens"
   RNSVG:
     :path: "../node_modules/react-native-svg"
+  stripe-react-native:
+    :path: "../node_modules/@stripe/stripe-react-native"
   Yoga:
     :path: "../node_modules/react-native/ReactCommon/yoga"
 
@@ -1561,6 +1613,7 @@ SPEC CHECKSUMS:
   React-jsitracing: 0fa7f78d8fdda794667cb2e6f19c874c1cf31d7e
   React-logger: 29fa3e048f5f67fe396bc08af7606426d9bd7b5d
   React-Mapbuffer: bf56147c9775491e53122a94c423ac201417e326
+  react-native-background-timer: 17ea5e06803401a379ebf1f20505b793ac44d0fe
   react-native-camera: 3eae183c1d111103963f3dd913b65d01aef8110f
   react-native-html-to-pdf: 4c5c6e26819fe202971061594058877aa9b25265
   react-native-image-picker: c3afe5472ef870d98a4b28415fc0b928161ee5f7
@@ -1600,6 +1653,15 @@ SPEC CHECKSUMS:
   RNScreens: b32a9ff15bea7fcdbe5dff6477bc503f792b1208
   RNSVG: a48668fd382115bc89761ce291a81c4ca5f2fd2e
   SocketRocket: abac6f5de4d4d62d24e11868d7a2f427e0ef940d
+  Stripe: 9fec845645e39f371e6898926d096fd9c2feb5a5
+  stripe-react-native: 0e66c2b3f529af8a64cfffffa9aecd98be937d39
+  StripeApplePay: 5f017e8dfe259fafbab70137776189deef754bb2
+  StripeCore: 01ec57f0dddfe742054dc6a322f811426c25313d
+  StripeFinancialConnections: 56698cb6274bf89fb8c76b934f6156f368e97765
+  StripePayments: 6adf11faf1b7038e77aa97019410305c6adca79d
+  StripePaymentSheet: 3eaf870c4388e44b0cc37e4c69d00b6957fd8bd7
+  StripePaymentsUI: 59ccddeacad592b09fa67e8d641340820ddb4751
+  StripeUICore: 879bbf5889265db13f52fac8aad7a176ba62481f
   Yoga: ae3c32c514802d30f687a04a6a35b348506d411f
 
 PODFILE CHECKSUM: 7853cecc0cda6caa2f44720289ea49c896cca51f
