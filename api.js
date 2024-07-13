@@ -261,5 +261,15 @@ export const updateTicket = async (ticketId, discountId, foodItems, total_food, 
     throw error;
   }
 };
-
+// check discount
+export const checkDiscount = async (code,cinemaId) => {
+  try {  const api = await createApiInstance();
+    const url = `/discounts/check/code?code=${code}&cinemaId=${cinemaId}`;
+    const response = await api.get(url);
+    return response.data;
+  } catch (error) {
+    console.error('Error check code:', error);
+    throw error;
+  }
+};
 

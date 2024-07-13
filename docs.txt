@@ -22,6 +22,8 @@ npm i react-native-video
 npm i react-native-virtualized-view
 npm install react-native-linear-gradient
 npm install react-native-websocket
+npm install react-native-background-timer
+
 
 
 
