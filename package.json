@@ -25,6 +25,7 @@
     "react-hook-form": "^7.52.0",
     "react-native": "0.74.2",
     "react-native-alert-notification": "^0.4.0",
+    "react-native-background-timer": "^2.4.1",
     "react-native-camera": "^4.2.1",
     "react-native-confirmation-code-field": "^7.4.0",
     "react-native-html-to-pdf": "^0.12.0",
