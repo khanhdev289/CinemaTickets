@@ -12,7 +12,7 @@ import iconClock from '../../assets/icons/iconClock';
 import iconDiscount from '../../assets/icons/iconDiscount';
 import { ScrollView } from 'react-native-virtualized-view';
 import { IMAGE_API_URL, checkDiscount, fetchCinemaById, fetchCombo, fetchMovieById, fetchSeatById, fetchShowTimeById, fetchTimeById, updateTicket } from '../../../api';
-import { set } from 'date-fns';
+
 const screenWidth = Dimensions.get('screen').width;
 const screenHeight = Dimensions.get('screen').height;
 const PaymentScreen = ({ route }) => {
@@ -80,16 +80,12 @@ const PaymentScreen = ({ route }) => {
         return await fetchSeatById(seatId);
       }));
       const comboRespose = await fetchCombo();
-
       setCombo(comboRespose);
       setMovieInfo(movieResponse.getmovie);
       setCinemaInfo(cinemaResponse);
       setDateInfo(showtimeResponse);
       setTimeInfo(timeResponse);
       setSeatInfor(seatResponses);
-
-
-
     } catch (error) {
       console.error('Error fetching data:', error);
     } finally {
