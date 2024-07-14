@@ -44,7 +44,7 @@ import {useAuth} from '../../components/AuthProvider ';
 const screenWidth = Dimensions.get('screen').width;
 const screenHeight = Dimensions.get('screen').height;
 const POSTS_API_URL1 = 'http://139.180.132.97:3000/tickets/status';
-
+const POSTS_API_URL = 'http://139.180.132.97:3000/tickets/payment';
 const PaymentScreen = ({route}) => {
   const stripe = useStripe();
   const {user} = useAuth();
@@ -186,15 +186,6 @@ const PaymentScreen = ({route}) => {
     return `${day}/${month}/${year}`;
   };
   const handleContinue = async () => {
-    if (countdownExpired) {
-      Alert.alert('Thông báo', 'Thời gian thanh toán của bạn đã hết.');
-      navigation.goBack(); // Chuyển về màn hình trước đó
-      return;
-    }
-    if (!selectedPaymentMethod) {
-      Alert.alert('Thông báo', 'Bạn cần chọn phương thức thanh toán');
-      return;
-    }
     try {
       // Tạo mảng gồm các combo được chọn với id và quantity
       const selectedCombos = Object.keys(comboChecked)
@@ -240,8 +231,8 @@ const PaymentScreen = ({route}) => {
       handleContinue();
       const token = user.token.access_token;
 
-      const response = await axios.put(
-        `${POSTS_API_URL1}/${ticketData._id}`,
+      const response = await axios.post(
+        `${POSTS_API_URL}/${ticketData._id}`,
         {
           name: 'khanh',
           amount: calculateTotalAmount(),
@@ -253,13 +244,19 @@ const PaymentScreen = ({route}) => {
           },
         },
       );
+      console.log(response.data);
 
       if (!selectedPaymentMethod) {
         Alert.alert('Thông báo', 'Bạn cần chọn phương thức thanh toán');
         return;
       }
+      if (countdownExpired) {
+        Alert.alert('Thông báo', 'Thời gian thanh toán của bạn đã hết.');
+        navigation.goBack();
+        return;
+      }
 
-      const clientSecret = response.data.payment;
+      const clientSecret = response.data;
 
       const {error: initError} = await stripe.initPaymentSheet({
         paymentIntentClientSecret: clientSecret,
@@ -282,9 +279,30 @@ const PaymentScreen = ({route}) => {
       }
 
       Alert.alert('Thanh toán thành công, cảm ơn bạn!');
+      paymentSuccess();
     } catch (err) {
       console.error(err);
       Alert.alert('Có lỗi xảy ra, vui lòng thử lại sau!');
+    }
+  };
+  const paymentSuccess = async () => {
+    try {
+      const token = user.token.access_token;
+
+      const axiosInstance = axios.create({
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const url = `${POSTS_API_URL1}/${ticketData._id}`;
+      const response = await axiosInstance.put(url);
+
+      const data = response.data;
+      console.log(data);
+      navigation.navigate('TicketScreen', {_id: ticketData._id});
+    } catch (error) {
+      console.error('Lỗi khi thanh toán: ', error);
     }
   };
 
