@@ -225,8 +225,7 @@ const SelectSeatScreen = ({ route }) => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView>
-        <View style={styles.header}>
+       <View style={styles.header}>
           <TouchableOpacity onPress={handleBack} style={styles.backButton}>
             <SvgXml xml={iconsBack()} />
           </TouchableOpacity>
@@ -234,6 +233,8 @@ const SelectSeatScreen = ({ route }) => {
             <Text style={styles.title}>Chọn Ghế</Text>
           </View>
         </View>
+      <ScrollView>
+       
 
         <View style={{ flexDirection: 'column', justifyContent: 'center', margin: 16, alignSelf: 'center', height: screenHeight * 0.1 }}>
           <SvgXml xml={iconLine()} />

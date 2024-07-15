@@ -12,7 +12,8 @@ import iconClock from '../../assets/icons/iconClock';
 import iconDiscount from '../../assets/icons/iconDiscount';
 import { ScrollView } from 'react-native-virtualized-view';
 import { IMAGE_API_URL, checkDiscount, fetchCinemaById, fetchCombo, fetchMovieById, fetchSeatById, fetchShowTimeById, fetchTimeById, updateTicket } from '../../../api';
-
+import { set } from 'date-fns';
+import iconDes from '../../assets/icons/iconDes';
 const screenWidth = Dimensions.get('screen').width;
 const screenHeight = Dimensions.get('screen').height;
 const PaymentScreen = ({ route }) => {
@@ -35,6 +36,8 @@ const PaymentScreen = ({ route }) => {
   const [discountCode, setDiscountCode] = useState('');
   const [discountAmountT, setDiscountAmountT] = useState(0);
   const [discountAmountF, setDiscountAmountF] = useState(0);
+  const [showAllItems, setShowAllItems] = useState(false);
+
   // Modal state and toggle function
   const [modalVisible, setModalVisible] = useState(false);
   const toggleModal = () => {
@@ -80,16 +83,20 @@ const PaymentScreen = ({ route }) => {
         return await fetchSeatById(seatId);
       }));
       const comboRespose = await fetchCombo();
+
       setCombo(comboRespose);
       setMovieInfo(movieResponse.getmovie);
       setCinemaInfo(cinemaResponse);
       setDateInfo(showtimeResponse);
       setTimeInfo(timeResponse);
       setSeatInfor(seatResponses);
+
+
+
     } catch (error) {
       console.error('Error fetching data:', error);
     } finally {
-      setIsLoading(flase);
+      setIsLoading(false);
     }
 
   }
@@ -203,7 +210,7 @@ const PaymentScreen = ({ route }) => {
             <Text style={styles.comboPrice}>{totalPrice.toLocaleString()} VND</Text>
             <View style={styles.quantityContainer}>
               <TouchableOpacity style={styles.quantityButton} onPress={() => decreaseQuantity(comboKey)}>
-                <Text style={styles.buttonText}>-</Text>
+              <Text style={styles.buttonText}>-</Text>
               </TouchableOpacity>
               <Text style={styles.comboQuantity}>{comboQuantities[comboKey]}</Text>
               <TouchableOpacity style={styles.quantityButton} onPress={() => increaseQuantity(comboKey, item.price)}>
@@ -222,16 +229,17 @@ const PaymentScreen = ({ route }) => {
       </View>
     );
   };
-  // if (isLoading) {
-  //   return (
-  //     <View style={styles.loadingContainer}>
-  //       <ActivityIndicator size="large" color="#f7b731" />
-  //     </View>
-  //   );
-  // }
+  
+
+  if (isLoading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#f7b731" />
+      </View>
+    );
+  }
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView>
         <View style={styles.header}>
           <TouchableOpacity onPress={handleBack} style={styles.backButton}>
             <SvgXml xml={iconBack()} />
@@ -240,6 +248,8 @@ const PaymentScreen = ({ route }) => {
             <Text style={styles.title}>Thanh Toán</Text>
           </View>
         </View>
+      <ScrollView>
+      
         <View style={styles.movieInfo}>
           <Image style={styles.image} source={{ uri: IMAGE_API_URL + movieInfo.image }} />
           <View style={{ flexDirection: 'column', margin: 10 }}>
@@ -446,20 +456,19 @@ const styles = StyleSheet.create({
   },
   quantityContainer: {
     flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginVertical: 5,
+    alignItems:'center',
+
   },
   quantityButton: {
     backgroundColor: '#fff',
     borderColor: 'black',
     borderRadius: 5,
-    paddingVertical: 5,
-    paddingHorizontal: 8,
+  width:24,height:24,
     alignItems: 'center',
     justifyContent: 'center',
-    marginHorizontal: 5
   },
+ 
+ 
   buttonText: {
     fontSize: 14,
     fontWeight: 'bold',
@@ -533,9 +542,9 @@ flex:1,
   comboItem: {
     marginLeft: 20,
     flexDirection: 'column',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    padding: 5,
+  
+    justifyContent: 'center',
+   
   },
 
   comboTitle: {
@@ -549,7 +558,7 @@ flex:1,
   },
   comboQuantity: {
     fontSize: 14,
-    color: 'white'
+    color: 'white',marginHorizontal:3
   },
   checkboxContainer: {
     flexDirection: 'row',
