@@ -1,19 +1,17 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, Dimensions, TouchableOpacity, Image, TextInput, Button, Modal, FlatList, Alert, ActivityIndicator } from 'react-native';
+import { ScrollView, View, Text, StyleSheet, Dimensions, TouchableOpacity, Image, TextInput, Button, Modal, FlatList, Alert, ActivityIndicator } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import iconBack from '../../assets/icons/iconBack';
 import { SvgXml } from 'react-native-svg';
 import BackgroundTimer from 'react-native-background-timer';
-import iconPlay from '../../assets/icons/iconPlay';
 import iconPlayVideo from '../../assets/icons/iconPlayVideo';
 import iconLocation from '../../assets/icons/iconLocation';
 import iconClock from '../../assets/icons/iconClock';
 import iconDiscount from '../../assets/icons/iconDiscount';
-import { ScrollView } from 'react-native-virtualized-view';
 import { IMAGE_API_URL, checkDiscount, fetchCinemaById, fetchCombo, fetchMovieById, fetchSeatById, fetchShowTimeById, fetchTimeById, updateTicket } from '../../../api';
-import { set } from 'date-fns';
-import iconDes from '../../assets/icons/iconDes';
+
+
 const screenWidth = Dimensions.get('screen').width;
 const screenHeight = Dimensions.get('screen').height;
 const PaymentScreen = ({ route }) => {
@@ -37,21 +35,14 @@ const PaymentScreen = ({ route }) => {
   const [discountAmountT, setDiscountAmountT] = useState(0);
   const [discountAmountF, setDiscountAmountF] = useState(0);
   const [showAllItems, setShowAllItems] = useState(false);
-
-  // Modal state and toggle function
-  const [modalVisible, setModalVisible] = useState(false);
-  const toggleModal = () => {
-    setModalVisible(!modalVisible);
-  };
-
-  // State and functions for combo quantities and checkboxes
   const [comboQuantities, setComboQuantities] = useState({ combo1: 1, combo2: 1, combo3: 1 });
   const [comboChecked, setComboChecked] = useState({ combo1: false, combo2: false, combo3: false });
-  const [countdown, setCountdown] = useState(1 * 60); // 15 minutes in seconds
+  const [countdown, setCountdown] = useState(60);
+
   useEffect(() => {
     fetchData();
   }, [ticketData]);
-  // UseEffect for countdown
+
   useEffect(() => {
     if (countdown > 0 && !countdownExpired) {
       const intervalId = BackgroundTimer.setInterval(() => {
@@ -64,13 +55,12 @@ const PaymentScreen = ({ route }) => {
     } else if (countdown === 0) {
       setCountdownExpired(true);
     }
-  }, [countdown, countdownExpired]);
-
+  }, [countdownExpired]);
 
   const calculateTotalAmount = () => {
-    const ticketTotal = parseFloat(ticketData.total-discountAmountT);
-    const comboTotal = parseFloat(getTotalPrice()-discountAmountF);
-    return ticketTotal + comboTotal ;
+    const ticketTotal = parseFloat(ticketData.total - discountAmountT);
+    const comboTotal = parseFloat(getTotalPrice() - discountAmountF);
+    return ticketTotal + comboTotal;
   };
 
   const fetchData = async () => {
@@ -83,25 +73,19 @@ const PaymentScreen = ({ route }) => {
         return await fetchSeatById(seatId);
       }));
       const comboRespose = await fetchCombo();
-
       setCombo(comboRespose);
       setMovieInfo(movieResponse.getmovie);
       setCinemaInfo(cinemaResponse);
       setDateInfo(showtimeResponse);
       setTimeInfo(timeResponse);
       setSeatInfor(seatResponses);
-
-
-
     } catch (error) {
       console.error('Error fetching data:', error);
     } finally {
       setIsLoading(false);
     }
-
   }
 
-  // Function to format countdown to mm:ss
   const formatCountdown = (seconds) => {
     const minutes = Math.floor(seconds / 60);
     const remainingSeconds = seconds % 60;
@@ -124,7 +108,6 @@ const PaymentScreen = ({ route }) => {
     }
   };
 
-
   const toggleComboCheckbox = (combo) => {
     setComboChecked({
       ...comboChecked,
@@ -144,7 +127,6 @@ const PaymentScreen = ({ route }) => {
     return total;
   };
 
-
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     const day = String(date.getDate()).padStart(2, '0');
@@ -152,6 +134,7 @@ const PaymentScreen = ({ route }) => {
     const year = date.getFullYear();
     return `${day}/${month}/${year}`;
   };
+  
   const handleContinue = async () => {
     if (countdownExpired) {
       Alert.alert('Thông báo', 'Thời gian thanh toán của bạn đã hết.');
@@ -190,7 +173,7 @@ const PaymentScreen = ({ route }) => {
       } else if (discountData.type === 'food') {
         setDiscountAmountF(discountData.percent * parseFloat(getTotalPrice()));
       } else {
-        Alert.alert('thông báo','Mã code của bạn không hợp lệ');
+        Alert.alert('thông báo', 'Mã code của bạn không hợp lệ');
       }
     } catch (error) {
       Alert.alert('Mã code của bạn không hợp lệ');
@@ -201,6 +184,11 @@ const PaymentScreen = ({ route }) => {
     const comboKey = `combo${index + 1}`;
     const totalPrice = comboQuantities[comboKey] * item.price;
 
+    // Chỉ hiển thị mục đầu tiên và các mục thêm khi showAllItems là true
+    if (!showAllItems && index > 0) {
+      return null;
+    }
+
     return (
       <View key={index} style={styles.comboModal}>
         <Image style={styles.imageCombo} source={{ uri: IMAGE_API_URL + item.image }} />
@@ -210,10 +198,10 @@ const PaymentScreen = ({ route }) => {
             <Text style={styles.comboPrice}>{totalPrice.toLocaleString()} VND</Text>
             <View style={styles.quantityContainer}>
               <TouchableOpacity style={styles.quantityButton} onPress={() => decreaseQuantity(comboKey)}>
-              <Text style={styles.buttonText}>-</Text>
+                <Text style={styles.buttonText}>-</Text>
               </TouchableOpacity>
               <Text style={styles.comboQuantity}>{comboQuantities[comboKey]}</Text>
-              <TouchableOpacity style={styles.quantityButton} onPress={() => increaseQuantity(comboKey, item.price)}>
+              <TouchableOpacity style={styles.quantityButton} onPress={() => increaseQuantity(comboKey)}>
                 <Text style={styles.buttonText}>+</Text>
               </TouchableOpacity>
             </View>
@@ -229,7 +217,10 @@ const PaymentScreen = ({ route }) => {
       </View>
     );
   };
-  
+  const toggleShowAllItems = () => {
+    setShowAllItems(!showAllItems);
+  };
+
 
   if (isLoading) {
     return (
@@ -240,16 +231,16 @@ const PaymentScreen = ({ route }) => {
   }
   return (
     <SafeAreaView style={styles.container}>
-        <View style={styles.header}>
-          <TouchableOpacity onPress={handleBack} style={styles.backButton}>
-            <SvgXml xml={iconBack()} />
-          </TouchableOpacity>
-          <View style={styles.titleContainer}>
-            <Text style={styles.title}>Thanh Toán</Text>
-          </View>
+      <View style={styles.header}>
+        <TouchableOpacity onPress={handleBack} style={styles.backButton}>
+          <SvgXml xml={iconBack()} />
+        </TouchableOpacity>
+        <View style={styles.titleContainer}>
+          <Text style={styles.title}>Thanh Toán</Text>
         </View>
+      </View>
       <ScrollView>
-      
+
         <View style={styles.movieInfo}>
           <Image style={styles.image} source={{ uri: IMAGE_API_URL + movieInfo.image }} />
           <View style={{ flexDirection: 'column', margin: 10 }}>
@@ -283,9 +274,8 @@ const PaymentScreen = ({ route }) => {
           <SvgXml xml={iconDiscount()} width={24} height={24} style={styles.icon} />
           <TextInput
             style={styles.textInput}
+            onChangeText={discountCode => setDiscountCode(discountCode)}
             placeholder="Mã khuyến mãi"
-            value={discountCode}
-            onChangeText={setDiscountCode}
             placeholderTextColor="#949494"
           />
           <TouchableOpacity style={styles.applyButton} onPress={handleApplyDiscount}>
@@ -295,28 +285,30 @@ const PaymentScreen = ({ route }) => {
 
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', margin: 10 }}>
           <Text style={{ color: 'white' }}>Vé</Text>
-          <Text style={{ color: 'white', fontSize: 20 }}>{ticketData.total-discountAmountT} VND</Text>
+          <Text style={{ color: 'white', fontSize: 20 }}>{ticketData.total - discountAmountT} VND</Text>
         </View>
         <View style={styles.line} />
 
         <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
           <Text style={styles.comboTitle}> Chọn Combo</Text>
-          <TouchableOpacity onPress={toggleModal}>
-            <Text style={styles.viewAllText}>Xem tất cả </Text>
+          <TouchableOpacity onPress={toggleShowAllItems}>
+            <Text style={styles.viewAllText}>{showAllItems ? 'Ẩn đi' : 'Xem tất cả'}</Text>
           </TouchableOpacity>
         </View>
         <View style={styles.combo}>
-
           <FlatList
             data={combo}
             renderItem={renderComboItem}
-            keyExtractor={(item, index) => item._id}
-            contentContainerStyle={{ paddingBottom: 20 }}
+            keyExtractor={(item, index) => index.toString()}
+            
+            contentContainerStyle={[styles.comboList, !showAllItems && { maxHeight: screenHeight * 0.5 }]}
           />
+
+
         </View>
         <View style={styles.line} />
         <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
-          <Text style={styles.comboTotalPrice}>{getTotalPrice()-discountAmountF} VND</Text>
+          <Text style={styles.comboTotalPrice}>{getTotalPrice() - discountAmountF} VND</Text>
         </View>
         <Text style={{ color: 'white', margin: 5, fontSize: 20 }}>Phương Thức Thanh Toán</Text>
         <TouchableOpacity
@@ -358,29 +350,6 @@ const PaymentScreen = ({ route }) => {
           </View>
         </TouchableOpacity>
       </ScrollView>
-      {/* <Modal
-        animationType="slide"
-        transparent={true}
-        visible={modalVisible}
-        onRequestClose={toggleModal}
-      > */}
-      {/* <View style={styles.modalContainer}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Chọn combo</Text>
-
-            <View style={styles.footer}>
-              <View style={{ flexDirection: 'column' }}>
-                <Text style={styles.totalText1}>Tổng:</Text>
-                <Text style={styles.totalText}>{getTotalPrice()} VND</Text>
-              </View>
-              <TouchableOpacity style={styles.button} onPress={() => { toggleModal() }} >
-                <Text style={styles.buttonText}>tiếp tục</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </View>
-      </Modal> */}
-
 
     </SafeAreaView>
 
@@ -456,19 +425,19 @@ const styles = StyleSheet.create({
   },
   quantityContainer: {
     flexDirection: 'row',
-    alignItems:'center',
+    alignItems: 'center',
 
   },
   quantityButton: {
     backgroundColor: '#fff',
     borderColor: 'black',
     borderRadius: 5,
-  width:24,height:24,
+    width: 24, height: 24,
     alignItems: 'center',
     justifyContent: 'center',
   },
- 
- 
+
+
   buttonText: {
     fontSize: 14,
     fontWeight: 'bold',
@@ -507,7 +476,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 10,
   },
   textInput: {
-flex:1,
+    flex: 1,
     color: '#949494',
   },
   applyButton: {
@@ -542,9 +511,9 @@ flex:1,
   comboItem: {
     marginLeft: 20,
     flexDirection: 'column',
-  
+
     justifyContent: 'center',
-   
+
   },
 
   comboTitle: {
@@ -558,7 +527,7 @@ flex:1,
   },
   comboQuantity: {
     fontSize: 14,
-    color: 'white',marginHorizontal:3
+    color: 'white', marginHorizontal: 3
   },
   checkboxContainer: {
     flexDirection: 'row',
