@@ -226,6 +226,7 @@ const PaymentScreen = ({route}) => {
       Alert.alert('Mã code của bạn không hợp lệ');
     }
   };
+  
   const subscribe = async () => {
     try {
       handleContinue();
