@@ -184,21 +184,6 @@ const PaymentScreen = ({route}) => {
     }
   };
 
-  const handleApplyDiscount = async () => {
-    try {
-      const discountData = await checkDiscount(discountCode, ticketData.cinema);
-      console.log(discountData);
-      if (discountData.type === 'ticket') {
-        setDiscountAmountT(discountData.percent * parseFloat(ticketData.total));
-      } else if (discountData.type === 'food') {
-        setDiscountAmountF(discountData.percent * parseFloat(getTotalPrice()));
-      } else {
-        Alert.alert('thông báo', 'Mã code của bạn không hợp lệ');
-      }
-    } catch (error) {
-      Alert.alert('Mã code của bạn không hợp lệ');
-    }
-  };
 
   const subscribe = async () => {
     try {
