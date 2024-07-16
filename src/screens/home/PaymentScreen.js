@@ -11,6 +11,9 @@ import iconPlayVideo from '../../assets/icons/iconPlayVideo';
 import iconLocation from '../../assets/icons/iconLocation';
 import iconClock from '../../assets/icons/iconClock';
 import iconDiscount from '../../assets/icons/iconDiscount';
+import {useStripe} from '@stripe/stripe-react-native';
+import axios from 'axios';
+import {useAuth} from '../../components/AuthProvider ';
 
 import { IMAGE_API_URL, checkDiscount, fetchCinemaById, fetchCombo, fetchMovieById, fetchSeatById, fetchShowTimeById, fetchTimeById, updateTicket } from '../../../api';
 
@@ -180,6 +183,85 @@ const PaymentScreen = ({route}) => {
       console.error('Error updating ticket:', error);
     }
   };
+  const subscribe = async () => {
+    try {
+      handleContinue();
+      const token = user.token.access_token;
+
+      const response = await axios.post(
+        `${POSTS_API_URL}/${ticketData._id}`,
+        {
+          name: 'khanh',
+          amount: calculateTotalAmount(),
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json', // Đảm bảo đúng loại dữ liệu gửi đi
+          },
+        },
+      );
+      console.log(response.data);
+
+      if (!selectedPaymentMethod) {
+        Alert.alert('Thông báo', 'Bạn cần chọn phương thức thanh toán');
+        return;
+      }
+      if (countdownExpired) {
+        Alert.alert('Thông báo', 'Thời gian thanh toán của bạn đã hết.');
+        navigation.goBack();
+        return;
+      }
+
+      const clientSecret = response.data;
+
+      const {error: initError} = await stripe.initPaymentSheet({
+        paymentIntentClientSecret: clientSecret,
+        googlePay: true,
+        merchantDisplayName: 'MD-Cinema',
+      });
+
+      if (initError) {
+        console.error(initError);
+        return Alert.alert('Lỗi', initError.message);
+      }
+
+      const {error: presentError} = await stripe.presentPaymentSheet({
+        clientSecret,
+      });
+
+      if (presentError) {
+        console.error(presentError);
+        return Alert.alert('Lỗi', presentError.message);
+      }
+
+      Alert.alert('Thanh toán thành công, cảm ơn bạn!');
+      paymentSuccess();
+    } catch (err) {
+      console.error(err);
+      Alert.alert('Có lỗi xảy ra, vui lòng thử lại sau!');
+    }
+  };
+  const paymentSuccess = async () => {
+    try {
+      const token = user.token.access_token;
+
+      const axiosInstance = axios.create({
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const url = `${POSTS_API_URL1}/${ticketData._id}`;
+      const response = await axiosInstance.put(url);
+
+      const data = response.data;
+      console.log(data);
+      navigation.navigate('TicketScreen', {_id: ticketData._id});
+    } catch (error) {
+      console.error('Lỗi khi thanh toán: ', error);
+    }
+  };
 
   const handleApplyDiscount = async () => {
     try {
@@ -197,8 +279,7 @@ const PaymentScreen = ({route}) => {
     }
   };
 
-
-
+  const renderComboItem = ({ item, index }) => {
     const comboKey = `combo${index + 1}`;
     const totalPrice = comboQuantities[comboKey] * item.price;
 
@@ -343,7 +424,7 @@ const PaymentScreen = ({route}) => {
             onChangeText={discountCode => setDiscountCode(discountCode)}
             placeholder="Mã khuyến mãi"
             value={discountCode}
-            onChangeText={setDiscountCode}
+         
             placeholderTextColor="#949494"
           />
 
@@ -357,7 +438,7 @@ const PaymentScreen = ({route}) => {
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', margin: 10 }}>
           <Text style={{ color: 'white' }}>Vé</Text>
           <Text style={{ color: 'white', fontSize: 20 }}>{ticketData.total - discountAmountT} VND</Text>
-
+          </View>
         <View
           style={{
             flexDirection: 'row',
@@ -382,7 +463,7 @@ const PaymentScreen = ({route}) => {
           <FlatList
             data={combo}
             renderItem={renderComboItem}
-            keyExtractor={(item, index) => index.toString()
+            keyExtractor={(item, index) => index.toString()}
             contentContainerStyle={[styles.comboList, !showAllItems && { maxHeight: screenHeight * 0.5 }]}
 
           />
