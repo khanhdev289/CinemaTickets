@@ -12,7 +12,7 @@ import {SvgXml} from 'react-native-svg';
 import iconsBack from '../../assets/icons/iconsBack';
 import axios from 'axios'; // Import axios
 import {useNavigation} from '@react-navigation/native';
-import { useAuth } from '../../components/AuthProvider ';
+import {useAuth} from '../../components/AuthProvider ';
 
 const CHANGE_PASS_API_URL = 'http://139.180.132.97:3000/users/password';
 
@@ -25,8 +25,20 @@ const ChangePassScreen = () => {
 
   const updateUserPassData = async () => {
     try {
+      if (currentPassword.trim() === '') {
+        Alert.alert('Vui lòng nhập mật khẩu hiện tại');
+        return;
+      }
+
+      if (newPassword.length < 6 || newPassword.trim() === '') {
+        Alert.alert(
+          'Mật khẩu mới phải có ít nhất 6 ký tự và không được để trống',
+        );
+        return;
+      }
+
       if (newPassword !== confirmPassword) {
-        alert('Mật khẩu mới và nhập lại mật khẩu mới không khớp');
+        Alert.alert('Mật khẩu mới và nhập lại mật khẩu mới không khớp');
         return;
       }
 
@@ -48,9 +60,7 @@ const ChangePassScreen = () => {
       const url = `${CHANGE_PASS_API_URL}/${userID}`;
       const response = await axios.put(url, requestData, config);
 
-      const updatedUserData = response.data;
-      Alert.alert(updatedUserData);
-      console.log('Updated user data:', updatedUserData);
+      Alert.alert(response.data);
 
       setCurrentPassword('');
       setNewPassword('');
