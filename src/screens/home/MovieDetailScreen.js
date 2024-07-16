@@ -33,7 +33,7 @@ const MovieDetailScreen = ({ route }) => {
         const movieResponse = await fetchMovieById(movieId);
         const theaterResponse = await fetchCinemaByMovie(movieId);
         setMovie(movieResponse.getmovie);
-        setTheaters(theaterResponse.cinemas);
+        setTheaters(theaterResponse);
       } catch (error) {
         console.error('Error fetching data:', error);
       } finally {
