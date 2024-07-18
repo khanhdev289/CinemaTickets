@@ -307,11 +307,7 @@ const SignUpScreen = () => {
               <Text style={styles.buttonText}>Hoàn thành</Text>
             </View>
           </TouchableOpacity>
-          <Spinner
-            visible={loading}
-            textContent={'Loading...'}
-            textStyle={styles.spinnerTextStyle}
-          />
+          <Spinner visible={loading} color="#FCC434" />
         </SafeAreaView>
       </ScrollView>
     </TouchableWithoutFeedback>
