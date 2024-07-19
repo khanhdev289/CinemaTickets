@@ -8,11 +8,13 @@ export const AuthProvider = ({children}) => {
 
   const login = userData => {
     setUser(userData);
-     AsyncStorage.setItem('token', userData.token.access_token);
+    AsyncStorage.setItem('token', userData.token.access_token);
   };
 
   const logout = () => {
     setUser(null);
+    AsyncStorage.removeItem('password');
+    AsyncStorage.removeItem('token');
   };
 
   return (

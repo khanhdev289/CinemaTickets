@@ -269,8 +269,7 @@ const SelectSeatScreen = ({ route }) => {
             <Text style={styles.title}>Chọn Ghế</Text>
           </View>
         </View>
-      <ScrollView>
-      
+      <ScrollView>      
         <View style={{ flexDirection: 'column', justifyContent: 'center', margin: 8, alignSelf: 'center', height: screenHeight * 0.1 }}>
           <SvgXml xml={iconLine()} />
           <LinearGradient colors={['#FCC434', '#00000000']} style={styles.gradientLine} />

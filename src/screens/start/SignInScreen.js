@@ -9,7 +9,7 @@ import {
   TouchableWithoutFeedback,
   Keyboard,
 } from 'react-native';
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {useNavigation} from '@react-navigation/native';
 import Spinner from 'react-native-loading-spinner-overlay';
 import {useAuth} from '../../components/AuthProvider ';
@@ -20,12 +20,36 @@ import {
   AlertNotificationRoot,
   Toast,
 } from 'react-native-alert-notification';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import CheckBox from '@react-native-community/checkbox';
+
 const SignInScreen = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const {login} = useAuth();
   const navigation = useNavigation();
   const [loading, setLoading] = useState(false);
+  const [termsAccepted, setTermsAccepted] = useState(false);
+  useEffect(() => {
+    const fetchStoredCredentials = async () => {
+      try {
+        const storedEmail = await AsyncStorage.getItem('email');
+        const storedPassword = await AsyncStorage.getItem('password');
+
+        if (storedEmail && storedPassword) {
+          setEmail(storedEmail);
+          setPassword(storedPassword);
+          setTermsAccepted(true);
+        } else {
+          console.log('Không tìm thấy email hoặc password trong AsyncStorage.');
+        }
+      } catch (error) {
+        console.error('Lỗi khi lấy thông tin đã lưu:', error);
+      }
+    };
+
+    fetchStoredCredentials();
+  }, []);
 
   const handleLogin = () => {
     setLoading(true);
@@ -48,6 +72,13 @@ const SignInScreen = () => {
           console.log('Đăng nhập thành công:', response.data);
           const userData = response.data;
           login(userData);
+          if (termsAccepted) {
+            AsyncStorage.setItem('email', email);
+            AsyncStorage.setItem('password', password);
+          } else {
+            AsyncStorage.removeItem('email');
+            AsyncStorage.removeItem('password');
+          }
           navigation.navigate('Home');
         }
       })
@@ -90,6 +121,7 @@ const SignInScreen = () => {
                   placeholder="Nhập Email"
                   placeholderTextColor="#FFFFFF"
                   onChangeText={text => setEmail(text)}
+                  value={email}
                 />
               </View>
               <View style={styles.inputPass}>
@@ -100,13 +132,28 @@ const SignInScreen = () => {
                   placeholderTextColor="#FFFFFF"
                   secureTextEntry
                   onChangeText={text => setPassword(text)}
+                  value={password}
                 />
               </View>
             </View>
-            <View style={styles.forgotPassword}>
-              <TouchableOpacity onPress={handleForgotPassword}>
-                <Text style={styles.forgotPasswordText}>Quên mật khẩu ?</Text>
-              </TouchableOpacity>
+            <View style={styles.row}>
+              <View style={styles.checkBoxContainer}>
+                <CheckBox
+                  value={termsAccepted}
+                  onValueChange={setTermsAccepted}
+                  style={styles.checkBox}
+                  tintColors={{true: '#FFFFFF', false: '#FFFFFF'}}
+                  boxType="circle"
+                />
+                <Text style={[styles.checkBoxText, {color: '#FF9C00'}]}>
+                  Nhớ mật khẩu
+                </Text>
+              </View>
+              <View style={styles.forgotPassword}>
+                <TouchableOpacity onPress={handleForgotPassword}>
+                  <Text style={styles.forgotPasswordText}>Quên mật khẩu ?</Text>
+                </TouchableOpacity>
+              </View>
             </View>
             <TouchableOpacity
               style={styles.buttonContainer}
@@ -115,11 +162,7 @@ const SignInScreen = () => {
                 <Text style={styles.buttonText}>Đăng Nhập</Text>
               </View>
             </TouchableOpacity>
-            <Spinner
-              visible={loading}
-              textContent={'Đang đăng nhập...'}
-              textStyle={styles.spinnerText}
-            />
+            <Spinner visible={loading} color="#FCC434" />
           </SafeAreaView>
         </TouchableWithoutFeedback>
       </ImageBackground>
@@ -205,14 +248,21 @@ const styles = StyleSheet.create({
     color: '#000000',
     fontSize: 20,
   },
-  spinnerText: {
-    color: '#FFFFFF',
-  },
   dialog_error: {
     position: 'absolute',
     top: 0,
     bottom: 0,
     left: 0,
     right: 0,
+  },
+  checkBoxContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  row: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginHorizontal: '5%',
   },
 });
