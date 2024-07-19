@@ -1,5 +1,4 @@
 
-
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Dimensions, TouchableOpacity, Image, TextInput, Button, Modal, FlatList, Alert, ActivityIndicator, ScrollView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
@@ -22,8 +21,11 @@ import {
   fetchShowTimeById,
   fetchTimeById,
   updateTicket,
+
 } from '../../../api'; import iconsBack from '../../assets/icons/iconsBack';
 import { useAuth } from '../../components/AuthProvider ';
+
+
 
 const screenWidth = Dimensions.get('screen').width;
 const screenHeight = Dimensions.get('screen').height;
@@ -74,7 +76,9 @@ const PaymentScreen = ({ route }) => {
     } else if (countdown == 0) {
       setCountdownExpired(true);
     }
+
   }, [countdownExpired, countdown]);
+
   const calculateTotalAmount = () => {
     const ticketTotal = parseFloat(ticketData.total - discountAmountT);
     const comboTotal = parseFloat(getTotalPrice() - discountAmountF);
@@ -426,7 +430,7 @@ const PaymentScreen = ({ route }) => {
             style={styles.textInput}
             onChangeText={discountCode => setDiscountCode(discountCode)}
             placeholder="Mã khuyến mãi"
-            value={discountCode}
+            value={discountCode}      
             placeholderTextColor="#949494"
           />
 
@@ -439,7 +443,6 @@ const PaymentScreen = ({ route }) => {
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', margin: 10 }}>
           <Text style={{ color: 'white' }}>Vé</Text>
           <Text style={{ color: 'white', fontSize: 20 }}>{ticketData.total - discountAmountT} VND</Text>
-        </View>
         <View style={styles.line} />
 
         <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
@@ -461,6 +464,7 @@ const PaymentScreen = ({ route }) => {
             screenHeight={screenHeight}
             styles={styles}
           />
+
         </View>
         <View style={styles.line} />
         <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
@@ -530,7 +534,8 @@ const PaymentScreen = ({ route }) => {
       </ScrollView>
     </SafeAreaView>
   );
-}; const ComboList = ({ combo, comboQuantities, comboChecked, showAllItems, decreaseQuantity, increaseQuantity, toggleComboCheckbox, IMAGE_API_URL, screenHeight, styles }) => {
+};
+const ComboList = ({ combo, comboQuantities, comboChecked, showAllItems, decreaseQuantity, increaseQuantity, toggleComboCheckbox, IMAGE_API_URL, screenHeight, styles }) => {
   return (
     <ScrollView contentContainerStyle={[!showAllItems && { maxHeight: screenHeight * 0.5 }]}>
       {combo.map((item, index) => {
