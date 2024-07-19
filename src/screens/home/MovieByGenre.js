@@ -24,6 +24,7 @@ import iconClock from '../../assets/icons/iconClock';
 import { IMAGE_API_URL, fetchGenreById, movieByGenre, searchMovie } from '../../../api';
 import iconCalendar from '../../assets/icons/iconCalendar';
 import { useNavigation } from '@react-navigation/native';
+import iconsBack from '../../assets/icons/iconsBack';
 
 
 const screenWidth = Dimensions.get('screen').width;
@@ -136,14 +137,16 @@ const MovieByGenre = ({ route }) => {
   return (
 
     <View style={styles.container}>
-       <View style={styles.header}>
-      <TouchableOpacity onPress={handleBack} style={styles.backButton}>
-        <SvgXml xml={iconBack()} />
-      </TouchableOpacity>
-      <View style={styles.titleContainer}>
-        <Text style={styles.title}>{text}</Text>
+      <View style={styles.header}>
+        <View style={styles.backContainer}>
+          <TouchableOpacity onPress={handleBack} >
+            <SvgXml xml={iconsBack()} />
+          </TouchableOpacity>
+        </View>
+        <View style={styles.titleContainer}>
+          <Text style={styles.title}>{text}</Text>
+        </View>
       </View>
-    </View>
 
       <View style={styles.searchContainer}>
         <View style={styles.searchWrapper}>
@@ -179,18 +182,19 @@ const styles = StyleSheet.create({
     backgroundColor: 'black',
   },
   header: {
-
-    height: screenHeight *0.05,
-    justifyContent: 'center',
+    flexDirection: 'row',
     alignItems: 'center',
-    position: 'relative',
+    justifyContent: 'center',
+    width: '100%',
+    paddingHorizontal: 16,
+    marginBottom: '5%',
   },
-  backButton: {
+  backContainer: {
     position: 'absolute',
     left: 5,
   },
   titleContainer: {
-    width:screenWidth - 10, 
+    width: screenWidth - 10,
 
     alignItems: 'center',
   },
@@ -198,7 +202,7 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
 
-    color:'#fff'
+    color: '#fff'
 
   },
   searchContainer: {

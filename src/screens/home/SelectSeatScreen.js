@@ -10,14 +10,16 @@ import iconLine from '../../assets/icons/iconLine';
 import iconsBack from '../../assets/icons/iconsBack';
 import { useAuth } from '../../components/AuthProvider ';
 const rows = 'ABCDEFGH'.split('');
-const cols = Array.from({ length: 9 }, (_, i) => i + 1);
+const cols = Array.from({ length: 8 }, (_, i) => i + 1);
 const screenWidth = Dimensions.get('screen').width;
 const screenHeight = Dimensions.get('screen').height;
-
+import io from 'socket.io-client';
 
 const SelectSeatScreen = ({ route }) => {
   const navigation = useNavigation();
   const { roomId } = route.params;
+  const [message, setMessage] = useState();
+  const socket = io('http://139.180.132.97:3000');
   const handleBack = () => {
     navigation.goBack();
   };
@@ -36,7 +38,18 @@ const SelectSeatScreen = ({ route }) => {
   useEffect(() => {
     fetchRoomData(roomId);
     fetchSeatData(roomId);
+    socket.on('connect', () => {
+      console.log('Đã kết nối tới server');
+    });
 
+    socket.on('statusseat', (message) => {
+      console.log('Nhận được tin nhắn:', message);
+      updateSeatStatus1(message);
+    });
+
+    return () => {
+      socket.disconnect();
+    };
   }, [roomId]);
 
   useEffect(() => {
@@ -170,7 +183,18 @@ const SelectSeatScreen = ({ route }) => {
       </TouchableOpacity>
     );
   };
-
+  const renderSeatGrid = () => {
+    const seatGrid = [];
+    for (let i = 0; i < rows.length; i++) {
+      const rowSeats = seats.slice(i * cols.length, (i + 1) * cols.length);
+      seatGrid.push(
+        <View key={i} style={styles.row}>
+          {rowSeats.map(seat => renderSeat(seat))}
+        </View>
+      );
+    }
+    return seatGrid;
+  };
   const calculateTotal = () => {
     return selectedSeats.reduce((total, seat) => total + seat.price, 0);
   };
@@ -193,6 +217,16 @@ const SelectSeatScreen = ({ route }) => {
   const updateSeatStatus = (seatStatusData) => {
     const updatedSeats = seats.map(seat => {
       const seatData = seatStatusData.find(s => s.seat._id === seat._id);
+      if (seatData) {
+        return { ...seat, status: seatData.status };
+      }
+      return { ...seat, status: 'available' };;
+    });
+    setSeats(updatedSeats);
+  };
+  const updateSeatStatus1 = (seatStatusData) => {
+    const updatedSeats = seats.map(seat => {
+      const seatData = seatStatusData.find(s => s.seat === seat._id);
       if (seatData) {
         return { ...seat, status: seatData.status };
       }
@@ -226,29 +260,29 @@ const SelectSeatScreen = ({ route }) => {
   return (
     <SafeAreaView style={styles.container}>
        <View style={styles.header}>
-          <TouchableOpacity onPress={handleBack} style={styles.backButton}>
+       <View style={styles.backContainer}>
+          <TouchableOpacity onPress={handleBack} >
             <SvgXml xml={iconsBack()} />
           </TouchableOpacity>
+          </View>
           <View style={styles.titleContainer}>
             <Text style={styles.title}>Chọn Ghế</Text>
           </View>
         </View>
-      <ScrollView>
-       
-
-        <View style={{ flexDirection: 'column', justifyContent: 'center', margin: 16, alignSelf: 'center', height: screenHeight * 0.1 }}>
+      <ScrollView>      
+        <View style={{ flexDirection: 'column', justifyContent: 'center', margin: 8, alignSelf: 'center', height: screenHeight * 0.1 }}>
           <SvgXml xml={iconLine()} />
           <LinearGradient colors={['#FCC434', '#00000000']} style={styles.gradientLine} />
         </View>
 
         <View style={styles.seatContainer}>
-          {seats.map(seat => renderSeat(seat))}
+          {renderSeatGrid()}
         </View>
 
 
         {renderLegend()}
 
-        <Text style={{ color: 'white', marginVertical: 15, textAlign: 'center' }}>{selectedDate}</Text>
+        <Text style={{ color: 'white', margin:5, textAlign: 'center',justifyContent:'center' }}>{selectedDate}</Text>
 
         <FlatList
           data={dateArray}
@@ -256,7 +290,7 @@ const SelectSeatScreen = ({ route }) => {
           horizontal
           bounces={false}
           contentContainerStyle={styles.containerGap24}
-          renderItem={({ item }) => (
+          renderItem={({ item ,index}) => (
             <TouchableOpacity
               onPress={() => {
                 setSelectedDateIndex(dateArray.indexOf(item));
@@ -267,6 +301,7 @@ const SelectSeatScreen = ({ route }) => {
               <View
                 style={[
                   styles.dateContainer,
+                  index === 0 ? { marginLeft: 12 } : index === dateArray.length - 1 ? { marginRight: 12 } : {},
                   item._id === dateArray[selectedDateIndex]?._id ? { backgroundColor: "#FCC434" } : {},
                 ]}
                 key={item._id}
@@ -300,7 +335,7 @@ const SelectSeatScreen = ({ route }) => {
                 <View
                   style={[
                     styles.timeContainer,
-                    index === 0 ? { marginLeft: 24 } : index === timeArray.length - 1 ? { marginRight: 24 } : {},
+                    index === 0 ? { marginLeft: 12 } : index === timeArray.length - 1 ? { marginRight: 12 } : {},
                     item._id === timeArray[selectedTimeIndex]?._id ? { backgroundColor: '#261D08', borderColor: '#FCC434' } : {},
                   ]}>
                   <Text style={styles.timeText}>{item.time}</Text>
@@ -336,12 +371,14 @@ const styles = StyleSheet.create({
     backgroundColor: 'black',
   },
   header: {
-    height: screenHeight * 0.05,
-    justifyContent: 'center',
+    flexDirection: 'row',
     alignItems: 'center',
-    position: 'relative',
+    justifyContent: 'center',
+    width: '100%',
+    paddingHorizontal: 16,
+    marginBottom: '5%',
   },
-  backButton: {
+  backContainer: {
     position: 'absolute',
     left: 5,
   },
@@ -360,18 +397,14 @@ const styles = StyleSheet.create({
   seatContainer: {
     flex: 1,
     alignItems: 'center',
-    margin: 5,
-    padding: 5,
-    flexDirection: 'row',
-
+    padding:5
   },
   row: {
     flexDirection: 'row',
   },
   seat: {
-
-    width: screenWidth * 0.08,
-    height: screenWidth * 0.08,
+    width: screenWidth * 0.1,  // Điều chỉnh kích thước ghế
+    height: screenWidth * 0.1,
     margin: screenWidth * 0.01,
     borderRadius: 5,
     justifyContent: 'center',
@@ -417,9 +450,9 @@ const styles = StyleSheet.create({
     gap: screenWidth * 0.04,
   },
   dateContainer: {
-    marginLeft: 5,
-    width: screenWidth * 0.12,
-    height: screenHeight * 0.12,
+    paddingVertical: 8,
+    width: screenWidth * 0.13,
+    height: screenHeight * 0.13,
     borderRadius: 20,
     backgroundColor: "#1C1C1C",
     alignItems: 'center',
@@ -441,7 +474,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     paddingHorizontal: 16,
     borderRadius: 25,
-
     backgroundColor: "#1C1C1C",
     alignItems: 'center',
     justifyContent: 'center',

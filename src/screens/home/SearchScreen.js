@@ -25,6 +25,8 @@ import { IMAGE_API_URL, fetchGenreById, fetchMovies, movieByGenre, searchMovie }
 import iconCalendar from '../../assets/icons/iconCalendar';
 
 import { useNavigation } from '@react-navigation/native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import iconsBack from '../../assets/icons/iconsBack';
 
 const screenWidth = Dimensions.get('screen').width;
 const screenHeight = Dimensions.get('screen').height;
@@ -46,7 +48,7 @@ const MovieByGenre = () => {
   const fetchData = async () => {
     try {
       const response = await fetchMovies(); // Gọi API lấy danh sách phim theo thể loại
-     
+
       setMovieList(response.getall); // Lưu danh sách phim vào state movieList
       setFilteredMovieList(response.getall); // Khởi tạo danh sách phim tìm kiếm với toàn bộ danh sách ban đầu
     } catch (error) {
@@ -72,7 +74,7 @@ const MovieByGenre = () => {
 
   // Render mỗi item phim trong danh sách
   const renderItem = ({ item }) => {
-    
+
     return (
       <View style={styles.resultItem}>
         <TouchableOpacity
@@ -110,7 +112,7 @@ const MovieByGenre = () => {
             <SvgXml xml={iconVideo()} width={14} height={14} />
             <Text style={{ fontSize: 12, marginLeft: 5, color: '#DEDEDE' }}>
 
-            <Text style={styles.infoText}> {item.genre?.map(genre => genre.name).join(', ')}</Text>
+              <Text style={styles.infoText}> {item.genre?.map(genre => genre.name).join(', ')}</Text>
 
             </Text>
           </View>
@@ -120,17 +122,18 @@ const MovieByGenre = () => {
   };
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
 
-     <View style={styles.header}>
-      <TouchableOpacity onPress={handleBack} style={styles.backButton}>
-        <SvgXml xml={iconBack()} />
-      </TouchableOpacity>
-      <View style={styles.titleContainer}>
-        <Text style={styles.title}>Tìm Kiếm</Text>
-
+      <View style={styles.header}>
+        <View style={styles.backContainer}>
+          <TouchableOpacity onPress={handleBack} >
+            <SvgXml xml={iconsBack()} />
+          </TouchableOpacity>
+        </View>
+        <View style={styles.titleContainer}>
+          <Text style={styles.title}>Tìm Kiếm</Text>
+        </View>
       </View>
-    </View>
       <View style={styles.searchContainer}>
         <View style={styles.searchWrapper}>
           <SvgXml xml={iconSearch()} onPress={() => handleSearch(searchQuery)} />
@@ -153,7 +156,7 @@ const MovieByGenre = () => {
         contentContainerStyle={styles.resultList}
       />
 
-    </View>
+    </SafeAreaView>
   );
 };
 
@@ -170,23 +173,25 @@ const styles = StyleSheet.create({
     backgroundColor: 'black',
   },
   header: {
-    height: screenHeight *0.05,
-    justifyContent: 'center',
+    flexDirection: 'row',
     alignItems: 'center',
-    position: 'relative',
+    justifyContent: 'center',
+    width: '100%',
+    paddingHorizontal: 16,
+    marginBottom: '5%',
   },
-  backButton: {
+  backContainer: {
     position: 'absolute',
-    left: 8,
+    left: 5,
   },
   titleContainer: {
-    width:screenWidth - 16, 
+    width: screenWidth - 16,
     alignItems: 'center',
   },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
-    color:'#fff'
+    color: '#fff'
   },
   searchContainer: {
     paddingHorizontal: 10,
