@@ -51,6 +51,7 @@
     "react-native-video": "^6.3.0",
     "react-native-virtualized-view": "^1.0.0",
     "react-native-websocket": "^1.0.2",
+    "socket.io-client": "^4.7.5",
     "yup": "^1.4.0"
   },
   "devDependencies": {

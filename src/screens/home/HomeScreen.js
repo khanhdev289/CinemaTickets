@@ -143,7 +143,7 @@ const HomeScreen = () => {
           showsHorizontalScrollIndicator={false}
           renderItem={({ item }) => <CategoryItem item={item} navigation={navigation}/>}
         />
-
+{/* 
         <Section title="Tin mới" onPress={() => alert('Xem tất cả clicked!')} />
         <FlatList
           data={newsList}
@@ -151,7 +151,7 @@ const HomeScreen = () => {
           horizontal
           showsHorizontalScrollIndicator={false}
           renderItem={({ item }) => <NewsItem item={item} />}
-        />
+        /> */}
       </ScrollView>
     </SafeAreaView>
   );
@@ -195,7 +195,7 @@ const MovieList = ({ data, flatListRef, renderItem, onViewableItemsChanged, view
     data={data}
     keyExtractor={item => item._id}
     snapToAlignment="start"
-    snapToInterval={0.6 * screenWidth} // 70% of screen width
+    snapToInterval={0.6 * screenWidth} // 
     decelerationRate="fast"
     horizontal
     showsHorizontalScrollIndicator={false}
@@ -317,19 +317,19 @@ const CategoryItem = ({ item,navigation }) => (
   </View>
 );
 
-const NewsItem = ({ item }) => (
-  <View style={styles.movieItemNew}>
-    <TouchableOpacity onPress={() => alert(`News ID: ${item.id}`)}>
-      <Image
-        style={styles.newsImage}
-        source={{ uri: item.poster }}
-      />
-      <Text style={styles.newsTitle}>
-        When The Batman 2 Starts Filming Reportedly Revealed
-      </Text>
-    </TouchableOpacity>
-  </View>
-);
+// const NewsItem = ({ item }) => (
+//   <View style={styles.movieItemNew}>
+//     <TouchableOpacity onPress={() => alert(`News ID: ${item.id}`)}>
+//       <Image
+//         style={styles.newsImage}
+//         source={{ uri: item.poster }}
+//       />
+//       <Text style={styles.newsTitle}>
+//         When The Batman 2 Starts Filming Reportedly Revealed
+//       </Text>
+//     </TouchableOpacity>
+//   </View>
+// );
 
 const styles = StyleSheet.create({
   container: {

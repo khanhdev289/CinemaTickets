@@ -140,6 +140,11 @@ export default function App() {
               component={CheckSuccess}
               options={{headerShown: false}}
             />
+             <Stack.Screen
+              name="MovieScreen"
+              component={MovieScreen}
+              options={{headerShown: false}}
+            />
           </Stack.Navigator>
         </StripeProvider>
       </NavigationContainer>

@@ -1,6 +1,6 @@
 
 import React, { useEffect, useState } from 'react';
-import { ScrollView, View, Text, StyleSheet, Dimensions, TouchableOpacity, Image, TextInput, Button, Modal, FlatList, Alert, ActivityIndicator } from 'react-native';
+import {  View, Text, StyleSheet, Dimensions, TouchableOpacity, Image, TextInput, Button, Modal, FlatList, Alert, ActivityIndicator, ScrollView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import iconBack from '../../assets/icons/iconBack';
@@ -16,6 +16,8 @@ import axios from 'axios';
 import {useAuth} from '../../components/AuthProvider ';
 
 import { IMAGE_API_URL, checkDiscount, fetchCinemaById, fetchCombo, fetchMovieById, fetchSeatById, fetchShowTimeById, fetchTimeById, updateTicket } from '../../../api';
+import iconsBack from '../../assets/icons/iconsBack';
+
 
 
 
@@ -347,16 +349,17 @@ const PaymentScreen = ({route}) => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity onPress={handleBack} style={styles.backButton}>
-          <SvgXml xml={iconBack()} />
-        </TouchableOpacity>
-        <View style={styles.titleContainer}>
-          <Text style={styles.title}>Thanh Toán</Text>
+     <View style={styles.header}>
+       <View style={styles.backContainer}>
+          <TouchableOpacity onPress={handleBack} >
+            <SvgXml xml={iconsBack()} />
+          </TouchableOpacity>
+          </View>
+          <View style={styles.titleContainer}>
+            <Text style={styles.title}>Thanh Toán</Text>
+          </View>
         </View>
-      </View>
-      <ScrollView>
-
+      <ScrollView >
         <View style={styles.movieInfo}>
           <Image
             style={styles.image}
@@ -451,15 +454,18 @@ const PaymentScreen = ({route}) => {
           </TouchableOpacity>
         </View>
         <View style={styles.combo}>
-          <FlatList
-            data={combo}
-            renderItem={renderComboItem}
-            keyExtractor={(item, index) => index.toString()}
-            contentContainerStyle={[styles.comboList, !showAllItems && { maxHeight: screenHeight * 0.5 }]}
-
-          />
-
-
+        <ComboList
+        combo={combo}
+        comboQuantities={comboQuantities}
+        comboChecked={comboChecked}
+        showAllItems={showAllItems}
+        decreaseQuantity={decreaseQuantity}
+        increaseQuantity={increaseQuantity}
+        toggleComboCheckbox={toggleComboCheckbox}
+        IMAGE_API_URL={IMAGE_API_URL}
+        screenHeight={screenHeight}
+        styles={styles}
+      />
         </View>
         <View style={styles.line} />
         <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
@@ -530,6 +536,64 @@ const PaymentScreen = ({route}) => {
 
     </SafeAreaView>
   );
+};const ComboList = ({ combo, comboQuantities, comboChecked, showAllItems, decreaseQuantity, increaseQuantity, toggleComboCheckbox, IMAGE_API_URL, screenHeight, styles }) => {
+  return (
+    <ScrollView contentContainerStyle={[!showAllItems && { maxHeight: screenHeight * 0.5 }]}>
+      {combo.map((item, index) => {
+        const comboKey = `combo${index + 1}`;
+        const totalPrice = comboQuantities[comboKey] * item.price;
+
+        // Chỉ hiển thị mục đầu tiên và các mục thêm khi showAllItems là true
+        if (!showAllItems && index > 0) {
+          return null;
+        }
+
+        return (
+          <View key={index} style={styles.comboModal}>
+            <Image
+              style={styles.imageCombo}
+              source={{ uri: IMAGE_API_URL + item.image }}
+            />
+            <View style={styles.modalCombo}>
+              <View style={styles.comboItem}>
+                <Text style={styles.comboTitle}>{item.name}</Text>
+                <Text style={styles.comboPrice}>
+                  {totalPrice.toLocaleString()} VND
+                </Text>
+                <View style={styles.quantityContainer}>
+                  <TouchableOpacity
+                    style={styles.quantityButton}
+                    onPress={() => decreaseQuantity(comboKey)}
+                  >
+                    <Text style={styles.buttonText}>-</Text>
+                  </TouchableOpacity>
+
+                  <Text style={styles.comboQuantity}>{comboQuantities[comboKey]}</Text>
+                  <TouchableOpacity style={styles.quantityButton} onPress={() => increaseQuantity(comboKey)}>
+                    <Text style={styles.buttonText}>+</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+              <View style={styles.checkboxContainer}>
+                <TouchableOpacity onPress={() => toggleComboCheckbox(comboKey)}>
+                  <View
+                    style={[
+                      styles.checkbox,
+                      comboChecked[comboKey] && styles.checked,
+                    ]}
+                  >
+                    {comboChecked[comboKey] && (
+                      <Text style={styles.checkmark}>✓</Text>
+                    )}
+                  </View>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+        );
+      })}
+    </ScrollView>
+  );
 };
 
 const styles = StyleSheet.create({
@@ -545,12 +609,14 @@ const styles = StyleSheet.create({
     backgroundColor: 'black',
   },
   header: {
-    height: screenHeight * 0.05,
-    justifyContent: 'center',
+    flexDirection: 'row',
     alignItems: 'center',
-    position: 'relative',
+    justifyContent: 'center',
+    width: '100%',
+    paddingHorizontal: 16,
+    marginBottom: '5%',
   },
-  backButton: {
+  backContainer: {
     position: 'absolute',
     left: 5,
   },

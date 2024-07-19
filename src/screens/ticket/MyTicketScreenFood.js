@@ -75,7 +75,7 @@ const MyTicketScreenFood = () => {
     <SafeAreaView style={styles.container}>
       <ScrollView>
         <View style={styles.ticketContainer}>
-          <Text style={styles.movieTitle}>{ticketData.movie.name}</Text>
+          <Text style={styles.movieTitle}>{ticketData.name}</Text>
           <View style={styles.foodItem1}>
             <Text style={styles.foodName}>Tên</Text>
             <Text style={styles.foodQuantity}>Số lượng</Text>
