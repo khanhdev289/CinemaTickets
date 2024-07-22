@@ -174,7 +174,7 @@ const SearchBar = ({ navigation }) => (
         style={styles.searchInput}
         placeholder="Tìm kiếm phim..."
         placeholderTextColor="#8C8C8C"
-        onFocus={() => navigation.navigate('SearchScreeen')}
+        onPressIn={() => navigation.navigate('SearchScreeen')}
       />
     </View>
   </View>
@@ -280,8 +280,8 @@ const UpcomingMovieItem = ({ item,navigation }) => {
       <Text style={styles.movieTitle2}>{item.name}</Text>
       <View style={styles.movieDetailRow}>
         <SvgXml xml={iconVideo()} width={14} height={14} />
-        <Text style={styles.movieDetailText}> {item.duration} • </Text>
-        <Text style={styles.movieDetailText}>{item.genre.map(g => g.name).join(', ')}</Text>
+        <Text style={styles.movieDetailText}> {item.duration} •</Text>
+        <Text style={styles.movieDetailText}>{ item.genre[0].name }</Text>
       </View>
       <View style={styles.movieDetailRow}>
         <SvgXml xml={iconCalendar()} width={14} height={14} />

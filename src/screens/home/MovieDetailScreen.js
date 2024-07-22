@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 
-import { StyleSheet, Text, View, Image, Dimensions, TouchableOpacity, FlatList, ActivityIndicator, Modal } from 'react-native';
+import { StyleSheet, Text, View, Image, Dimensions, TouchableOpacity, FlatList, ActivityIndicator, Modal, Alert } from 'react-native';
 
 import { SvgXml } from 'react-native-svg';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -32,7 +32,7 @@ const MovieDetailScreen = ({ route }) => {
       try {
         const movieResponse = await fetchMovieById(movieId);
         const theaterResponse = await fetchCinemaByMovie(movieId);
-        setMovie(movieResponse.getmovie);
+        setMovie(movieResponse);
         setTheaters(theaterResponse);
       } catch (error) {
         console.error('Error fetching data:', error);
@@ -180,27 +180,32 @@ const MovieDetailScreen = ({ route }) => {
           renderItem={renderDirector}
           contentContainerStyle={{ paddingHorizontal: 10 }}
         />
-        <Text style={styles.summaryTitle}>Các rạp chiếu</Text>
-        <FlatList
-          data={theaters || []}
-          keyExtractor={(item) => item._id}
-          renderItem={renderTheater}
-          contentContainerStyle={{ paddingHorizontal: 10 }}
-        />
+        {movie.release_status!== 'sc' && (
+          <>
+            <Text style={styles.summaryTitle}>Các rạp chiếu</Text>
+            <FlatList
+              data={theaters || []}
+              keyExtractor={(item) => item._id}
+              renderItem={renderTheater}
+              contentContainerStyle={{ paddingHorizontal: 10 }}
+            />
 
-        <TouchableOpacity
-          style={styles.button}
-          onPress={() => {
-            if (selectedTheater) {
-              navigation.navigate('SelectSeatScreen', { roomId: selectedTheater });
-            } else {
-              // Xử lý trường hợp không có rạp nào được chọn
-              alert('Vui lòng chọn một rạp chiếu');
-            }
-          }}
-        >
-          <Text style={styles.buttonText}>Tiếp tục</Text>
-        </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.button}
+              onPress={() => {
+                if (selectedTheater) {
+                  navigation.navigate('SelectSeatScreen', { roomId: selectedTheater });
+                } else {
+                  // Xử lý trường hợp không có rạp nào được chọn
+                  Alert.alert('Thông báo','Vui lòng chọn một rạp chiếu');
+                }
+              }}
+            >
+              <Text style={styles.buttonText}>Tiếp tục</Text>
+            </TouchableOpacity>
+          </>
+        )}
+
 
       </ScrollView>
       <Modal visible={isModalVisible} transparent={true} animationType="slide">

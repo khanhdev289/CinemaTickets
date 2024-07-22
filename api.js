@@ -40,7 +40,7 @@ export const fetchMovieById = async (id) => {
     const api = await createApiInstance();
     const url = '/movies/'+id; // Đường dẫn API để lấy danh sách phim
     const response = await api.get(url);
-    return response.data;
+    return response.data.getmovie;
   } catch (error) {
     console.error('Error fetching movies:', error);
     throw error;
