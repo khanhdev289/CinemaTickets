@@ -114,7 +114,7 @@ const PaymentScreen = ({route}) => {
       );
       const comboRespose = await fetchCombo();
       setCombo(comboRespose);
-      setMovieInfo(movieResponse.getmovie);
+      setMovieInfo(movieResponse);
       setCinemaInfo(cinemaResponse);
       setDateInfo(showtimeResponse);
       setTimeInfo(timeResponse);
@@ -178,13 +178,23 @@ const PaymentScreen = ({route}) => {
   };
   const handleContinue = async () => {
     try {
-      // Tạo mảng gồm các combo được chọn với id và quantity
       const selectedCombos = Object.keys(comboChecked)
-        .filter(comboKey => comboChecked[comboKey])
-        .map(comboKey => ({
-          id: comboKey,
-          quantity: comboQuantities[comboKey],
-        }));
+      .filter(comboKey => comboChecked[comboKey])
+      .map(comboKey => {
+        const comboIndex = parseInt(comboKey.replace('combo', '')) - 1;
+        const item = combo[comboIndex];
+    
+        if (item) {
+          return {
+            foodId: item._id,
+            quantity: comboQuantities[comboKey],
+          };
+        }
+    
+        return null;
+      })
+      .filter(combo => combo !== null);
+
 
       // Update ticket with new data
       await updateTicket(
@@ -211,7 +221,7 @@ const PaymentScreen = ({route}) => {
       } else if (discountData.type === 'food') {
         setDiscountAmountF(discountData.percent * parseFloat(getTotalPrice()));
       } else {
-        Alert.alert('thông báo', 'Mã code của bạn không hợp lệ');
+        Alert.alert('Thông báo', 'Mã code của bạn không hợp lệ');
       }
     } catch (error) {
       Alert.alert('Mã code của bạn không hợp lệ');
@@ -298,61 +308,6 @@ const PaymentScreen = ({route}) => {
     }
   };
 
-  const renderComboItem = ({item, index}) => {
-    const comboKey = `combo${index + 1}`;
-    const totalPrice = comboQuantities[comboKey] * item.price;
-
-    // Chỉ hiển thị mục đầu tiên và các mục thêm khi showAllItems là true
-    if (!showAllItems && index > 0) {
-      return null;
-    }
-
-    return (
-      <View key={index} style={styles.comboModal}>
-        <Image
-          style={styles.imageCombo}
-          source={{uri: IMAGE_API_URL + item.image}}
-        />
-        <View style={styles.modalCombo}>
-          <View style={styles.comboItem}>
-            <Text style={styles.comboTitle}>{item.name}</Text>
-            <Text style={styles.comboPrice}>
-              {totalPrice.toLocaleString()} VND
-            </Text>
-            <View style={styles.quantityContainer}>
-              <TouchableOpacity
-                style={styles.quantityButton}
-                onPress={() => decreaseQuantity(comboKey)}>
-                <Text style={styles.buttonText}>-</Text>
-              </TouchableOpacity>
-              <Text style={styles.comboQuantity}>
-                {comboQuantities[comboKey]}
-              </Text>
-              <TouchableOpacity
-                style={styles.quantityButton}
-                onPress={() => increaseQuantity(comboKey)}>
-                <Text style={styles.buttonText}>+</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-          <View style={styles.checkboxContainer}>
-            <TouchableOpacity onPress={() => toggleComboCheckbox(comboKey)}>
-              <View
-                style={[
-                  styles.checkbox,
-                  comboChecked[comboKey] && styles.checked,
-                ]}>
-                {comboChecked[comboKey] && (
-                  <Text style={styles.checkmark}>✓</Text>
-                )}
-              </View>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </View>
-    );
-  };
-
   const toggleShowAllItems = () => {
     setShowAllItems(!showAllItems);
   };
@@ -366,12 +321,13 @@ const PaymentScreen = ({route}) => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <View style={styles.backContainer}>
-          <TouchableOpacity onPress={handleBack}>
-            <SvgXml xml={iconsBack()} />
-          </TouchableOpacity>
-        </View>
+
+         <View style={styles.header}>
+        <TouchableOpacity onPress={handleBack} style={styles.iconButton}>
+          <SvgXml xml={iconsBack()} />
+        </TouchableOpacity>
+
+
         <View style={styles.titleContainer}>
           <Text style={styles.title}>Thanh Toán</Text>
         </View>
@@ -555,19 +511,10 @@ const PaymentScreen = ({route}) => {
       </ScrollView>
     </SafeAreaView>
   );
-};
-const ComboList = ({
-  combo,
-  comboQuantities,
-  comboChecked,
-  showAllItems,
-  decreaseQuantity,
-  increaseQuantity,
-  toggleComboCheckbox,
-  IMAGE_API_URL,
-  screenHeight,
-  styles,
-}) => {
+
+}; 
+const ComboList = ({ combo, comboQuantities, comboChecked, showAllItems, decreaseQuantity, increaseQuantity, toggleComboCheckbox, IMAGE_API_URL, screenHeight, styles }) => {
+
   return (
     <ScrollView
       contentContainerStyle={[
@@ -648,22 +595,22 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    width: '100%',
     paddingHorizontal: 16,
-    marginBottom: '5%',
+    paddingVertical: 8,
+ 
   },
-  backContainer: {
+  iconButton: {
     position: 'absolute',
-    left: 5,
+    left: 8,
   },
   titleContainer: {
-    width: screenWidth - 10,
+    flex: 1,
     alignItems: 'center',
   },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#fff',
+    color: 'white',
   },
   movieInfo: {
     flexDirection: 'row',

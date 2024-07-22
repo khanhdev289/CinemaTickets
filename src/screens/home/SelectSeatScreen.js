@@ -32,26 +32,37 @@ const SelectSeatScreen = ({ route }) => {
 
   const [selectedSeats, setSelectedSeats] = useState([]);
 
-  const {user} = useAuth();
+  const { user } = useAuth();
   const userID = user.user._id;
 
   useEffect(() => {
     fetchRoomData(roomId);
     fetchSeatData(roomId);
+   
+
+  }, [roomId]);
+  useEffect(() => {
+    if (message) {
+      updateSeatStatus(message);
+    }
+  }, [message]);
+  
+  useEffect(() => {
     socket.on('connect', () => {
       console.log('Đã kết nối tới server');
+      
     });
 
     socket.on('statusseat', (message) => {
       console.log('Nhận được tin nhắn:', message);
-      updateSeatStatus1(message);
+      setMessage(message);
+      
     });
 
     return () => {
       socket.disconnect();
     };
-  }, [roomId]);
-
+  }, []);
   useEffect(() => {
     if (selectedDateIndex !== null) {
       fetchTimeData(dateArray[selectedDateIndex]._id);
@@ -60,12 +71,13 @@ const SelectSeatScreen = ({ route }) => {
 
   useEffect(() => {
     if (selectedDateIndex !== null && selectedTimeIndex !== null) {
-      const showtimeId = dateArray[selectedDateIndex]._id;
-      const timeId = timeArray[selectedTimeIndex]._id;
+      const showtimeId = dateArray[selectedDateIndex]?._id;
+      const timeId = timeArray[selectedTimeIndex]?._id;
+  
       fetchStatusSeat(roomId, showtimeId, timeId);
     }
-
-  }, [selectedDateIndex, selectedTimeIndex, roomId]);
+  }, [selectedDateIndex, selectedTimeIndex, roomId, dateArray, timeArray]);
+  
 
   const fetchRoomData = async (roomId) => {
     try {
@@ -113,19 +125,19 @@ const SelectSeatScreen = ({ route }) => {
 
   const handleSeatPress = (seatId) => {
     if (selectedDateIndex === null || selectedTimeIndex === null) {
-      Alert.alert('Error', 'Vui lòng chọn suất chiếu trước khi chọn ghế');
+      Alert.alert('Thông báo', 'Vui lòng chọn suất chiếu trước khi chọn ghế');
       return;
     }
 
     const updatedSeats = seats.map(seat =>
       seat._id === seatId
-        ? { ...seat, status: seat.status === 'available' ? 'selected' : seat.status === 'selected' ? 'available' : seat.status }
+        ? { ...seat, status: seat.status === 'available' ? 'select' : seat.status === 'select' ? 'available' : seat.status }
         : seat
     );
     setSeats(updatedSeats);
 
     const selectedSeat = updatedSeats.find(seat => seat._id === seatId);
-    if (selectedSeat.status === 'selected') {
+    if (selectedSeat.status === 'select') {
       setSelectedSeats([...selectedSeats, selectedSeat]);
     } else {
       setSelectedSeats(selectedSeats.filter(seat => seat._id !== seatId));
@@ -134,18 +146,18 @@ const SelectSeatScreen = ({ route }) => {
 
   const handleTicket = async () => {
     if (selectedSeats.length === 0) {
-      Alert.alert('Error', 'Bạn chưa chọn ghế nào. Vui lòng chọn ghế trước khi tiếp tục.');
+      Alert.alert('Thông báo', 'Vui lòng chọn ghế trước khi tiếp tục');
       return;
     }
-  
+
     const seatIds = selectedSeats.map(seat => seat._id);
     const showtimeId = dateArray[selectedDateIndex]._id;
     const timeId = timeArray[selectedTimeIndex]._id;
 
-    const ticketData = await createTicket(seatIds,userID, showtimeId, timeId,calculateTotal());
+    const ticketData = await createTicket(seatIds, userID, showtimeId, timeId, calculateTotal());
     if (ticketData) {
       console.log('Ticket created successfully:', ticketData);
-      navigation.navigate('PaymentScreen', { ticketData: ticketData.create});
+      navigation.navigate('PaymentScreen', { ticketData: ticketData.create });
     }
   };
 
@@ -160,11 +172,11 @@ const SelectSeatScreen = ({ route }) => {
         seatStyle = styles.pendingSeat;
         seatTextStyle = [styles.seatText, { color: '#FCC434' }];
         break;
-      case 'booked':
+      case 'selected':
         seatStyle = styles.bookedSeat;
         seatTextStyle = [styles.seatText, { color: '#FCC434' }];
         break;
-      case 'selected':
+      case 'select':
         seatStyle = styles.selectedSeat;
         seatTextStyle = [styles.seatText, { color: 'black' }];
         break;
@@ -177,7 +189,7 @@ const SelectSeatScreen = ({ route }) => {
         key={seat._id}
         style={[styles.seat, seatStyle]}
         onPress={() => handleSeatPress(seat._id)}
-        disabled={seat.status !== 'available' && seat.status !== 'selected'}
+        disabled={seat.status !== 'available' && seat.status !== 'select'}
       >
         <Text style={seatTextStyle}>{seat.name}</Text>
       </TouchableOpacity>
@@ -203,7 +215,7 @@ const SelectSeatScreen = ({ route }) => {
     try {
       const data = await fetchStatusSeats(roomId, showtimeId, timeId);
       if (data) {
-        updateSeatStatus(data);
+        SeatStatus(data);
 
       } else {
         console.warn('Empty seat status data or invalid response:', data);
@@ -214,7 +226,30 @@ const SelectSeatScreen = ({ route }) => {
     }
   };
 
-  const updateSeatStatus = (seatStatusData) => {
+  const updateSeatStatus = (message) => {
+    const { seat, showday, showtime, status } = message;
+  
+    // Cập nhật trạng thái của ghế dựa trên seatId, showday và showtime
+    const updatedSeats = seats.map(seatItem => {
+      // Kiểm tra xem seatItem có phù hợp với seatId, showday và showtime
+      const seatMatches = seatItem._id === seat;
+      const dateMatches = selectedDateIndex !== null && dateArray[selectedDateIndex]._id === showday;
+      const timeMatches = selectedTimeIndex !== null && timeArray[selectedTimeIndex]._id === showtime;
+  
+      // Nếu tất cả các điều kiện đều trùng khớp, cập nhật trạng thái ghế
+      if (seatMatches && dateMatches && timeMatches) {
+        return { ...seatItem, status };
+      }
+  
+      // Nếu không trùng khớp, trả về ghế hiện tại không thay đổi
+      return seatItem;
+    });
+  
+    // Cập nhật trạng thái ghế
+    setSeats(updatedSeats);
+  };
+
+   const SeatStatus = (seatStatusData) => {
     const updatedSeats = seats.map(seat => {
       const seatData = seatStatusData.find(s => s.seat._id === seat._id);
       if (seatData) {
@@ -224,17 +259,6 @@ const SelectSeatScreen = ({ route }) => {
     });
     setSeats(updatedSeats);
   };
-  const updateSeatStatus1 = (seatStatusData) => {
-    const updatedSeats = seats.map(seat => {
-      const seatData = seatStatusData.find(s => s.seat === seat._id);
-      if (seatData) {
-        return { ...seat, status: seatData.status };
-      }
-      return { ...seat, status: 'available' };;
-    });
-    setSeats(updatedSeats);
-  };
-
 
   const renderLegend = () => (
     <View style={styles.legendContainer}>
@@ -259,17 +283,18 @@ const SelectSeatScreen = ({ route }) => {
 
   return (
     <SafeAreaView style={styles.container}>
-       <View style={styles.header}>
-       <View style={styles.backContainer}>
-          <TouchableOpacity onPress={handleBack} >
-            <SvgXml xml={iconsBack()} />
-          </TouchableOpacity>
-          </View>
-          <View style={styles.titleContainer}>
-            <Text style={styles.title}>Chọn Ghế</Text>
-          </View>
+      <View style={styles.header}>
+        <TouchableOpacity onPress={handleBack} style={styles.iconButton}>
+          <SvgXml xml={iconsBack()} />
+        </TouchableOpacity>
+
+        <View style={styles.titleContainer}>
+          <Text style={styles.title}>Chọn Ghế</Text>
         </View>
-      <ScrollView>      
+      </View>
+
+
+      <ScrollView>
         <View style={{ flexDirection: 'column', justifyContent: 'center', margin: 8, alignSelf: 'center', height: screenHeight * 0.1 }}>
           <SvgXml xml={iconLine()} />
           <LinearGradient colors={['#FCC434', '#00000000']} style={styles.gradientLine} />
@@ -282,7 +307,7 @@ const SelectSeatScreen = ({ route }) => {
 
         {renderLegend()}
 
-        <Text style={{ color: 'white', margin:5, textAlign: 'center',justifyContent:'center' }}>{selectedDate}</Text>
+        <Text style={{ color: 'white', margin: 5, textAlign: 'center', justifyContent: 'center' }}>{selectedDate}</Text>
 
         <FlatList
           data={dateArray}
@@ -290,7 +315,7 @@ const SelectSeatScreen = ({ route }) => {
           horizontal
           bounces={false}
           contentContainerStyle={styles.containerGap24}
-          renderItem={({ item ,index}) => (
+          renderItem={({ item, index }) => (
             <TouchableOpacity
               onPress={() => {
                 setSelectedDateIndex(dateArray.indexOf(item));
@@ -353,7 +378,7 @@ const SelectSeatScreen = ({ route }) => {
           <TouchableOpacity
             style={[styles.button, { backgroundColor: selectedSeats.length === 0 ? '#999' : '#FCC434' }]}
             onPress={() => {
-            handleTicket()
+              handleTicket()
             }}
 
           >
@@ -370,26 +395,27 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: 'black',
   },
+
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    width: '100%',
     paddingHorizontal: 16,
-    marginBottom: '5%',
+    paddingVertical: 8,
+
   },
-  backContainer: {
+  iconButton: {
     position: 'absolute',
-    left: 5,
+    left: 8,
   },
   titleContainer: {
-    width: screenWidth - 10,
+    flex: 1,
     alignItems: 'center',
   },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#fff'
+    color: 'white',
   },
   gradientLine: {
     height: screenHeight * 0.08,
@@ -397,7 +423,7 @@ const styles = StyleSheet.create({
   seatContainer: {
     flex: 1,
     alignItems: 'center',
-    padding:5
+    padding: 5
   },
   row: {
     flexDirection: 'row',

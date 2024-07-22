@@ -112,7 +112,7 @@ const MovieByGenre = () => {
             <SvgXml xml={iconVideo()} width={14} height={14} />
             <Text style={{ fontSize: 12, marginLeft: 5, color: '#DEDEDE' }}>
 
-              <Text style={styles.infoText}> {item.genre?.map(genre => genre.name).join(', ')}</Text>
+              <Text style={styles.infoText}>{item.genre?.map(genre => genre.name).join(', ')}</Text>
 
             </Text>
           </View>
@@ -125,13 +125,12 @@ const MovieByGenre = () => {
     <SafeAreaView style={styles.container}>
 
       <View style={styles.header}>
-        <View style={styles.backContainer}>
-          <TouchableOpacity onPress={handleBack} >
-            <SvgXml xml={iconsBack()} />
-          </TouchableOpacity>
-        </View>
+        <TouchableOpacity onPress={handleBack} style={styles.iconButton}>
+          <SvgXml xml={iconsBack()} />
+        </TouchableOpacity>
+
         <View style={styles.titleContainer}>
-          <Text style={styles.title}>Tìm Kiếm</Text>
+          <Text style={styles.title}>Tìm kiếm</Text>
         </View>
       </View>
       <View style={styles.searchContainer}>
@@ -176,22 +175,22 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    width: '100%',
     paddingHorizontal: 16,
-    marginBottom: '5%',
+    paddingVertical: 8,
+
   },
-  backContainer: {
+  iconButton: {
     position: 'absolute',
-    left: 5,
+    left: 8,
   },
   titleContainer: {
-    width: screenWidth - 16,
+    flex: 1,
     alignItems: 'center',
   },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#fff'
+    color: 'white',
   },
   searchContainer: {
     paddingHorizontal: 10,
