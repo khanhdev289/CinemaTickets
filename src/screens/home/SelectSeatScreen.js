@@ -172,7 +172,7 @@ const SelectSeatScreen = ({ route }) => {
         seatStyle = styles.pendingSeat;
         seatTextStyle = [styles.seatText, { color: '#FCC434' }];
         break;
-      case 'selected':
+      case 'reserved':
         seatStyle = styles.bookedSeat;
         seatTextStyle = [styles.seatText, { color: '#FCC434' }];
         break;

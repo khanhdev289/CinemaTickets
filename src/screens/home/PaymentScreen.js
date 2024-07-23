@@ -402,6 +402,7 @@ const PaymentScreen = ({ route }) => {
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', margin: 10 }}>
           <Text style={{ color: 'white' }}>Vé</Text>
           <Text style={{ color: 'white', fontSize: 20 }}>{ticketData.total - discountAmountT} VND</Text>
+          </View>
         <View style={styles.line} />
 
         <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
