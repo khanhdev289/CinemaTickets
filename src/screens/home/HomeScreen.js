@@ -297,29 +297,31 @@ const formatDate = dateString => {
 
 const UpcomingMovieItem = ({item, navigation}) => {
   const formattedDate = formatDate(item.release_date);
-  return (
-    <View style={styles.movieItem}>
-      <TouchableOpacity
-        onPress={() => {
-          navigation.navigate('MovieDetailScreen', {movieId: item._id});
-        }}>
-        <Image
-          style={styles.upcomingMovieImage}
-          source={{uri: IMAGE_API_URL + item.image}}
-        />
-        <Text style={styles.movieTitle2}>{item.name}</Text>
-        <View style={styles.movieDetailRow}>
-          <SvgXml xml={iconVideo()} width={14} height={14} />
-          <Text style={styles.movieDetailText}> {item.duration} •</Text>
-          <Text style={styles.movieDetailText}>{item.genre[0].name}</Text>
-        </View>
-        <View style={styles.movieDetailRow}>
-          <SvgXml xml={iconCalendar()} width={14} height={14} />
-          <Text style={styles.movieDetailText}> {formattedDate}</Text>
-        </View>
-      </TouchableOpacity>
-    </View>
-  );
+
+  return(
+  <View style={styles.movieItem}>
+   <TouchableOpacity
+      onPress={() => {
+        navigation.navigate('MovieDetailScreen', { movieId: item._id });
+      }}>
+
+      <Image
+        style={styles.upcomingMovieImage}
+        source={{ uri: IMAGE_API_URL + item.image }}
+      />
+      <Text style={styles.movieTitle2}>{item.name}</Text>
+      <View style={styles.movieDetailRow}>
+        <SvgXml xml={iconVideo()} width={14} height={14} />
+        <Text style={styles.movieDetailText}> {item.duration} •</Text>
+        <Text style={styles.movieDetailText}>{ item.genre[0].name }</Text>
+      </View>
+      <View style={styles.movieDetailRow}>
+        <SvgXml xml={iconCalendar()} width={14} height={14} />
+        <Text style={styles.movieDetailText}> {formattedDate}</Text>
+      </View>
+    </TouchableOpacity>
+  </View>)
+
 };
 const DiscountItem = ({item}) => (
   <View style={styles.discountItem}>
