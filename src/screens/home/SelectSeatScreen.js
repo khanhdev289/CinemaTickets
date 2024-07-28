@@ -37,8 +37,6 @@ const SelectSeatScreen = ({ route }) => {
   useEffect(() => {
     fetchRoomData(roomId);
     fetchSeatData(roomId);
-
-
   }, [roomId]);
   useEffect(() => {
     if (message) {
