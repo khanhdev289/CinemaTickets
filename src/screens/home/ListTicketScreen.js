@@ -7,30 +7,36 @@ import {
   StyleSheet,
   ActivityIndicator,
   StatusBar,
+  Alert,
 } from 'react-native';
 import {SvgXml} from 'react-native-svg';
 import iconBack from '../../assets/icons/iconBack';
 import iconClock from '../../assets/icons/iconClock';
 import {useNavigation} from '@react-navigation/native';
-
-import axios from 'axios';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import iconLocation from '../../assets/icons/iconLocation';
+import {useStripe} from '@stripe/stripe-react-native';
+import axios from 'axios';
 import {useAuth} from '../../components/AuthProvider ';
 
 const POSTS_API_URL = 'http://139.180.132.97:3000/tickets/user';
 const IMAGE_API_URL = 'http://139.180.132.97:3000/images/';
+const PAY_API_URL1 = 'http://139.180.132.97:3000/tickets/status';
+const PAY_API_URL = 'http://139.180.132.97:3000/tickets/payment';
 
 const ListTicketScreen = () => {
+  const stripe = useStripe();
   const navigation = useNavigation();
 
   const [ticketData, setTicketData] = useState([]);
+  const [total, setTotal] = useState(0); // Ensure this is initialized to 0
   const [isLoading, setIsLoading] = useState(false);
   const {user} = useAuth();
 
   useEffect(() => {
     fetchDataUser();
   }, []);
+
   useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
       fetchDataUser();
@@ -58,11 +64,13 @@ const ListTicketScreen = () => {
       const userData = response.data;
       // Lưu dữ liệu từ API vào state
       setTicketData(
-        userData.getTicket.map(item => ({
-          ...item,
-          // Lấy ngày từ phần date và chỉ lấy phần đầu tiên (ngày)
-          date: item.showdate.date.split('T')[0],
-        })),
+        userData.getTicket
+          .map(item => ({
+            ...item,
+            // Lấy ngày từ phần date và chỉ lấy phần đầu tiên (ngày)
+            date: item.showdate.date.split('T')[0],
+          }))
+          .reverse(),
       );
       setIsLoading(false);
     } catch (error) {
@@ -71,8 +79,100 @@ const ListTicketScreen = () => {
     }
   };
 
-  const navigateToTicketDetail = _id => {
-    navigation.navigate('TicketScreen', {_id});
+  const handlePressTicket = item => {
+    if (item.status === 'active') {
+      navigation.navigate('TicketScreen', {_id: item._id});
+    } else {
+      Alert.alert(
+        'Thông báo',
+        'Vé chưa được thanh toán, bạn có muốn thanh toán không?',
+        [
+          {
+            text: 'Hủy',
+            onPress: () => console.log('Đăng xuất bị hủy'),
+            style: 'cancel',
+          },
+          {
+            text: 'Có',
+            onPress: () => {
+              subscribe(item._id, item.total); // Truyền thêm giá trị total vào hàm subscribe
+            },
+            style: 'destructive',
+          },
+        ],
+        {cancelable: false},
+      );
+    }
+  };
+
+  const subscribe = async (ticketId, total) => {
+    try {
+      const token = user.token.access_token;
+
+      const response = await axios.post(
+        `${PAY_API_URL}/${ticketId}`,
+        {
+          name: 'khanh',
+          amount: total, // Sử dụng giá trị total từ item
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json', // Đảm bảo đúng loại dữ liệu gửi đi
+          },
+        },
+      );
+
+      console.log(response.data);
+      const clientSecret = response.data;
+
+      const {error: initError} = await stripe.initPaymentSheet({
+        paymentIntentClientSecret: clientSecret,
+        googlePay: true,
+        merchantDisplayName: 'MD-Cinema',
+      });
+
+      if (initError) {
+        console.error(initError);
+        return Alert.alert('Lỗi', initError.message);
+      }
+
+      const {error: presentError} = await stripe.presentPaymentSheet({
+        clientSecret,
+      });
+
+      if (presentError) {
+        console.error(presentError);
+        return Alert.alert('Lỗi', presentError.message);
+      }
+
+      Alert.alert('Thanh toán thành công, cảm ơn bạn!');
+      paymentSuccess(ticketId);
+    } catch (err) {
+      console.error(err);
+      Alert.alert('Có lỗi xảy ra, vui lòng thử lại sau!');
+    }
+  };
+
+  const paymentSuccess = async ticketId => {
+    try {
+      const token = user.token.access_token;
+
+      const axiosInstance = axios.create({
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const url = `${PAY_API_URL1}/${ticketId}`;
+      const response = await axiosInstance.put(url);
+
+      const data = response.data;
+      console.log(data);
+      navigation.navigate('TicketScreen', {_id: ticketId});
+    } catch (error) {
+      console.error('Lỗi khi thanh toán: ', error);
+    }
   };
 
   if (isLoading) {
@@ -81,7 +181,7 @@ const ListTicketScreen = () => {
 
   return (
     <SafeAreaView style={{flex: 1, backgroundColor: 'black'}}>
-       {isLoading && (
+      {isLoading && (
         <View style={styles.loadingOverlay}>
           <ActivityIndicator size="large" color="#f7b731" />
         </View>
@@ -99,7 +199,7 @@ const ListTicketScreen = () => {
           <TouchableOpacity
             key={item._id}
             style={styles.ticketContainer}
-            onPress={() => navigateToTicketDetail(item._id)}>
+            onPress={() => handlePressTicket(item)}>
             <Image
               source={{uri: IMAGE_API_URL + item.movie.image}}
               style={styles.ticketImage}
@@ -114,6 +214,25 @@ const ListTicketScreen = () => {
                 <SvgXml xml={iconLocation()} width={14} height={14} />{' '}
                 {item.cinema.name}
               </Text>
+              <View
+                style={[
+                  styles.statusView,
+                  item.status === 'active'
+                    ? styles.activeStatus
+                    : styles.inactiveStatus,
+                ]}>
+                <Text
+                  style={[
+                    styles.statusProfileInfo,
+                    item.status === 'active'
+                      ? styles.activeText
+                      : styles.inactiveText,
+                  ]}>
+                  {item.status === 'active'
+                    ? 'Đã thanh toán'
+                    : 'Chưa thanh toán'}
+                </Text>
+              </View>
             </View>
           </TouchableOpacity>
         ))}
@@ -140,6 +259,18 @@ const styles = StyleSheet.create({
     color: 'white',
     textAlign: 'center',
     flex: 1,
+  },
+  statusView: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderColor: '#f7b731',
+    borderWidth: 2,
+    padding: 3,
+    marginTop: 5,
+    borderRadius: 10,
+    width: 170,
+    marginTop: 20,
   },
   ticketContainer: {
     flexDirection: 'row',
@@ -178,5 +309,22 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     zIndex: 1,
+  },
+  statusProfileInfo: {
+    color: '#f7b731',
+    fontSize: 14,
+    fontWeight: 'bold',
+  },
+  activeStatus: {
+    borderColor: 'green',
+  },
+  inactiveStatus: {
+    borderColor: 'red',
+  },
+  activeText: {
+    color: 'green',
+  },
+  inactiveText: {
+    color: 'red',
   },
 });

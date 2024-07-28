@@ -44,16 +44,17 @@ const SelectSeatScreen = ({ route }) => {
     }
   }, [message]);
 
+
   useEffect(() => {
     socket.on('connect', () => {
       console.log('Đã kết nối tới server');
+
 
     });
 
     socket.on('statusseat', (message) => {
       console.log('Nhận được tin nhắn:', message);
       setMessage(message);
-
     });
 
     return () => {
@@ -70,14 +71,12 @@ const SelectSeatScreen = ({ route }) => {
     if (selectedDateIndex !== null && selectedTimeIndex !== null) {
       const showtimeId = dateArray[selectedDateIndex]?._id;
       const timeId = timeArray[selectedTimeIndex]?._id;
-
       fetchStatusSeat(roomId, showtimeId, timeId);
       setSelectedSeats([]); // Đặt lại danh sách ghế đã chọn
    
 
     }
   }, [selectedDateIndex, selectedTimeIndex, roomId, dateArray, timeArray]);
-
 
   const fetchRoomData = async (roomId) => {
     try {
@@ -172,7 +171,9 @@ const SelectSeatScreen = ({ route }) => {
         seatStyle = styles.pendingSeat;
         seatTextStyle = [styles.seatText, { color: '#FCC434' }];
         break;
+
       case 'reserved':
+
         seatStyle = styles.bookedSeat;
         seatTextStyle = [styles.seatText, { color: '#FCC434' }];
         break;
@@ -228,28 +229,26 @@ const SelectSeatScreen = ({ route }) => {
 
   const updateSeatStatus = (message) => {
     const { seat, showday, showtime, status } = message;
-
     // Cập nhật trạng thái của ghế dựa trên seatId, showday và showtime
     const updatedSeats = seats.map(seatItem => {
       // Kiểm tra xem seatItem có phù hợp với seatId, showday và showtime
       const seatMatches = seatItem._id === seat;
       const dateMatches = selectedDateIndex !== null && dateArray[selectedDateIndex]._id === showday;
       const timeMatches = selectedTimeIndex !== null && timeArray[selectedTimeIndex]._id === showtime;
-
       // Nếu tất cả các điều kiện đều trùng khớp, cập nhật trạng thái ghế
       if (seatMatches && dateMatches && timeMatches) {
         return { ...seatItem, status };
       }
-
       // Nếu không trùng khớp, trả về ghế hiện tại không thay đổi
       return seatItem;
     });
-
     // Cập nhật trạng thái ghế
     setSeats(updatedSeats);
   };
 
+
   const SeatStatus = (seatStatusData) => {
+
     const updatedSeats = seats.map(seat => {
       const seatData = seatStatusData.find(s => s.seat._id === seat._id);
       if (seatData) {
