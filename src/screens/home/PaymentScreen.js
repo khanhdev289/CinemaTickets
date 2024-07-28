@@ -57,7 +57,7 @@ const PaymentScreen = ({ route }) => {
 
   const [comboQuantities, setComboQuantities] = useState({ combo1: 1, combo2: 1, combo3: 1 });
   const [comboChecked, setComboChecked] = useState({ combo1: false, combo2: false, combo3: false });
-  const [countdown, setCountdown] = useState(60);
+  const [countdown, setCountdown] = useState(60*2);
 
 
   useEffect(() => {
