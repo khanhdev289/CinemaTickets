@@ -41,7 +41,15 @@ const newsList = [
 
 const HomeScreen = () => {
   const {user} = useAuth();
-
+  const handlePress = (movieId) => {
+    if (user) {
+      // Nếu người dùng đã đăng nhập, điều hướng tới màn hình chi tiết phim
+      navigation.navigate('MovieDetailScreen', { movieId });
+    } else {
+      // Nếu chưa đăng nhập, điều hướng tới màn hình đăng nhập
+      navigation.navigate('Login');
+    }
+  };
   const navigation = useNavigation();
   const [isLoading, setIsLoading] = useState(true);
   const [nowPlayingMoviesList, setNowPlayingMoviesList] = useState([]);
@@ -64,9 +72,9 @@ const HomeScreen = () => {
     try {
       const nowPlayingResponse = await fetchMovies();
       const discountsReponse = await fetchDiscounts();
-      const genreReponse = await fetchGenres();
+      // const genreReponse = await fetchGenres();
 
-      const allMovies = nowPlayingResponse.getall;
+      const allMovies = nowPlayingResponse;
 
       const nowPlaying = allMovies.filter(
         movie => movie.release_status === 'dc',
@@ -120,6 +128,7 @@ const HomeScreen = () => {
               index={index}
               visibleIndex={visibleIndex}
               navigation={navigation}
+              handlePress={handlePress}
             />
           )}
           onViewableItemsChanged={onViewableItemsChanged}
@@ -151,7 +160,7 @@ const HomeScreen = () => {
           autoplayLoop
           showPagination={false}
           data={discountList}
-          renderItem={({item}) => <DiscountItem item={item} />}
+          renderItem={({item}) => <DiscountItem item={item} navigation={navigation}/>}
         />
 
         <SectionNoClick title="Thể Loại" />
@@ -178,14 +187,17 @@ const HomeScreen = () => {
   );
 };
 
-const Header = ({user}) => (
+const Header = ({ user }) => (
   <View style={styles.headerContainer}>
-    <Text style={styles.greetingText}>Xin Chào, {user.user.name} 👋</Text>
+    <Text style={styles.greetingText}>
+      Xin Chào  {user ? `${user.user.name} 👋` : ""}
+    </Text>
     <TouchableOpacity onPress={() => alert('Notification clicked!')}>
       <SvgXml xml={iconNotification()} />
     </TouchableOpacity>
   </View>
 );
+
 
 const SearchBar = ({navigation}) => (
   <View style={styles.searchContainer}>
@@ -239,13 +251,11 @@ const MovieList = ({
   />
 );
 
-const MovieItem = ({item, index, visibleIndex, navigation}) => {
+const MovieItem = ({item, index, visibleIndex, navigation,handlePress}) => {
   const scale = index === visibleIndex ? 1.2 : 1;
   return (
     <TouchableOpacity
-      onPress={() => {
-        navigation.navigate('MovieDetailScreen', {movieId: item._id});
-      }}>
+    onPress={() => handlePress(item._id)}>
       <View
         style={[
           styles.movieItemNowPlaying,
@@ -323,9 +333,11 @@ const UpcomingMovieItem = ({item, navigation}) => {
   </View>)
 
 };
-const DiscountItem = ({item}) => (
+const DiscountItem = ({item,navigation}) => (
+  
   <View style={styles.discountItem}>
-    <TouchableOpacity onPress={() => alert(`Movie ID: ${item._id}`)}>
+   <TouchableOpacity onPress={() => navigation.navigate('DiscountDetailScreen', { discountId: item._id })}>
+        
       <Image
         style={styles.discountImage}
         source={{uri: IMAGE_API_URL + item.image}}

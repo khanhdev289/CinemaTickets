@@ -25,9 +25,9 @@ export  const VIDEO_API_URL = 'http://139.180.132.97:3000/videos/';
 export const fetchMovies = async () => {
   try {
     const api = await createApiInstance();
-    const url = '/movies'; // Đường dẫn API để lấy danh sách phim
+    const url = '/movies/no/login'; // Đường dẫn API để lấy danh sách phim
     const response = await api.get(url);
-    return response.data;
+    return response.data.getall;
   } catch (error) {
     console.error('Error fetching movies:', error);
     throw error;
@@ -38,7 +38,7 @@ export const fetchMovies = async () => {
 export const fetchMovieById = async (id) => {
   try {
     const api = await createApiInstance();
-    const url = '/movies/'+id; // Đường dẫn API để lấy danh sách phim
+    const url = '/movies/no/login'+id; // Đường dẫn API để lấy danh sách phim
     const response = await api.get(url);
     return response.data.getmovie;
   } catch (error) {
@@ -72,7 +72,7 @@ export const movieByGenre = async (genreId) => {
 export const fetchDiscounts= async () => {
   try {
     const api = await createApiInstance();
-    const url = '/discounts'; // Đường dẫn API để lấy danh sách phim
+    const url = '/discounts/no/login'; // Đường dẫn API để lấy danh sách phim
     const response = await api.get(url);
     return response.data;
   } catch (error) {
@@ -174,7 +174,7 @@ export const fetchStatusSeats = async (roomId, showtimeId, timeId) => {
 export const fetchGenres = async () => {
   try {
     const api = await createApiInstance();
-    const url = '/genres'; // Đường dẫn API để lấy danh sách thể loại
+    const url = '/genres/user'; // Đường dẫn API để lấy danh sách thể loại
     const response = await api.get(url);
     return response.data;
   } catch (error) {
@@ -222,7 +222,7 @@ export const fetchNews = async () => {
 export const fetchCombo = async () => {
   try {
     const api = await createApiInstance();
-    const url = '/foods'; // Đường dẫn API để lấy danh sách tin tức
+    const url = '/foods/user'; // Đường dẫn API để lấy danh sách tin tức
     const response = await api.get(url);
     return response.data.getall;
   } catch (error) {

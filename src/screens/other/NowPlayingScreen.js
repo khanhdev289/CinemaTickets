@@ -26,7 +26,7 @@ const NowPlayingScreen = () => {
  const fetchData =async ()=>{
   try {
     const movieResponse=await fetchMovies();
-    const allMovies = movieResponse.getall;
+    const allMovies = movieResponse;
     const nowPlaying = allMovies.filter(movie => movie.release_status === 'dc');
     setListMovie(nowPlaying);
 
