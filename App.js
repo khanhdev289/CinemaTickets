@@ -26,7 +26,10 @@ import SelectSeatScreen from './src/screens/home/SelectSeatScreen';
 import PaymentScreen from './src/screens/home/PaymentScreen';
 import {StripeProvider} from '@stripe/stripe-react-native';
 import {AuthProvider} from './src/components/AuthProvider ';
+
+import WelComeNew from './src/screens/start/WelComeNew';
 import DiscountDetailScreen from './src/screens/home/DiscountDetailScreen';
+
 
 const Stack = createNativeStackNavigator();
 
@@ -35,7 +38,9 @@ export default function App() {
     <AuthProvider>
       <NavigationContainer>
         <StripeProvider publishableKey="pk_test_51PNdpDDbcfrQz51XX1abFbkrZH4yagcpYDWPNRrA8ursSgjR1LCRAPh5TFqjPsYKcgsnSPEu5BWMSvW20lYqwVEy00ludlggnR">
-          <Stack.Navigator initialRouteName="Home">
+
+          <Stack.Navigator initialRouteName="WelComeNew">
+
             <Stack.Screen
               name="Home"
               component={BottomNavication}
@@ -146,9 +151,14 @@ export default function App() {
               component={CheckSuccess}
               options={{headerShown: false}}
             />
-             <Stack.Screen
+            <Stack.Screen
               name="MovieScreen"
               component={MovieScreen}
+              options={{headerShown: false}}
+            />
+            <Stack.Screen
+              name="WelComeNew"
+              component={WelComeNew}
               options={{headerShown: false}}
             />
           </Stack.Navigator>

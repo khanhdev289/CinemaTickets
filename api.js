@@ -38,7 +38,7 @@ export const fetchMovies = async () => {
 export const fetchMovieById = async (id) => {
   try {
     const api = await createApiInstance();
-    const url = '/movies/no/login'+id; // Đường dẫn API để lấy danh sách phim
+    const url = '/movies/no/login/'+id; // Đường dẫn API để lấy danh sách phim
     const response = await api.get(url);
     return response.data.getmovie;
   } catch (error) {
@@ -80,10 +80,21 @@ export const fetchDiscounts= async () => {
     throw error;
   }
 };
+export const fetchDiscountById= async (id) => {
+  try {
+    const api = await createApiInstance();
+    const url = '/discounts/no/login/'+id; // Đường dẫn API để lấy danh sách phim
+    const response = await api.get(url);
+    return response.data.getDiscount;
+  } catch (error) {
+    console.error('Error fetching movies:', error);
+    throw error;
+  }
+};
 export const fetchCinemaByMovie = async (movieId) => {
   try {
     const api = await createApiInstance();
-    const url = '/rooms/cinema/'+movieId; 
+    const url = '/rooms/cinema/no/login/'+movieId; 
     const response = await api.get(url);
     return response.data;
   } catch (error) {
@@ -174,7 +185,7 @@ export const fetchStatusSeats = async (roomId, showtimeId, timeId) => {
 export const fetchGenres = async () => {
   try {
     const api = await createApiInstance();
-    const url = '/genres/user'; // Đường dẫn API để lấy danh sách thể loại
+    const url = '/genres/no/login'; // Đường dẫn API để lấy danh sách thể loại
     const response = await api.get(url);
     return response.data;
   } catch (error) {
