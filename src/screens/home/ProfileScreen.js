@@ -48,8 +48,10 @@ const ProfileScreen = ({navigation}) => {
   const {logout} = useAuth();
 
   useEffect(() => {
-    fetchDataUser();
-  }, []);
+    if (user) {
+      fetchDataUser();
+    }
+  }, [user]);
 
   const fetchDataUser = async () => {
     try {

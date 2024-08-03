@@ -8,6 +8,8 @@ import {
   ActivityIndicator,
   StatusBar,
   Alert,
+  FlatList,
+  TextInput,
 } from 'react-native';
 import {SvgXml} from 'react-native-svg';
 import iconBack from '../../assets/icons/iconBack';
@@ -29,8 +31,9 @@ const ListTicketScreen = () => {
   const navigation = useNavigation();
 
   const [ticketData, setTicketData] = useState([]);
-  const [total, setTotal] = useState(0); // Ensure this is initialized to 0
+  const [filteredData, setFilteredData] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [searchQuery, setSearchQuery] = useState(''); // State to store search query
   const {user} = useAuth();
 
   useEffect(() => {
@@ -44,6 +47,14 @@ const ListTicketScreen = () => {
 
     return unsubscribe;
   }, [navigation]);
+
+  useEffect(() => {
+    // Filter data based on search query
+    const filtered = ticketData.filter(ticket =>
+      ticket.movie.name.toLowerCase().includes(searchQuery.toLowerCase()),
+    );
+    setFilteredData(filtered);
+  }, [searchQuery, ticketData]);
 
   const fetchDataUser = async () => {
     try {
@@ -67,7 +78,6 @@ const ListTicketScreen = () => {
         userData.getTicket
           .map(item => ({
             ...item,
-            // Lấy ngày từ phần date và chỉ lấy phần đầu tiên (ngày)
             date: item.showdate.date.split('T')[0],
           }))
           .reverse(),
@@ -79,7 +89,7 @@ const ListTicketScreen = () => {
   };
 
   const handlePressTicket = item => {
-    if (item.status === 'active' || 'complete') {
+    if (item.status === 'active' || item.status === 'complete') {
       navigation.navigate('TicketScreen', {_id: item._id});
     } else {
       Alert.alert(
@@ -94,7 +104,7 @@ const ListTicketScreen = () => {
           {
             text: 'Có',
             onPress: () => {
-              subscribe(item._id, item.total); // Truyền thêm giá trị total vào hàm subscribe
+              subscribe(item._id, item.total);
             },
             style: 'destructive',
           },
@@ -112,12 +122,12 @@ const ListTicketScreen = () => {
         `${PAY_API_URL}/${ticketId}`,
         {
           name: 'khanh',
-          amount: total, // Sử dụng giá trị total từ item
+          amount: total,
         },
         {
           headers: {
             Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json', // Đảm bảo đúng loại dữ liệu gửi đi
+            'Content-Type': 'application/json',
           },
         },
       );
@@ -192,6 +202,47 @@ const ListTicketScreen = () => {
     );
   }
 
+  const renderItem = ({item}) => (
+    <TouchableOpacity
+      style={styles.ticketContainer}
+      onPress={() => handlePressTicket(item)}>
+      <Image
+        source={{uri: IMAGE_API_URL + item.movie.image}}
+        style={styles.ticketImage}
+      />
+      <View style={styles.ticketDetails}>
+        <Text style={styles.ticketTitle}>{item.movie.name}</Text>
+        <Text style={styles.ticketTime}>
+          <SvgXml xml={iconClock()} width={14} height={14} />{' '}
+          {item.movie.duration} * {item.date}
+        </Text>
+        <Text style={styles.ticketLocation}>
+          <SvgXml xml={iconLocation()} width={14} height={14} />{' '}
+          {item.cinema.name}
+        </Text>
+        <View
+          style={[
+            styles.statusView,
+            item.status === 'active' || item.status === 'complete'
+              ? styles.activeStatus
+              : styles.inactiveStatus,
+          ]}>
+          <Text
+            style={[
+              styles.statusProfileInfo,
+              item.status === 'active' || item.status === 'complete'
+                ? styles.activeText
+                : styles.inactiveText,
+            ]}>
+            {item.status === 'active' || item.status === 'complete'
+              ? 'Đã thanh toán'
+              : 'Chưa thanh toán'}
+          </Text>
+        </View>
+      </View>
+    </TouchableOpacity>
+  );
+
   return (
     <SafeAreaView style={{flex: 1, backgroundColor: 'black'}}>
       {isLoading && (
@@ -208,53 +259,23 @@ const ListTicketScreen = () => {
         <View style={styles.header}>
           <Text style={styles.headerTitle}>Tất cả vé</Text>
         </View>
-        {ticketData.map(item => (
-          <TouchableOpacity
-            key={item._id}
-            style={styles.ticketContainer}
-            onPress={() => handlePressTicket(item)}>
-            <Image
-              source={{uri: IMAGE_API_URL + item.movie.image}}
-              style={styles.ticketImage}
-            />
-            <View style={styles.ticketDetails}>
-              <Text style={styles.ticketTitle}>{item.movie.name}</Text>
-              <Text style={styles.ticketTime}>
-                <SvgXml xml={iconClock()} width={14} height={14} />{' '}
-                {item.movie.duration} * {item.date}
-              </Text>
-              <Text style={styles.ticketLocation}>
-                <SvgXml xml={iconLocation()} width={14} height={14} />{' '}
-                {item.cinema.name}
-              </Text>
-              <View
-                style={[
-                  styles.statusView,
-                  item.status === 'active' || item.status === 'complete'
-                    ? styles.activeStatus
-                    : styles.inactiveStatus,
-                ]}>
-                <Text
-                  style={[
-                    styles.statusProfileInfo,
-                    item.status === 'active' || item.status === 'complete'
-                      ? styles.activeText
-                      : styles.inactiveText,
-                  ]}>
-                  {item.status === 'active' || 'complete'
-                    ? 'Đã thanh toán'
-                    : 'Chưa thanh toán'}
-                </Text>
-              </View>
-            </View>
-          </TouchableOpacity>
-        ))}
+        <TextInput
+          style={styles.searchInput}
+          placeholder="Tìm kiếm theo tên phim"
+          placeholderTextColor="#C4C4C4"
+          value={searchQuery}
+          onChangeText={text => setSearchQuery(text)}
+        />
+        <FlatList
+          data={filteredData.reverse()}
+          renderItem={renderItem}
+          keyExtractor={item => item._id}
+          contentContainerStyle={{paddingBottom: 20}}
+        />
       </View>
     </SafeAreaView>
   );
 };
-
-export default ListTicketScreen;
 
 const styles = StyleSheet.create({
   container: {
@@ -278,86 +299,78 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     borderColor: '#f7b731',
-    borderWidth: 2,
-    padding: 3,
-    marginTop: 5,
-    borderRadius: 10,
-    width: 170,
-    marginTop: 20,
+    width: 120,
+    borderRadius: 4,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    marginTop: 8,
+  },
+  activeStatus: {
+    backgroundColor: '#1e1e1e',
+  },
+  inactiveStatus: {
+    backgroundColor: '#4d4d4d',
+  },
+  statusProfileInfo: {
+    fontSize: 12,
+    color: 'white',
+  },
+  activeText: {
+    color: '#f7b731',
+  },
+  inactiveText: {
+    color: '#ffffff',
+  },
+  searchInput: {
+    height: 40,
+    borderColor: '#C4C4C4',
+    borderWidth: 1,
+    borderRadius: 8,
+    marginVertical: 16,
+    paddingHorizontal: 10,
+    color: 'white',
   },
   ticketContainer: {
     flexDirection: 'row',
-    backgroundColor: '#1C1C1C',
-    borderRadius: 10,
-    marginVertical: 8,
-    overflow: 'hidden',
-    marginVertical: 10,
+    marginBottom: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#444',
+    paddingBottom: 8,
   },
   ticketImage: {
-    width: 100,
-    height: 150,
+    width: 80,
+    height: 120,
+    borderRadius: 8,
+    marginRight: 16,
   },
   ticketDetails: {
     flex: 1,
-    padding: 10,
-    marginVertical: 10,
+    justifyContent: 'center',
   },
   ticketTitle: {
-    fontSize: 18,
+    fontSize: 16,
     color: 'white',
-    fontWeight: 'bold',
+    marginBottom: 4,
   },
   ticketTime: {
     fontSize: 14,
-    color: 'white',
-    marginVertical: 4,
+    color: '#C4C4C4',
+    marginBottom: 4,
   },
   ticketLocation: {
     fontSize: 14,
-    color: 'white',
+    color: '#C4C4C4',
   },
   loadingOverlay: {
-    ...StyleSheet.absoluteFillObject,
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
     backgroundColor: 'rgba(0,0,0,0.5)',
     justifyContent: 'center',
     alignItems: 'center',
-    zIndex: 1,
-  },
-  statusProfileInfo: {
-    color: '#f7b731',
-    fontSize: 14,
-    fontWeight: 'bold',
-  },
-  activeStatus: {
-    borderColor: 'green',
-  },
-  inactiveStatus: {
-    borderColor: 'red',
-  },
-  activeText: {
-    color: 'green',
-  },
-  inactiveText: {
-    color: 'red',
-  },
-  loginContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  loginText: {
-    fontSize: 18,
-    color: 'white',
-    marginBottom: 20,
-  },
-  loginButton: {
-    backgroundColor: '#f7b731',
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 5,
-  },
-  loginButtonText: {
-    fontSize: 16,
-    color: 'black',
   },
 });
+
+export default ListTicketScreen;

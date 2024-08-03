@@ -27,7 +27,7 @@ const Tab = createBottomTabNavigator();
 
 const BottomNavigation = () => {
   const {user} = useAuth();
-  
+
   const renderScreens = () => {
     const isStaff = user && user.user.role === 'staff';
     return (
@@ -126,6 +126,5 @@ const BottomNavigation = () => {
     </Tab.Navigator>
   );
 };
-
 
 export default BottomNavigation;
