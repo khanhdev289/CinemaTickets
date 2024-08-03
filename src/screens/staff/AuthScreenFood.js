@@ -67,7 +67,7 @@ const AuthScreenFood = () => {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.loadingContainer}>
-          <Text style={styles.loadingText}>Loading...</Text>
+          <Text style={styles.loadingText}>Không có dữ liệu</Text>
         </View>
       </SafeAreaView>
     );
