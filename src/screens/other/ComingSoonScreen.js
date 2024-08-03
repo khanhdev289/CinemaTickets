@@ -1,4 +1,4 @@
-import { ActivityIndicator, Dimensions, FlatList, Image, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, Dimensions, FlatList, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { SvgXml } from 'react-native-svg';
@@ -6,15 +6,17 @@ import iconStar from '../../assets/icons/iconStar';
 import iconCalendar from '../../assets/icons/iconCalendar';
 import iconVideo from '../../assets/icons/iconVideo';
 import { IMAGE_API_URL, fetchMovies } from '../../../api';
+import { useNavigation } from '@react-navigation/native';
 const screenWidth = Dimensions.get('screen').width;
 const screenHeight = Dimensions.get('screen').height;
 const ComingSoonScreen = () => {
+  const navigation = useNavigation();
   const [isLoading, setIsLoading] = useState(true);
   const [listMovie, setListMovie] = useState([]);
   const fetchData = async () => {
     try {
       const movieResponse = await fetchMovies();
-      const allMovies = movieResponse.getall;
+      const allMovies = movieResponse;
       const comingMoviesList = allMovies.filter(movie => movie.release_status === 'sc');
       setListMovie(comingMoviesList);
     } catch (error) {
@@ -37,6 +39,10 @@ const ComingSoonScreen = () => {
     const formattedDate = formatDate(item.release_date);
     return (
       <View style={styles.item}>
+        <TouchableOpacity
+          onPress={() => {
+            navigation.navigate('MovieDetailScreen', { movieId: item._id });
+          }}>
         <Image
           style={{
             width: '100%',
@@ -56,6 +62,7 @@ const ComingSoonScreen = () => {
           <SvgXml xml={iconVideo()} width={14} height={14} />
           <Text style={{ fontSize: 12, marginLeft: 5, color: '#DEDEDE' }}>{item.genre.map(g => g.name).join(', ')}</Text>
         </View>
+        </TouchableOpacity>
       </View>
     );
   };

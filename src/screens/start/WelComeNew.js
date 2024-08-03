@@ -22,7 +22,7 @@ const WelComeNew = () => {
         useNativeDriver: true,
       }),
     ]).start(() => {
-      navigation.navigate('Welcome');
+      navigation.navigate('Home');
     });
   };
 

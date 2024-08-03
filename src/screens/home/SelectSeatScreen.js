@@ -73,7 +73,7 @@ const SelectSeatScreen = ({ route }) => {
       const timeId = timeArray[selectedTimeIndex]?._id;
       fetchStatusSeat(roomId, showtimeId, timeId);
       setSelectedSeats([]); // Đặt lại danh sách ghế đã chọn
-   
+
 
     }
   }, [selectedDateIndex, selectedTimeIndex, roomId, dateArray, timeArray]);
@@ -123,6 +123,11 @@ const SelectSeatScreen = ({ route }) => {
   };
 
   const handleSeatPress = (seatId) => {
+    const seat = seats.find((seat) => seat._id === seatId);
+    if (seat.status === 'close') {
+      Alert.alert('Thông báo', 'Ghế đang bảo trì. Vui lòng chọn ghế khác.');
+      return;
+    }
     if (selectedDateIndex === null || selectedTimeIndex === null) {
       Alert.alert('Thông báo', 'Vui lòng chọn suất chiếu trước khi chọn ghế');
       return;
@@ -141,6 +146,7 @@ const SelectSeatScreen = ({ route }) => {
     } else {
       setSelectedSeats(selectedSeats.filter(seat => seat._id !== seatId));
     }
+   
   };
 
   const handleTicket = async () => {
@@ -171,15 +177,17 @@ const SelectSeatScreen = ({ route }) => {
         seatStyle = styles.pendingSeat;
         seatTextStyle = [styles.seatText, { color: '#FCC434' }];
         break;
-
       case 'reserved':
-
         seatStyle = styles.bookedSeat;
         seatTextStyle = [styles.seatText, { color: '#FCC434' }];
         break;
       case 'select':
         seatStyle = styles.selectedSeat;
         seatTextStyle = [styles.seatText, { color: 'black' }];
+        break;
+      case 'close': // Thêm trường hợp cho ghế hỏng
+        seatStyle = styles.brokenSeat;
+        seatTextStyle = [styles.seatText, { color: 'gray',fontWeight:'medium' }];
         break;
       default:
         seatStyle = styles.availableSeat;
@@ -190,7 +198,7 @@ const SelectSeatScreen = ({ route }) => {
         key={seat._id}
         style={[styles.seat, seatStyle]}
         onPress={() => handleSeatPress(seat._id)}
-        disabled={seat.status !== 'available' && seat.status !== 'select'}
+        disabled={seat.status !== 'available' && seat.status !== 'select' && seat.status !== 'close'}
       >
         <Text style={seatTextStyle}>{seat.name}</Text>
       </TouchableOpacity>
@@ -277,6 +285,10 @@ const SelectSeatScreen = ({ route }) => {
         <View style={[styles.legendColor, styles.selectedSeat]} />
         <Text style={styles.legendText}>Bạn đã chọn</Text>
       </View>
+      {/* <View style={styles.legendItem}>
+      <View style={[styles.legendColor, styles.brokenSeat]} />
+      <Text style={styles.legendText}>Đang bảo trì</Text>
+    </View> */}
     </View>
   );
 
@@ -450,8 +462,9 @@ const styles = StyleSheet.create({
     color: 'black'
   },
   seatText: {
-    fontSize: 10,
-    color: '#BFBFBF'
+    fontSize: 12,
+    color: '#BFBFBF',
+    fontWeight:'bold'
   },
   legendContainer: {
     flexDirection: 'row',
@@ -539,6 +552,9 @@ const styles = StyleSheet.create({
   buttonText: {
     color: '#000000',
     fontSize: 18,
+  },
+  brokenSeat: {
+    backgroundColor: '#333333', // Màu cho ghế hỏng
   },
 });
 
