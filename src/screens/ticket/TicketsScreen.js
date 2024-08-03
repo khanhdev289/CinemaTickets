@@ -23,10 +23,16 @@ const TabBarLabel = ({focused, label}) => (
 
 const TicketScreen = ({route}) => {
   const navigation = useNavigation();
-  const handleBack = () => {
-    navigation.goBack();
-  };
+  const {check} = route.params;
   const {_id} = route.params;
+
+  const handleBack = () => {
+    if (check) {
+      navigation.navigate('Home');
+    } else {
+      navigation.goBack();
+    }
+  };
 
   return (
     <SafeAreaView style={{flex: 1, backgroundColor: 'black'}}>
