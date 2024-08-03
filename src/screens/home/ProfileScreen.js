@@ -11,9 +11,7 @@ import {
   StatusBar,
   ScrollView,
   RefreshControl,
-
   Alert,
-
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import Modal from 'react-native-modal';
@@ -30,7 +28,6 @@ import {useAuth} from '../../components/AuthProvider ';
 import iconMailProfile from '../../assets/icons/iconProfile/iconMailProfile';
 import iconPhoneProfile from '../../assets/icons/iconProfile/iconPhoneProfile';
 
-
 const POSTS_API_URL = 'http://139.180.132.97:3000/users';
 const IMAGE_API_URL = 'http://139.180.132.97:3000/images/';
 const placeholderImage = require('../../assets/images/logo.png');
@@ -46,7 +43,6 @@ const ProfileScreen = ({navigation}) => {
   const [profilePhone, setProfilePhone] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
-
 
   const {user} = useAuth();
   const {logout} = useAuth();
@@ -78,13 +74,10 @@ const ProfileScreen = ({navigation}) => {
       setProfileEmail(userData.email);
       setProfileRole(userData.role);
 
-
       setIsLoading(false);
     } catch (error) {
-      console.error('Lỗi khi tải dữ liệu người dùng: ', error);
       setIsLoading(false);
     }
-
   };
   const getRoleText = () => {
     if (profileRole === 'user') {
@@ -125,7 +118,6 @@ const ProfileScreen = ({navigation}) => {
     );
   };
 
-
   const toggleUpdateUser = () => {
     navigation.navigate('UpdateUserScreen', {
       dataUserImage: profileImage,
@@ -141,6 +133,65 @@ const ProfileScreen = ({navigation}) => {
 
     return unsubscribe;
   }, [navigation]);
+
+  if (!user) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <View style={styles.profileHeader1}>
+          <View>
+            <Image
+              source={
+                profileImage
+                  ? {uri: IMAGE_API_URL + profileImage}
+                  : placeholderImage
+              }
+              style={styles.profileImage}
+            />
+            <View style={styles.roleView}>
+              <Text style={styles.roleProfileInfo}>Khách</Text>
+            </View>
+          </View>
+
+          <View style={styles.profileContent}>
+            <View style={styles.headerRow}>
+              <Text style={styles.profileName}>Khách</Text>
+            </View>
+            <View style={styles.headerRow}>
+              <SvgXml xml={iconPhoneProfile()} style={styles.menuIcon} />
+              <Text style={styles.profileInfo}>
+                {profilePhone || 'Số điện thoại'}
+              </Text>
+            </View>
+
+            <View style={styles.headerRow}>
+              <SvgXml xml={iconMailProfile()} style={styles.menuIcon} />
+              <Text style={styles.profileInfo}>{profileEmail || 'Email'}</Text>
+            </View>
+          </View>
+        </View>
+        <View style={styles.profileHeader2}>
+          <View
+            style={{borderBottomColor: '#444', borderBottomWidth: 1}}></View>
+          <TouchableOpacity style={styles.menuItem}>
+            <SvgXml xml={iconMyTicketProfile()} style={styles.menuIcon} />
+            <Text style={styles.menuText}>Chỉnh sửa thông tin</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.menuItem}>
+            <SvgXml xml={iconChangePassProfile()} style={styles.menuIcon} />
+            <Text style={styles.menuText}>Đổi mật khẩu</Text>
+          </TouchableOpacity>
+        </View>
+        <View style={styles.loginContainer}>
+          <Text style={styles.loginText}>Vui lòng đăng nhập</Text>
+          <TouchableOpacity
+            style={styles.loginButton}
+            onPress={() => navigation.navigate('Welcome')}>
+            <Text style={styles.loginButtonText}>Đăng nhập</Text>
+          </TouchableOpacity>
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView style={styles.container}>
@@ -160,7 +211,6 @@ const ProfileScreen = ({navigation}) => {
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }>
         <View style={styles.profileHeader}>
-
           <View>
             <Image
               source={
@@ -180,7 +230,6 @@ const ProfileScreen = ({navigation}) => {
               <Text style={styles.profileName}>
                 {profileName || 'Tên người dùng'}
               </Text>
-
             </View>
             <View style={styles.headerRow}>
               <SvgXml xml={iconPhoneProfile()} style={styles.menuIcon} />
@@ -199,7 +248,6 @@ const ProfileScreen = ({navigation}) => {
         <TouchableOpacity style={styles.menuItem} onPress={toggleUpdateUser}>
           <SvgXml xml={iconMyTicketProfile()} style={styles.menuIcon} />
           <Text style={styles.menuText}>Chỉnh sửa thông tin</Text>
-
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.menuItem}
@@ -210,9 +258,7 @@ const ProfileScreen = ({navigation}) => {
           <Text style={styles.menuText}>Đổi mật khẩu</Text>
         </TouchableOpacity>
 
-
         <TouchableOpacity style={styles.logoutButton} onPress={tapOnLogOut}>
-
           <Text style={styles.logoutText}>Đăng Xuất</Text>
         </TouchableOpacity>
       </ScrollView>
@@ -241,6 +287,20 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     flexDirection: 'row',
     marginTop: 30,
+  },
+  profileHeader1: {
+    alignItems: 'center',
+    marginBottom: 20,
+    flexDirection: 'row',
+    marginTop: 30,
+    opacity: 0.5,
+  },
+  profileHeader2: {
+    alignItems: 'center',
+    marginBottom: 20,
+    flexDirection: 'column',
+    marginTop: 30,
+    opacity: 0.5,
   },
   profileContent: {
     alignItems: 'flex-start',
@@ -358,6 +418,26 @@ const styles = StyleSheet.create({
   editButton: {
     marginLeft: 'auto',
     alignItems: 'flex-end',
+  },
+  loginContainer: {
+    flex: 1,
+    marginTop: 30,
+    alignItems: 'center',
+  },
+  loginText: {
+    fontSize: 18,
+    color: 'white',
+    marginBottom: 20,
+  },
+  loginButton: {
+    backgroundColor: '#f7b731',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 5,
+  },
+  loginButtonText: {
+    fontSize: 16,
+    color: 'black',
   },
 });
 

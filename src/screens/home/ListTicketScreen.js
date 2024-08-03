@@ -74,13 +74,12 @@ const ListTicketScreen = () => {
       );
       setIsLoading(false);
     } catch (error) {
-      console.error('Lỗi khi tải dữ liệu: ', error);
       setIsLoading(false);
     }
   };
 
   const handlePressTicket = item => {
-    if (item.status === 'active') {
+    if (item.status === 'active' || 'complete') {
       navigation.navigate('TicketScreen', {_id: item._id});
     } else {
       Alert.alert(
@@ -178,6 +177,20 @@ const ListTicketScreen = () => {
   if (isLoading) {
     return <ActivityIndicator size="large" color="#00ff00" />;
   }
+  if (!user) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <View style={styles.loginContainer}>
+          <Text style={styles.loginText}>Vui lòng đăng nhập</Text>
+          <TouchableOpacity
+            style={styles.loginButton}
+            onPress={() => navigation.navigate('Login')}>
+            <Text style={styles.loginButtonText}>Đăng nhập</Text>
+          </TouchableOpacity>
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView style={{flex: 1, backgroundColor: 'black'}}>
@@ -217,18 +230,18 @@ const ListTicketScreen = () => {
               <View
                 style={[
                   styles.statusView,
-                  item.status === 'active'
+                  item.status === 'active' || item.status === 'complete'
                     ? styles.activeStatus
                     : styles.inactiveStatus,
                 ]}>
                 <Text
                   style={[
                     styles.statusProfileInfo,
-                    item.status === 'active'
+                    item.status === 'active' || item.status === 'complete'
                       ? styles.activeText
                       : styles.inactiveText,
                   ]}>
-                  {item.status === 'active'
+                  {item.status === 'active' || 'complete'
                     ? 'Đã thanh toán'
                     : 'Chưa thanh toán'}
                 </Text>
@@ -326,5 +339,25 @@ const styles = StyleSheet.create({
   },
   inactiveText: {
     color: 'red',
+  },
+  loginContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  loginText: {
+    fontSize: 18,
+    color: 'white',
+    marginBottom: 20,
+  },
+  loginButton: {
+    backgroundColor: '#f7b731',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 5,
+  },
+  loginButtonText: {
+    fontSize: 16,
+    color: 'black',
   },
 });

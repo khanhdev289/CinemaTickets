@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {
   Text,
   View,
@@ -13,8 +13,8 @@ import {
   SafeAreaView,
   ActivityIndicator,
 } from 'react-native';
-import { SvgXml } from 'react-native-svg';
-import { useNavigation } from '@react-navigation/native';
+import {SvgXml} from 'react-native-svg';
+import {useNavigation} from '@react-navigation/native';
 
 import iconNotification from '../../assets/icons/iconNotification';
 import iconSearch from '../../assets/icons/iconSearch';
@@ -28,19 +28,19 @@ import {
   fetchMovies,
 } from '../../../api';
 import SwiperFlatList from 'react-native-swiper-flatlist';
-import { useAuth } from '../../components/AuthProvider ';
+import {useAuth} from '../../components/AuthProvider ';
 
 const screenWidth = Dimensions.get('screen').width;
 const screenHeight = Dimensions.get('screen').height;
 
 const newsList = [
-  { id: '7', title: 'News 1', poster: 'https://via.placeholder.com/150' },
-  { id: '8', title: 'News 2', poster: 'https://via.placeholder.com/150' },
-  { id: '9', title: 'News 3', poster: 'https://via.placeholder.com/150' },
+  {id: '7', title: 'News 1', poster: 'https://via.placeholder.com/150'},
+  {id: '8', title: 'News 2', poster: 'https://via.placeholder.com/150'},
+  {id: '9', title: 'News 3', poster: 'https://via.placeholder.com/150'},
 ];
 
 const HomeScreen = () => {
-  const { user } = useAuth();
+  const {user} = useAuth();
   const navigation = useNavigation();
   const [isLoading, setIsLoading] = useState(true);
   const [nowPlayingMoviesList, setNowPlayingMoviesList] = useState([]);
@@ -51,13 +51,13 @@ const HomeScreen = () => {
   const [visibleIndex, setVisibleIndex] = useState(0);
   const flatListRef = useRef(null);
 
-  const onViewableItemsChanged = useRef(({ viewableItems }) => {
+  const onViewableItemsChanged = useRef(({viewableItems}) => {
     if (viewableItems.length > 0) {
       setVisibleIndex(viewableItems[0].index);
     }
   }).current;
 
-  const viewConfigRef = useRef({ viewAreaCoveragePercentThreshold: 30 }).current;
+  const viewConfigRef = useRef({viewAreaCoveragePercentThreshold: 30}).current;
 
   const fetchData = async () => {
     try {
@@ -113,13 +113,12 @@ const HomeScreen = () => {
         <MovieList
           data={nowPlayingMoviesList}
           flatListRef={flatListRef}
-          renderItem={({ item, index }) => (
+          renderItem={({item, index}) => (
             <MovieItem
               item={item}
               index={index}
               visibleIndex={visibleIndex}
               navigation={navigation}
-
             />
           )}
           onViewableItemsChanged={onViewableItemsChanged}
@@ -137,7 +136,7 @@ const HomeScreen = () => {
           keyExtractor={item => item._id}
           horizontal
           showsHorizontalScrollIndicator={false}
-          renderItem={({ item }) => (
+          renderItem={({item}) => (
             <UpcomingMovieItem item={item} navigation={navigation} />
           )}
         />
@@ -151,7 +150,9 @@ const HomeScreen = () => {
           autoplayLoop
           showPagination={false}
           data={discountList}
-          renderItem={({ item }) => <DiscountItem item={item} navigation={navigation} />}
+          renderItem={({item}) => (
+            <DiscountItem item={item} navigation={navigation} />
+          )}
         />
 
         <SectionNoClick title="Thể Loại" />
@@ -160,7 +161,7 @@ const HomeScreen = () => {
           keyExtractor={item => item._id}
           horizontal
           showsHorizontalScrollIndicator={false}
-          renderItem={({ item }) => (
+          renderItem={({item}) => (
             <CategoryItem item={item} navigation={navigation} />
           )}
         />
@@ -178,10 +179,10 @@ const HomeScreen = () => {
   );
 };
 
-const Header = ({ user }) => (
+const Header = ({user}) => (
   <View style={styles.headerContainer}>
     <Text style={styles.greetingText}>
-      Xin Chào  {user ? `${user.user.name} 👋` : ""}
+      Xin Chào {user ? `${user.user.name} 👋` : ''}
     </Text>
     <TouchableOpacity onPress={() => alert('Notification clicked!')}>
       <SvgXml xml={iconNotification()} />
@@ -189,8 +190,7 @@ const Header = ({ user }) => (
   </View>
 );
 
-
-const SearchBar = ({ navigation }) => (
+const SearchBar = ({navigation}) => (
   <View style={styles.searchContainer}>
     <View style={styles.searchWrapper}>
       <SvgXml xml={iconSearch()} />
@@ -204,7 +204,7 @@ const SearchBar = ({ navigation }) => (
   </View>
 );
 
-const Section = ({ title, onPress }) => (
+const Section = ({title, onPress}) => (
   <View style={styles.sectionHeader}>
     <Text style={styles.categoryTitle}>{title}</Text>
     <TouchableOpacity onPress={onPress}>
@@ -212,7 +212,7 @@ const Section = ({ title, onPress }) => (
     </TouchableOpacity>
   </View>
 );
-const SectionNoClick = ({ title, onPress }) => (
+const SectionNoClick = ({title, onPress}) => (
   <View style={styles.sectionHeader}>
     <Text style={styles.categoryTitle}>{title}</Text>
   </View>
@@ -234,7 +234,7 @@ const MovieList = ({
     decelerationRate="fast"
     horizontal
     showsHorizontalScrollIndicator={false}
-    contentContainerStyle={{ paddingHorizontal: screenWidth * 0.15 }} // Padding to center the first and last item
+    contentContainerStyle={{paddingHorizontal: screenWidth * 0.15}} // Padding to center the first and last item
     renderItem={renderItem}
     onViewableItemsChanged={onViewableItemsChanged}
     viewabilityConfig={viewConfigRef}
@@ -242,23 +242,23 @@ const MovieList = ({
   />
 );
 
-const MovieItem = ({ item, index, visibleIndex, navigation,  }) => {
+const MovieItem = ({item, index, visibleIndex, navigation}) => {
   const scale = index === visibleIndex ? 1.2 : 1;
   return (
     <TouchableOpacity
       onPress={() => {
-        navigation.navigate('MovieDetailScreen', { movieId: item._id });
+        navigation.navigate('MovieDetailScreen', {movieId: item._id});
       }}>
       <View
         style={[
           styles.movieItemNowPlaying,
           {
-            transform: [{ scale }],
+            transform: [{scale}],
           },
         ]}>
         <Image
           style={styles.movieImage}
-          source={{ uri: IMAGE_API_URL + item.image }}
+          source={{uri: IMAGE_API_URL + item.image}}
         />
         <Text numberOfLines={1} style={styles.movieTitle}>
           {item.name}
@@ -298,19 +298,18 @@ const formatDate = dateString => {
   return `${day}/${month}/${year}`;
 };
 
-const UpcomingMovieItem = ({ item, navigation }) => {
+const UpcomingMovieItem = ({item, navigation}) => {
   const formattedDate = formatDate(item.release_date);
 
   return (
     <View style={styles.movieItem}>
       <TouchableOpacity
         onPress={() => {
-          navigation.navigate('MovieDetailScreen', { movieId: item._id });
+          navigation.navigate('MovieDetailScreen', {movieId: item._id});
         }}>
-
         <Image
           style={styles.upcomingMovieImage}
-          source={{ uri: IMAGE_API_URL + item.image }}
+          source={{uri: IMAGE_API_URL + item.image}}
         />
         <Text style={styles.movieTitle2}>{item.name}</Text>
         <View style={styles.movieDetailRow}>
@@ -323,31 +322,32 @@ const UpcomingMovieItem = ({ item, navigation }) => {
           <Text style={styles.movieDetailText}> {formattedDate}</Text>
         </View>
       </TouchableOpacity>
-    </View>)
-
+    </View>
+  );
 };
-const DiscountItem = ({ item, navigation }) => (
-
+const DiscountItem = ({item, navigation}) => (
   <View style={styles.discountItem}>
-    <TouchableOpacity onPress={() => navigation.navigate('DiscountDetailScreen', { discountId: item._id })}>
-
+    <TouchableOpacity
+      onPress={() =>
+        navigation.navigate('DiscountDetailScreen', {discountId: item._id})
+      }>
       <Image
         style={styles.discountImage}
-        source={{ uri: IMAGE_API_URL + item.image }}
+        source={{uri: IMAGE_API_URL + item.image}}
       />
     </TouchableOpacity>
   </View>
 );
 
-const CategoryItem = ({ item, navigation }) => (
+const CategoryItem = ({item, navigation}) => (
   <View style={styles.categoryItem}>
     <TouchableOpacity
       onPress={() => {
-        navigation.navigate('MovieByGenre', { genreId: item._id });
+        navigation.navigate('MovieByGenre', {genreId: item._id});
       }}>
       <Image
         style={styles.categoryImage}
-        source={{ uri: IMAGE_API_URL + item.image }}
+        source={{uri: IMAGE_API_URL + item.image}}
       />
       <Text
         numberOfLines={1}
@@ -505,7 +505,6 @@ const styles = StyleSheet.create({
   },
   movieTitle2: {
     color: '#FCC434',
-    textAlign: 'center',
     fontSize: 12,
     marginTop: 10,
   },
