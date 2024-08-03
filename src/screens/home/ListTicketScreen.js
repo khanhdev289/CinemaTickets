@@ -33,7 +33,8 @@ const ListTicketScreen = () => {
   const [ticketData, setTicketData] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [searchQuery, setSearchQuery] = useState(''); // State to store search query
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filterStatus, setFilterStatus] = useState('all'); // State to manage filter status
   const {user} = useAuth();
 
   useEffect(() => {
@@ -49,12 +50,23 @@ const ListTicketScreen = () => {
   }, [navigation]);
 
   useEffect(() => {
-    // Filter data based on search query
-    const filtered = ticketData.filter(ticket =>
+    // Filter data based on search query and filter status
+    let filtered = ticketData.filter(ticket =>
       ticket.movie.name.toLowerCase().includes(searchQuery.toLowerCase()),
     );
+
+    if (filterStatus === 'paid') {
+      filtered = filtered.filter(
+        ticket => ticket.status === 'active' || ticket.status === 'complete',
+      );
+    } else if (filterStatus === 'unpaid') {
+      filtered = filtered.filter(
+        ticket => ticket.status !== 'active' && ticket.status !== 'complete',
+      );
+    }
+
     setFilteredData(filtered);
-  }, [searchQuery, ticketData]);
+  }, [searchQuery, ticketData, filterStatus]);
 
   const fetchDataUser = async () => {
     try {
@@ -73,7 +85,6 @@ const ListTicketScreen = () => {
       const response = await axiosInstance.get(url);
 
       const userData = response.data;
-      // Lưu dữ liệu từ API vào state
       setTicketData(
         userData.getTicket
           .map(item => ({
@@ -266,6 +277,51 @@ const ListTicketScreen = () => {
           value={searchQuery}
           onChangeText={text => setSearchQuery(text)}
         />
+        <View style={styles.filterContainer}>
+          <TouchableOpacity
+            style={[
+              styles.filterButton,
+              filterStatus === 'all' && styles.activeFilter,
+            ]}
+            onPress={() => setFilterStatus('all')}>
+            <Text
+              style={[
+                styles.filterButtonText,
+                filterStatus === 'all' && styles.activeFilterText,
+              ]}>
+              Tất cả
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[
+              styles.filterButton,
+              filterStatus === 'paid' && styles.activeFilter,
+            ]}
+            onPress={() => setFilterStatus('paid')}>
+            <Text
+              style={[
+                styles.filterButtonText,
+                filterStatus === 'paid' && styles.activeFilterText,
+              ]}>
+              Đã thanh toán
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[
+              styles.filterButton,
+              filterStatus === 'unpaid' && styles.activeFilter,
+            ]}
+            onPress={() => setFilterStatus('unpaid')}>
+            <Text
+              style={[
+                styles.filterButtonText,
+                filterStatus === 'unpaid' && styles.activeFilterText,
+              ]}>
+              Chưa thanh toán
+            </Text>
+          </TouchableOpacity>
+        </View>
+
         <FlatList
           data={filteredData.reverse()}
           renderItem={renderItem}
@@ -280,86 +336,98 @@ const ListTicketScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'black',
-    paddingHorizontal: 16,
+    padding: 16,
   },
   header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginVertical: 16,
+    marginBottom: 16,
   },
   headerTitle: {
-    fontSize: 28,
-    color: 'white',
-    textAlign: 'center',
-    flex: 1,
+    fontSize: 24,
+    color: '#fff',
+    fontWeight: 'bold',
   },
-  statusView: {
+  filterContainer: {
     flexDirection: 'row',
-    justifyContent: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 16,
+  },
+  filterButton: {
+    flex: 1,
     alignItems: 'center',
-    borderColor: '#f7b731',
-    width: 120,
-    borderRadius: 4,
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    marginTop: 8,
+    paddingVertical: 10,
+    borderRadius: 8,
+    backgroundColor: '#333',
+    marginHorizontal: 5,
   },
-  activeStatus: {
-    backgroundColor: '#1e1e1e',
+  filterButtonText: {
+    fontSize: 14,
+    color: '#C4C4C4',
   },
-  inactiveStatus: {
-    backgroundColor: '#4d4d4d',
+  activeFilter: {
+    backgroundColor: '#f7b731',
   },
-  statusProfileInfo: {
-    fontSize: 12,
-    color: 'white',
-  },
-  activeText: {
-    color: '#f7b731',
-  },
-  inactiveText: {
-    color: '#ffffff',
+  activeFilterText: {
+    color: '#000',
   },
   searchInput: {
-    height: 40,
-    borderColor: '#C4C4C4',
-    borderWidth: 1,
+    backgroundColor: '#333',
     borderRadius: 8,
-    marginVertical: 16,
-    paddingHorizontal: 10,
-    color: 'white',
+    padding: 10,
+    color: '#fff',
+    marginBottom: 16,
   },
   ticketContainer: {
     flexDirection: 'row',
+    backgroundColor: '#1f1f1f',
+    borderRadius: 8,
     marginBottom: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#444',
-    paddingBottom: 8,
+    overflow: 'hidden',
   },
   ticketImage: {
-    width: 80,
-    height: 120,
-    borderRadius: 8,
-    marginRight: 16,
+    width: 100,
+    height: 150,
+    resizeMode: 'cover',
   },
   ticketDetails: {
     flex: 1,
+    padding: 10,
     justifyContent: 'center',
   },
   ticketTitle: {
     fontSize: 16,
-    color: 'white',
-    marginBottom: 4,
+    color: '#fff',
+    fontWeight: 'bold',
   },
   ticketTime: {
-    fontSize: 14,
     color: '#C4C4C4',
-    marginBottom: 4,
+    marginVertical: 4,
   },
   ticketLocation: {
-    fontSize: 14,
     color: '#C4C4C4',
+    marginVertical: 4,
+  },
+  statusView: {
+    marginTop: 8,
+    padding: 4,
+    borderRadius: 4,
+    width: 100,
+  },
+  activeStatus: {
+    backgroundColor: '#4CAF50',
+  },
+  inactiveStatus: {
+    backgroundColor: '#F44336',
+  },
+  statusProfileInfo: {
+    textAlign: 'center',
+    fontSize: 12,
+    color: '#fff',
+  },
+  activeText: {
+    color: '#fff',
+  },
+  inactiveText: {
+    color: '#fff',
   },
   loadingOverlay: {
     position: 'absolute',
@@ -367,7 +435,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: 'rgba(0,0,0,0.5)',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
     justifyContent: 'center',
     alignItems: 'center',
   },
