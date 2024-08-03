@@ -19,7 +19,7 @@ import {useStripe} from '@stripe/stripe-react-native';
 import axios from 'axios';
 import {useAuth} from '../../components/AuthProvider ';
 
-const POSTS_API_URL = 'http://139.180.132.97:3000/tickets/user';
+const POSTS_API_URL = 'http://139.180.132.97:3000/tickets/user/user';
 const IMAGE_API_URL = 'http://139.180.132.97:3000/images/';
 const PAY_API_URL1 = 'http://139.180.132.97:3000/tickets/status';
 const PAY_API_URL = 'http://139.180.132.97:3000/tickets/payment';

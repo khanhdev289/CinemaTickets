@@ -36,7 +36,6 @@ const AuthScreen = () => {
   const route = useRoute();
   const [ticketData, setTicketData] = useState(null);
   const [loading, setLoading] = useState(true);
-  console.log(route);
   const {user} = useAuth();
 
   useEffect(() => {
@@ -56,7 +55,6 @@ const AuthScreen = () => {
       const url = `${POSTS_API_URL}/${ticketId}`;
       const response = await axiosInstance.get(url);
       const data = response.data.getTicket;
-      console.log(data);
       setTicketData({
         ...data,
         showdate: {
@@ -67,10 +65,6 @@ const AuthScreen = () => {
     } catch (error) {
       console.error('Error fetching ticket data: ', error);
     }
-  };
-
-  const handleBack = () => {
-    navigation.goBack();
   };
 
   const createPdf = async data => {
@@ -184,7 +178,7 @@ const AuthScreen = () => {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.loadingContainer}>
-          <Text style={styles.loadingText}>Loading...</Text>
+          <Text style={styles.loadingText}>Không có dữ liệu</Text>
         </View>
       </SafeAreaView>
     );
@@ -303,6 +297,10 @@ const styles = StyleSheet.create({
     width: '100%',
     paddingHorizontal: 16,
     marginBottom: '5%',
+  },
+  loadingText: {
+    fontSize: 18,
+    color: 'white',
   },
   backContainer: {
     position: 'absolute',
