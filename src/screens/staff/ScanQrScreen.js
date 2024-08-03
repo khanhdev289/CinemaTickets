@@ -21,8 +21,8 @@ const ScanQrScreen = () => {
     const result = await request(PERMISSIONS.IOS.CAMERA);
     if (result !== 'granted') {
       Alert.alert(
-        'Camera Permission',
-        'Camera permission is required to scan QR codes.',
+        'Quyền Truy Cập Máy Ảnh',
+        'Quyền truy cập máy ảnh là cần thiết để quét mã QR.',
       );
     }
   };
@@ -58,8 +58,7 @@ const ScanQrScreen = () => {
 
       const userData = response.data;
 
-      console.log('Dữ liệu QR Code: ', userData);
-      Alert.alert(userData);
+      Alert.alert('Thông báo', `Đã quét xong!`);
       navigation.navigate('CheckSuccess', {_id: userData._id});
       setScanned(true);
     } catch (error) {
@@ -74,18 +73,18 @@ const ScanQrScreen = () => {
   const handleQRRead = ({data}) => {
     try {
       const jsonData = JSON.parse(data);
-      if (jsonData && jsonData._id) {
+      if (jsonData && jsonData._id && jsonData.auth === 'mdcinema') {
         fetchDataUser(jsonData._id);
       } else {
         Alert.alert(
-          'Mã QR không hợp lệ',
+          'Mã QR Không Hợp Lệ',
           'Mã QR đã quét không hợp lệ để xác thực.',
         );
         setScanned(false);
       }
     } catch (error) {
       Alert.alert(
-        'Mã QR không hợp lệ',
+        'Mã QR Không Hợp Lệ',
         'Mã QR đã quét không phải là JSON hợp lệ.',
       );
       setScanned(false);
