@@ -23,9 +23,8 @@ const MovieScreen = () => {
           tabBarIndicatorStyle: {backgroundColor: 'transparent'},
           tabBarStyle: {
             backgroundColor: '#1C1C1C',
-            margin: 20,
-            
             borderRadius: 10,
+            marginHorizontal:10
           },
           tabBarLabel: ({focused}) => {
             let label;

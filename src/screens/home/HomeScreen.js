@@ -343,7 +343,7 @@ const CategoryItem = ({ item, navigation }) => (
   <View style={styles.categoryItem}>
     <TouchableOpacity
       onPress={() => {
-        navigation.navigate('MovieByGenre', { genreId: item._id });
+        navigation.navigate('MovieByGenre', { genreId: item.name });
       }}>
       <Image
         style={styles.categoryImage}
