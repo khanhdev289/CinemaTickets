@@ -22,6 +22,8 @@ import {
 } from 'react-native-alert-notification';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import CheckBox from '@react-native-community/checkbox';
+import messaging from '@react-native-firebase/messaging';
+import {getFcmToken} from '../../utils/firebase';
 
 const SignInScreen = () => {
   const [email, setEmail] = useState('');
@@ -30,6 +32,8 @@ const SignInScreen = () => {
   const navigation = useNavigation();
   const [loading, setLoading] = useState(false);
   const [termsAccepted, setTermsAccepted] = useState(false);
+  const [fcmToken, setFcmToken] = useState('');
+
   useEffect(() => {
     const fetchStoredCredentials = async () => {
       try {
@@ -51,47 +55,68 @@ const SignInScreen = () => {
     fetchStoredCredentials();
   }, []);
 
-  const handleLogin = () => {
+  useEffect(() => {
+    const getToken = async () => {
+      const fcmToken = await AsyncStorage.getItem('fcmToken');
+      if (fcmToken) {
+        setFcmToken(fcmToken);
+        console.log('AsyncStorage FCM Token :', fcmToken);
+      }
+    };
+
+    getToken();
+  }, []);
+
+  const handleLogin = async () => {
     setLoading(true);
-    axios
-      .post('http://139.180.132.97:3000/auth/login', {
-        email: email,
-        password: password,
-      })
-      .then(response => {
-        setLoading(false);
-        if (!response.data || response.data.error) {
-          console.error('Đăng nhập thất bại:', response.data.message);
-          Dialog.show({
-            type: ALERT_TYPE.WARNING,
-            title: 'Đăng nhập thất bại',
-            textBody: 'email và mật khẩu không trùng khớp',
-            button: 'Đóng',
-          });
-        } else {
-          console.log('Đăng nhập thành công:', response.data);
-          const userData = response.data;
-          login(userData);
-          if (termsAccepted) {
-            AsyncStorage.setItem('email', email);
-            AsyncStorage.setItem('password', password);
-          } else {
-            AsyncStorage.removeItem('email');
-            AsyncStorage.removeItem('password');
-          }
-          navigation.navigate('Home');
-        }
-      })
-      .catch(error => {
-        setLoading(false);
-        console.error('Đăng nhập thất bại:', error);
+    try {
+      const response = await axios.post(
+        'http://139.180.132.97:3000/auth/login',
+        {
+          email: email,
+          password: password,
+        },
+      );
+      if (!response.data || response.data.error) {
+        console.error('Đăng nhập thất bại:', response.data.message);
         Dialog.show({
-          type: ALERT_TYPE.DANGER,
+          type: ALERT_TYPE.WARNING,
           title: 'Đăng nhập thất bại',
-          textBody: 'Đã xảy ra lỗi khi đăng nhập. Vui lòng thử lại sau.',
+          textBody: 'email và mật khẩu không trùng khớp',
           button: 'Đóng',
         });
+      } else {
+        console.log('Đăng nhập thành công:', response.data);
+        const userData = response.data;
+        login(userData);
+
+        if (fcmToken) {
+          await axios.post(
+            `http://139.180.132.97:3000/auth/login?tokendevice=${fcmToken}`,
+          );
+        }
+
+        if (termsAccepted) {
+          await AsyncStorage.setItem('email', email);
+          await AsyncStorage.setItem('password', password);
+        } else {
+          await AsyncStorage.removeItem('email');
+          await AsyncStorage.removeItem('password');
+        }
+
+        navigation.navigate('Home');
+      }
+    } catch (error) {
+      console.error('Đăng nhập thất bại:', error);
+      Dialog.show({
+        type: ALERT_TYPE.DANGER,
+        title: 'Đăng nhập thất bại',
+        textBody: 'Đã xảy ra lỗi khi đăng nhập. Vui lòng thử lại sau.',
+        button: 'Đóng',
       });
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleForgotPassword = () => {

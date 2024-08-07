@@ -14,7 +14,7 @@ export const AuthProvider = ({children}) => {
   const handleBookingPress = () => {
     if (user) {
       // Nếu người dùng đã đăng nhập, điều hướng tới màn hình đặt vé
-      navigation.navigate('BookingScreen', );
+      navigation.navigate('BookingScreen');
     } else {
       // Nếu chưa đăng nhập, điều hướng tới màn hình đăng nhập
       navigation.navigate('LoginScreen');

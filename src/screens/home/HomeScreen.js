@@ -179,16 +179,21 @@ const HomeScreen = () => {
   );
 };
 
-const Header = ({user}) => (
-  <View style={styles.headerContainer}>
-    <Text style={styles.greetingText}>
-      Xin Chào {user ? `${user.user.name} 👋` : ''}
-    </Text>
-    <TouchableOpacity onPress={() => alert('Notification clicked!')}>
-      <SvgXml xml={iconNotification()} />
-    </TouchableOpacity>
-  </View>
-);
+const Header = ({user}) => {
+  const navigation = useNavigation();
+
+  return (
+    <View style={styles.headerContainer}>
+      <Text style={styles.greetingText}>
+        Xin Chào {user ? `${user.user.name} 👋` : ''}
+      </Text>
+      <TouchableOpacity
+        onPress={() => navigation.navigate('NotificationScreen')}>
+        <SvgXml xml={iconNotification()} />
+      </TouchableOpacity>
+    </View>
+  );
+};
 
 const SearchBar = ({navigation}) => (
   <View style={styles.searchContainer}>
