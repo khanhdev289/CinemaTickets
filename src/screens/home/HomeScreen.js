@@ -33,12 +33,6 @@ import { useAuth } from '../../components/AuthProvider ';
 const screenWidth = Dimensions.get('screen').width;
 const screenHeight = Dimensions.get('screen').height;
 
-const newsList = [
-  { id: '7', title: 'News 1', poster: 'https://via.placeholder.com/150' },
-  { id: '8', title: 'News 2', poster: 'https://via.placeholder.com/150' },
-  { id: '9', title: 'News 3', poster: 'https://via.placeholder.com/150' },
-];
-
 const HomeScreen = () => {
   const { user } = useAuth();
   const navigation = useNavigation();
@@ -47,10 +41,8 @@ const HomeScreen = () => {
   const [comingMoviesList, setcomingMoviesList] = useState([]);
   const [discountList, setDiscountList] = useState([]);
   const [genreList, setGenreList] = useState([]);
-
   const [visibleIndex, setVisibleIndex] = useState(0);
   const flatListRef = useRef(null);
-
   const onViewableItemsChanged = useRef(({ viewableItems }) => {
     if (viewableItems.length > 0) {
       setVisibleIndex(viewableItems[0].index);
@@ -64,16 +56,13 @@ const HomeScreen = () => {
       const nowPlayingResponse = await fetchMovies();
       const discountsReponse = await fetchDiscounts();
       const genreReponse = await fetchGenres();
-
       const allMovies = nowPlayingResponse;
-
       const nowPlaying = allMovies.filter(
         movie => movie.release_status === 'dc',
       );
       const comingSoon = allMovies.filter(
         movie => movie.release_status === 'sc',
       );
-
       setNowPlayingMoviesList(nowPlaying);
       setcomingMoviesList(comingSoon);
       setDiscountList(discountsReponse.getall);
@@ -164,15 +153,7 @@ const HomeScreen = () => {
             <CategoryItem item={item} navigation={navigation} />
           )}
         />
-        {/* 
-        <Section title="Tin mới" onPress={() => alert('Xem tất cả clicked!')} />
-        <FlatList
-          data={newsList}
-          keyExtractor={item => item.id}
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          renderItem={({ item }) => <NewsItem item={item} />}
-        /> */}
+
       </ScrollView>
     </SafeAreaView>
   );
@@ -242,7 +223,7 @@ const MovieList = ({
   />
 );
 
-const MovieItem = ({ item, index, visibleIndex, navigation,  }) => {
+const MovieItem = ({ item, index, visibleIndex, navigation, }) => {
   const scale = index === visibleIndex ? 1.2 : 1;
   return (
     <TouchableOpacity
@@ -343,7 +324,7 @@ const CategoryItem = ({ item, navigation }) => (
   <View style={styles.categoryItem}>
     <TouchableOpacity
       onPress={() => {
-        navigation.navigate('MovieByGenre', { genreId: item.name });
+        navigation.navigate('MovieByGenre', { genreId: item._id });
       }}>
       <Image
         style={styles.categoryImage}
@@ -362,20 +343,6 @@ const CategoryItem = ({ item, navigation }) => (
     </TouchableOpacity>
   </View>
 );
-
-// const NewsItem = ({ item }) => (
-//   <View style={styles.movieItemNew}>
-//     <TouchableOpacity onPress={() => alert(`News ID: ${item.id}`)}>
-//       <Image
-//         style={styles.newsImage}
-//         source={{ uri: item.poster }}
-//       />
-//       <Text style={styles.newsTitle}>
-//         When The Batman 2 Starts Filming Reportedly Revealed
-//       </Text>
-//     </TouchableOpacity>
-//   </View>
-// );
 
 const styles = StyleSheet.create({
   container: {

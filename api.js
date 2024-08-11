@@ -60,9 +60,9 @@ export const searchMovie = async (name) => {
 export const movieByGenre = async (genreId) => {
   try {
     const api = await createApiInstance();
-    const url = `/movies/no/login/genre?genre=${genreId}`; // Đường dẫn API để tìm kiếm phim theo tên
+    const url = `/movies/no/login/genre/`+genreId; // Đường dẫn API để tìm kiếm phim theo tên
     const response = await api.get(url);
-    return response.data;
+    return response.data.getmovie;
   } catch (error) {
     console.error('Error searching movies:', error);
     throw error;
