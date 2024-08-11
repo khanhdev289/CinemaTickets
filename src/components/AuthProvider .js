@@ -29,8 +29,17 @@ export const AuthProvider = ({children}) => {
     AsyncStorage.setItem('token', userData.token.access_token);
   };
 
- 
-  
+
+  const handleBookingPress = () => {
+    if (user) {
+      // Nếu người dùng đã đăng nhập, điều hướng tới màn hình đặt vé
+      navigation.navigate('BookingScreen', );
+    } else {
+      // Nếu chưa đăng nhập, điều hướng tới màn hình đăng nhập
+      navigation.navigate('LoginScreen');
+    }
+  };
+
   const logout = () => {
     setUser(null);
      AsyncStorage.removeItem('user');

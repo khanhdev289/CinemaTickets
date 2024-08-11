@@ -34,7 +34,9 @@ const screenWidth = Dimensions.get('screen').width;
 const screenHeight = Dimensions.get('screen').height;
 
 const HomeScreen = () => {
+
   const { user } = useAuth();
+
   const navigation = useNavigation();
   const [isLoading, setIsLoading] = useState(true);
   const [nowPlayingMoviesList, setNowPlayingMoviesList] = useState([]);
@@ -56,7 +58,9 @@ const HomeScreen = () => {
       const nowPlayingResponse = await fetchMovies();
       const discountsReponse = await fetchDiscounts();
       const genreReponse = await fetchGenres();
+
       const allMovies = nowPlayingResponse;
+
       const nowPlaying = allMovies.filter(
         movie => movie.release_status === 'dc',
       );
@@ -140,7 +144,9 @@ const HomeScreen = () => {
           autoplayLoop
           showPagination={false}
           data={discountList}
+
           renderItem={({ item }) => <DiscountItem item={item} navigation={navigation} />}
+
         />
 
         <SectionNoClick title="Thể Loại" />
@@ -162,7 +168,9 @@ const HomeScreen = () => {
 const Header = ({ user }) => (
   <View style={styles.headerContainer}>
     <Text style={styles.greetingText}>
+
       Xin Chào  {user ? `${user.user.name} 👋` : ""}
+
     </Text>
     <TouchableOpacity onPress={() => alert('Notification clicked!')}>
       <SvgXml xml={iconNotification()} />
@@ -286,12 +294,14 @@ const UpcomingMovieItem = ({ item, navigation }) => {
     <View style={styles.movieItem}>
       <TouchableOpacity
         onPress={() => {
+
           navigation.navigate('MovieDetailScreen', { movieId: item._id });
         }}>
 
         <Image
           style={styles.upcomingMovieImage}
           source={{ uri: IMAGE_API_URL + item.image }}
+
         />
         <Text style={styles.movieTitle2}>{item.name}</Text>
         <View style={styles.movieDetailRow}>
@@ -304,6 +314,7 @@ const UpcomingMovieItem = ({ item, navigation }) => {
           <Text style={styles.movieDetailText}> {formattedDate}</Text>
         </View>
       </TouchableOpacity>
+
     </View>)
 
 };
@@ -311,6 +322,7 @@ const DiscountItem = ({ item, navigation }) => (
 
   <View style={styles.discountItem}>
     <TouchableOpacity onPress={() => navigation.navigate('DiscountDetailScreen', { discountId: item._id })}>
+
 
       <Image
         style={styles.discountImage}
@@ -472,7 +484,6 @@ const styles = StyleSheet.create({
   },
   movieTitle2: {
     color: '#FCC434',
-    textAlign: 'center',
     fontSize: 12,
     marginTop: 10,
   },

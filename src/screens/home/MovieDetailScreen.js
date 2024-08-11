@@ -1,32 +1,52 @@
-import React, { useEffect, useState } from 'react';
+import React, {useEffect, useState} from 'react';
 
-import { StyleSheet, Text, View, Image, Dimensions, TouchableOpacity, FlatList, ActivityIndicator, Modal, Alert } from 'react-native';
+import {
+  StyleSheet,
+  Text,
+  View,
+  Image,
+  Dimensions,
+  TouchableOpacity,
+  FlatList,
+  ActivityIndicator,
+  Modal,
+  Alert,
+} from 'react-native';
 
-import { SvgXml } from 'react-native-svg';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import {SvgXml} from 'react-native-svg';
+import {SafeAreaView} from 'react-native-safe-area-context';
 import Video from 'react-native-video';
 import iconStar from '../../assets/icons/iconStar';
 import iconStarWhite from '../../assets/icons/iconStarWhite';
 import iconPlay from '../../assets/icons/iconPlay';
 
-import { ScrollView } from 'react-native-virtualized-view'
-import { IMAGE_API_URL, VIDEO_API_URL, fetchCinemaByMovie, fetchMovieById } from '../../../api';
+import {ScrollView} from 'react-native-virtualized-view';
+import {
+  IMAGE_API_URL,
+  VIDEO_API_URL,
+  fetchCinemaByMovie,
+  fetchMovieById,
+} from '../../../api';
 import iconBack from '../../assets/icons/iconBack';
+
 import { useNavigation } from '@react-navigation/native';
 import { useAuth } from '../../components/AuthProvider ';
+
 
 const screenWidth = Dimensions.get('screen').width;
 const screenHeight = Dimensions.get('screen').height;
 
-const MovieDetailScreen = ({ route }) => {
-  const { movieId } = route.params;
+const MovieDetailScreen = ({route}) => {
+  const {movieId} = route.params;
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [movie, setMovie] = useState(null);
   const [theaters, setTheaters] = useState(null);
   const [selectedTheater, setSelectedTheater] = useState(null);
   const [isExpanded, setIsExpanded] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+
   const { user } = useAuth();
+
 
   const navigation = useNavigation();
   useEffect(() => {
@@ -36,13 +56,17 @@ const MovieDetailScreen = ({ route }) => {
         const theaterResponse = await fetchCinemaByMovie(movieId);
         setMovie(movieResponse);
         setTheaters(theaterResponse);
+
         console.log(movieResponse + "kkk" + theaterResponse);
+
       } catch (error) {
         console.error('Error fetching data:', error);
       } finally {
         setIsLoading(false);
       }
+
     }
+
 
     fetchData();
   }, [movieId]);
@@ -51,22 +75,30 @@ const MovieDetailScreen = ({ route }) => {
     setIsExpanded(!isExpanded);
   };
 
-  const renderDirector = ({ item }) => (
+  const renderDirector = ({item}) => (
     <View style={styles.itemContainer}>
-      <Image style={styles.posterItem} source={{ uri: IMAGE_API_URL + item.image }} />
+      <Image
+        style={styles.posterItem}
+        source={{uri: IMAGE_API_URL + item.image}}
+      />
       <Text style={styles.itemTitle}>{item.name}</Text>
     </View>
   );
 
-  const renderTheater = ({ item }) => (
+  const renderTheater = ({item}) => (
     <TouchableOpacity
       onPress={() => setSelectedTheater(item._id)}
       style={[
         styles.theaterContainer,
-        selectedTheater === item._id ? { borderColor: '#FFD700' } : null,
-      ]}
-    ><View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-around' }}>
-        <View style={{ flexDirection: 'column' }}>
+        selectedTheater === item._id ? {borderColor: '#FFD700'} : null,
+      ]}>
+      <View
+        style={{
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'space-around',
+        }}>
+        <View style={{flexDirection: 'column'}}>
           <Text style={styles.theaterTitle}>{item.cinema.name}</Text>
           <Text style={styles.theaterAddress}>{item.cinema.address}</Text>
         </View>
@@ -76,14 +108,13 @@ const MovieDetailScreen = ({ route }) => {
             width: 80, // Điều chỉnh kích thước hình ảnh theo nhu cầu của bạn
             height: 80, // Điều chỉnh kích thước hình ảnh theo nhu cầu của bạn
             resizeMode: 'stretch',
-
           }}
         />
       </View>
     </TouchableOpacity>
   );
 
-  const formatDate = (dateString) => {
+  const formatDate = dateString => {
     const date = new Date(dateString);
     const day = String(date.getDate()).padStart(2, '0');
     const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -104,24 +135,30 @@ const MovieDetailScreen = ({ route }) => {
   }
 
   const summaryText = movie.storyline || '';
-  const truncatedSummary = summaryText.length > 100 ? `${summaryText.substring(0, 100)}...` : summaryText;
+  const truncatedSummary =
+    summaryText.length > 100
+      ? `${summaryText.substring(0, 100)}...`
+      : summaryText;
 
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView>
-
         <TouchableOpacity
           style={styles.backButton}
-          onPress={() => navigation.goBack()}
-        >
+          onPress={() => navigation.goBack()}>
           <SvgXml xml={iconBack()} />
         </TouchableOpacity>
 
-        <Image style={styles.poster} source={{ uri: IMAGE_API_URL + movie.image }} />
+        <Image
+          style={styles.poster}
+          source={{uri: IMAGE_API_URL + movie.image}}
+        />
         <View style={styles.infoOverlay}>
           <View style={styles.infoContainer}>
             <Text style={styles.title}>{movie.name}</Text>
-            <Text style={styles.movieTime}>{movie.duration} • {formatDate(movie.release_date)}</Text>
+            <Text style={styles.movieTime}>
+              {movie.duration} • {formatDate(movie.release_date)}
+            </Text>
             <View style={styles.reviewContainer}>
               <Text style={styles.reviewText}>Đánh giá</Text>
               <SvgXml xml={iconStar()} />
@@ -138,7 +175,9 @@ const MovieDetailScreen = ({ route }) => {
                   />
                 ))}
               </View>
-              <TouchableOpacity style={styles.trailerButton} onPress={() => setIsModalVisible(true)}>
+              <TouchableOpacity
+                style={styles.trailerButton}
+                onPress={() => setIsModalVisible(true)}>
                 <SvgXml xml={iconPlay()} />
                 <Text style={styles.trailerButtonText}>Xem Trailer</Text>
               </TouchableOpacity>
@@ -146,7 +185,9 @@ const MovieDetailScreen = ({ route }) => {
           </View>
         </View>
         <View style={styles.additionalInfo}>
-          <Text style={styles.infoText}>Thể loại: {movie.genre?.map(genre => genre.name).join(', ')}</Text>
+          <Text style={styles.infoText}>
+            Thể loại: {movie.genre?.map(genre => genre.name).join(', ')}
+          </Text>
           <Text style={styles.infoText}>Độ tuổi: {movie.censorship}</Text>
           <Text style={styles.infoText}>Ngôn ngữ: {movie.language}</Text>
         </View>
@@ -155,41 +196,43 @@ const MovieDetailScreen = ({ route }) => {
           {isExpanded ? summaryText : truncatedSummary}
           {!isExpanded && summaryText.length > 100 && (
             <Text style={styles.readMoreText} onPress={handleToggleExpand}>
-              {' '} Xem thêm
+              {' '}
+              Xem thêm
             </Text>
           )}
         </Text>
         {isExpanded && (
           <Text style={styles.readMoreText} onPress={handleToggleExpand}>
-            {' '} Thu gọn
+            {' '}
+            Thu gọn
           </Text>
         )}
         <Text style={styles.summaryTitle}>Đạo diễn</Text>
         <FlatList
           data={movie.director || []}
-          keyExtractor={(item) => item._id}
+          keyExtractor={item => item._id}
           horizontal
           showsHorizontalScrollIndicator={false}
           renderItem={renderDirector}
-          contentContainerStyle={{ paddingHorizontal: 10 }}
+          contentContainerStyle={{paddingHorizontal: 10}}
         />
         <Text style={styles.summaryTitle}>Diễn viên</Text>
         <FlatList
           data={movie.actor || []}
-          keyExtractor={(item) => item._id}
+          keyExtractor={item => item._id}
           horizontal
           showsHorizontalScrollIndicator={false}
           renderItem={renderDirector}
-          contentContainerStyle={{ paddingHorizontal: 10 }}
+          contentContainerStyle={{paddingHorizontal: 10}}
         />
         {movie.release_status !== 'sc' && (
           <>
             <Text style={styles.summaryTitle}>Các rạp chiếu</Text>
             <FlatList
               data={theaters || []}
-              keyExtractor={(item) => item._id}
+              keyExtractor={item => item._id}
               renderItem={renderTheater}
-              contentContainerStyle={{ paddingHorizontal: 10 }}
+              contentContainerStyle={{paddingHorizontal: 10}}
             />
 
             <TouchableOpacity
@@ -197,37 +240,40 @@ const MovieDetailScreen = ({ route }) => {
               onPress={() => {
                 if (!user) {
                   // Nếu chưa đăng nhập, điều hướng tới màn hình đăng nhập
+<
                   navigation.navigate('Login');
+
                   return;
                 }
 
                 if (selectedTheater) {
                   // Nếu đã chọn rạp chiếu, điều hướng tới màn hình chọn ghế
+
                   navigation.navigate('SelectSeatScreen', { roomId: selectedTheater });
+
                 } else {
                   // Xử lý trường hợp không có rạp nào được chọn
                   Alert.alert('Thông báo', 'Vui lòng chọn một rạp chiếu');
                 }
-              }}
-            >
+              }}>
               <Text style={styles.buttonText}>Tiếp tục</Text>
             </TouchableOpacity>
 
           </>
         )}
-
-
       </ScrollView>
       <Modal visible={isModalVisible} transparent={true} animationType="slide">
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
             <Video
-              source={{ uri: VIDEO_API_URL + movie.trailer }}
+              source={{uri: VIDEO_API_URL + movie.trailer}}
               style={styles.video}
               controls={true}
               resizeMode="stretch"
             />
-            <TouchableOpacity onPress={() => setIsModalVisible(false)} style={styles.closeButton}>
+            <TouchableOpacity
+              onPress={() => setIsModalVisible(false)}
+              style={styles.closeButton}>
               <Text style={styles.closeButtonText}>Đóng</Text>
             </TouchableOpacity>
           </View>
@@ -247,7 +293,6 @@ const styles = StyleSheet.create({
     width: '100%',
     height: screenHeight * 0.25,
     resizeMode: 'stretch',
-
   },
   backButton: {
     position: 'absolute',
@@ -255,7 +300,6 @@ const styles = StyleSheet.create({
     left: 20,
 
     zIndex: 1,
-
   },
   infoOverlay: {
     marginTop: -50,
@@ -370,7 +414,6 @@ const styles = StyleSheet.create({
     borderRadius: 5,
 
     margin: 16,
-
   },
   theaterTitle: {
     color: 'white',

@@ -311,7 +311,9 @@ const PaymentScreen = ({ route }) => {
 
       const data = response.data;
       console.log(data);
-      navigation.navigate('TicketScreen', { _id: ticketData._id });
+
+      navigation.navigate('TicketScreen', {_id: ticketData._id, check: true});
+
     } catch (error) {
       console.error('Lỗi khi thanh toán: ', error);
     }

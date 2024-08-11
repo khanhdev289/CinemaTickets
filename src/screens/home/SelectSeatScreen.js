@@ -72,6 +72,7 @@ const SelectSeatScreen = ({ route }) => {
       const timeId = timeArray[selectedTimeIndex]?._id;
       fetchStatusSeat(roomId, showtimeId, timeId);
       setSelectedSeats([]); // Đặt lại danh sách ghế đã chọn
+
     }
   }, [selectedDateIndex, selectedTimeIndex, roomId, dateArray, timeArray]);
 
@@ -137,6 +138,11 @@ const SelectSeatScreen = ({ route }) => {
   };
 
   const handleSeatPress = (seatId) => {
+    const seat = seats.find((seat) => seat._id === seatId);
+    if (seat.status === 'close') {
+      Alert.alert('Thông báo', 'Ghế đang bảo trì. Vui lòng chọn ghế khác.');
+      return;
+    }
     if (selectedDateIndex === null || selectedTimeIndex === null) {
         Alert.alert('Thông báo', 'Vui lòng chọn suất chiếu trước khi chọn ghế');
         return;
@@ -179,6 +185,7 @@ const SelectSeatScreen = ({ route }) => {
     } else {
         setSelectedSeats(selectedSeats.filter(seat => seat._id !== seatId));
     }
+
 };
 
 
@@ -219,7 +226,9 @@ const SelectSeatScreen = ({ route }) => {
         break;
       case 'close': // Thêm trường hợp cho ghế hỏng
         seatStyle = styles.brokenSeat;
+
         seatTextStyle = [styles.seatText, { color: 'gray', fontWeight: 'medium' }];
+
         break;
       default:
         seatStyle = styles.availableSeat;
@@ -500,8 +509,9 @@ const styles = StyleSheet.create({
   seatText: {
     fontSize: 12,
     color: '#BFBFBF',
+
     fontWeight: 'bold'
-  },
+
   legendContainer: {
     flexDirection: 'row',
     justifyContent: 'space-around',

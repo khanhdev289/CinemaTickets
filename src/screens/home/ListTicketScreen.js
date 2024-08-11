@@ -8,6 +8,8 @@ import {
   ActivityIndicator,
   StatusBar,
   Alert,
+  FlatList,
+  TextInput,
 } from 'react-native';
 import {SvgXml} from 'react-native-svg';
 import iconBack from '../../assets/icons/iconBack';
@@ -19,7 +21,7 @@ import {useStripe} from '@stripe/stripe-react-native';
 import axios from 'axios';
 import {useAuth} from '../../components/AuthProvider ';
 
-const POSTS_API_URL = 'http://139.180.132.97:3000/tickets/user';
+const POSTS_API_URL = 'http://139.180.132.97:3000/tickets/user/user';
 const IMAGE_API_URL = 'http://139.180.132.97:3000/images/';
 const PAY_API_URL1 = 'http://139.180.132.97:3000/tickets/status';
 const PAY_API_URL = 'http://139.180.132.97:3000/tickets/payment';
@@ -29,8 +31,10 @@ const ListTicketScreen = () => {
   const navigation = useNavigation();
 
   const [ticketData, setTicketData] = useState([]);
-  const [total, setTotal] = useState(0); // Ensure this is initialized to 0
+  const [filteredData, setFilteredData] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filterStatus, setFilterStatus] = useState('all'); // State to manage filter status
   const {user} = useAuth();
 
   useEffect(() => {
@@ -44,6 +48,25 @@ const ListTicketScreen = () => {
 
     return unsubscribe;
   }, [navigation]);
+
+  useEffect(() => {
+    // Filter data based on search query and filter status
+    let filtered = ticketData.filter(ticket =>
+      ticket.movie.name.toLowerCase().includes(searchQuery.toLowerCase()),
+    );
+
+    if (filterStatus === 'paid') {
+      filtered = filtered.filter(
+        ticket => ticket.status === 'active' || ticket.status === 'complete',
+      );
+    } else if (filterStatus === 'unpaid') {
+      filtered = filtered.filter(
+        ticket => ticket.status !== 'active' && ticket.status !== 'complete',
+      );
+    }
+
+    setFilteredData(filtered);
+  }, [searchQuery, ticketData, filterStatus]);
 
   const fetchDataUser = async () => {
     try {
@@ -62,25 +85,22 @@ const ListTicketScreen = () => {
       const response = await axiosInstance.get(url);
 
       const userData = response.data;
-      // Lưu dữ liệu từ API vào state
       setTicketData(
         userData.getTicket
           .map(item => ({
             ...item,
-            // Lấy ngày từ phần date và chỉ lấy phần đầu tiên (ngày)
             date: item.showdate.date.split('T')[0],
           }))
           .reverse(),
       );
       setIsLoading(false);
     } catch (error) {
-      console.error('Lỗi khi tải dữ liệu: ', error);
       setIsLoading(false);
     }
   };
 
   const handlePressTicket = item => {
-    if (item.status === 'active') {
+    if (item.status === 'active' || item.status === 'complete') {
       navigation.navigate('TicketScreen', {_id: item._id});
     } else {
       Alert.alert(
@@ -95,7 +115,7 @@ const ListTicketScreen = () => {
           {
             text: 'Có',
             onPress: () => {
-              subscribe(item._id, item.total); // Truyền thêm giá trị total vào hàm subscribe
+              subscribe(item._id, item.total);
             },
             style: 'destructive',
           },
@@ -113,12 +133,12 @@ const ListTicketScreen = () => {
         `${PAY_API_URL}/${ticketId}`,
         {
           name: 'khanh',
-          amount: total, // Sử dụng giá trị total từ item
+          amount: total,
         },
         {
           headers: {
             Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json', // Đảm bảo đúng loại dữ liệu gửi đi
+            'Content-Type': 'application/json',
           },
         },
       );
@@ -178,6 +198,61 @@ const ListTicketScreen = () => {
   if (isLoading) {
     return <ActivityIndicator size="large" color="#00ff00" />;
   }
+  if (!user) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <View style={styles.loginContainer}>
+          <Text style={styles.loginText}>Vui lòng đăng nhập</Text>
+          <TouchableOpacity
+            style={styles.loginButton}
+            onPress={() => navigation.navigate('Login')}>
+            <Text style={styles.loginButtonText}>Đăng nhập</Text>
+          </TouchableOpacity>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  const renderItem = ({item}) => (
+    <TouchableOpacity
+      style={styles.ticketContainer}
+      onPress={() => handlePressTicket(item)}>
+      <Image
+        source={{uri: IMAGE_API_URL + item.movie.image}}
+        style={styles.ticketImage}
+      />
+      <View style={styles.ticketDetails}>
+        <Text style={styles.ticketTitle}>{item.movie.name}</Text>
+        <Text style={styles.ticketTime}>
+          <SvgXml xml={iconClock()} width={14} height={14} />{' '}
+          {item.movie.duration} * {item.date}
+        </Text>
+        <Text style={styles.ticketLocation}>
+          <SvgXml xml={iconLocation()} width={14} height={14} />{' '}
+          {item.cinema.name}
+        </Text>
+        <View
+          style={[
+            styles.statusView,
+            item.status === 'active' || item.status === 'complete'
+              ? styles.activeStatus
+              : styles.inactiveStatus,
+          ]}>
+          <Text
+            style={[
+              styles.statusProfileInfo,
+              item.status === 'active' || item.status === 'complete'
+                ? styles.activeText
+                : styles.inactiveText,
+            ]}>
+            {item.status === 'active' || item.status === 'complete'
+              ? 'Đã thanh toán'
+              : 'Chưa thanh toán'}
+          </Text>
+        </View>
+      </View>
+    </TouchableOpacity>
+  );
 
   return (
     <SafeAreaView style={{flex: 1, backgroundColor: 'black'}}>
@@ -195,136 +270,175 @@ const ListTicketScreen = () => {
         <View style={styles.header}>
           <Text style={styles.headerTitle}>Tất cả vé</Text>
         </View>
-        {ticketData.map(item => (
+        <TextInput
+          style={styles.searchInput}
+          placeholder="Tìm kiếm theo tên phim"
+          placeholderTextColor="#C4C4C4"
+          value={searchQuery}
+          onChangeText={text => setSearchQuery(text)}
+        />
+        <View style={styles.filterContainer}>
           <TouchableOpacity
-            key={item._id}
-            style={styles.ticketContainer}
-            onPress={() => handlePressTicket(item)}>
-            <Image
-              source={{uri: IMAGE_API_URL + item.movie.image}}
-              style={styles.ticketImage}
-            />
-            <View style={styles.ticketDetails}>
-              <Text style={styles.ticketTitle}>{item.movie.name}</Text>
-              <Text style={styles.ticketTime}>
-                <SvgXml xml={iconClock()} width={14} height={14} />{' '}
-                {item.movie.duration} * {item.date}
-              </Text>
-              <Text style={styles.ticketLocation}>
-                <SvgXml xml={iconLocation()} width={14} height={14} />{' '}
-                {item.cinema.name}
-              </Text>
-              <View
-                style={[
-                  styles.statusView,
-                  item.status === 'active'
-                    ? styles.activeStatus
-                    : styles.inactiveStatus,
-                ]}>
-                <Text
-                  style={[
-                    styles.statusProfileInfo,
-                    item.status === 'active'
-                      ? styles.activeText
-                      : styles.inactiveText,
-                  ]}>
-                  {item.status === 'active'
-                    ? 'Đã thanh toán'
-                    : 'Chưa thanh toán'}
-                </Text>
-              </View>
-            </View>
+            style={[
+              styles.filterButton,
+              filterStatus === 'all' && styles.activeFilter,
+            ]}
+            onPress={() => setFilterStatus('all')}>
+            <Text
+              style={[
+                styles.filterButtonText,
+                filterStatus === 'all' && styles.activeFilterText,
+              ]}>
+              Tất cả
+            </Text>
           </TouchableOpacity>
-        ))}
+          <TouchableOpacity
+            style={[
+              styles.filterButton,
+              filterStatus === 'paid' && styles.activeFilter,
+            ]}
+            onPress={() => setFilterStatus('paid')}>
+            <Text
+              style={[
+                styles.filterButtonText,
+                filterStatus === 'paid' && styles.activeFilterText,
+              ]}>
+              Đã thanh toán
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[
+              styles.filterButton,
+              filterStatus === 'unpaid' && styles.activeFilter,
+            ]}
+            onPress={() => setFilterStatus('unpaid')}>
+            <Text
+              style={[
+                styles.filterButtonText,
+                filterStatus === 'unpaid' && styles.activeFilterText,
+              ]}>
+              Chưa thanh toán
+            </Text>
+          </TouchableOpacity>
+        </View>
+
+        <FlatList
+          data={filteredData.reverse()}
+          renderItem={renderItem}
+          keyExtractor={item => item._id}
+          contentContainerStyle={{paddingBottom: 20}}
+        />
       </View>
     </SafeAreaView>
   );
 };
 
-export default ListTicketScreen;
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'black',
-    paddingHorizontal: 16,
+    padding: 16,
   },
   header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginVertical: 16,
+    marginBottom: 16,
   },
   headerTitle: {
-    fontSize: 28,
-    color: 'white',
-    textAlign: 'center',
-    flex: 1,
+    fontSize: 24,
+    color: '#fff',
+    fontWeight: 'bold',
   },
-  statusView: {
+  filterContainer: {
     flexDirection: 'row',
-    justifyContent: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 16,
+  },
+  filterButton: {
+    flex: 1,
     alignItems: 'center',
-    borderColor: '#f7b731',
-    borderWidth: 2,
-    padding: 3,
-    marginTop: 5,
-    borderRadius: 10,
-    width: 170,
-    marginTop: 20,
+    paddingVertical: 10,
+    borderRadius: 8,
+    backgroundColor: '#333',
+    marginHorizontal: 5,
+  },
+  filterButtonText: {
+    fontSize: 14,
+    color: '#C4C4C4',
+  },
+  activeFilter: {
+    backgroundColor: '#f7b731',
+  },
+  activeFilterText: {
+    color: '#000',
+  },
+  searchInput: {
+    backgroundColor: '#333',
+    borderRadius: 8,
+    padding: 10,
+    color: '#fff',
+    marginBottom: 16,
   },
   ticketContainer: {
     flexDirection: 'row',
-    backgroundColor: '#1C1C1C',
-    borderRadius: 10,
-    marginVertical: 8,
+    backgroundColor: '#1f1f1f',
+    borderRadius: 8,
+    marginBottom: 16,
     overflow: 'hidden',
-    marginVertical: 10,
   },
   ticketImage: {
     width: 100,
     height: 150,
+    resizeMode: 'cover',
   },
   ticketDetails: {
     flex: 1,
     padding: 10,
-    marginVertical: 10,
+    justifyContent: 'center',
   },
   ticketTitle: {
-    fontSize: 18,
-    color: 'white',
+    fontSize: 16,
+    color: '#fff',
     fontWeight: 'bold',
   },
   ticketTime: {
-    fontSize: 14,
-    color: 'white',
+    color: '#C4C4C4',
     marginVertical: 4,
   },
   ticketLocation: {
-    fontSize: 14,
-    color: 'white',
+    color: '#C4C4C4',
+    marginVertical: 4,
   },
-  loadingOverlay: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    zIndex: 1,
-  },
-  statusProfileInfo: {
-    color: '#f7b731',
-    fontSize: 14,
-    fontWeight: 'bold',
+  statusView: {
+    marginTop: 8,
+    padding: 4,
+    borderRadius: 4,
+    width: 100,
   },
   activeStatus: {
-    borderColor: 'green',
+    backgroundColor: '#4CAF50',
   },
   inactiveStatus: {
-    borderColor: 'red',
+    backgroundColor: '#F44336',
+  },
+  statusProfileInfo: {
+    textAlign: 'center',
+    fontSize: 12,
+    color: '#fff',
   },
   activeText: {
-    color: 'green',
+    color: '#fff',
   },
   inactiveText: {
-    color: 'red',
+    color: '#fff',
+  },
+  loadingOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
+
+export default ListTicketScreen;
