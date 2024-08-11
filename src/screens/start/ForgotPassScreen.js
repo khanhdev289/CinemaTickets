@@ -15,6 +15,7 @@ import {useForm, Controller} from 'react-hook-form';
 import {useNavigation} from '@react-navigation/native';
 import Spinner from 'react-native-loading-spinner-overlay';
 import axios from 'axios';
+import HeaderComponent from '../../components/HeaderComponent';
 
 const FORGOT_PASSWORD_API_URL =
   'http://139.180.132.97:3000/auth/forgot-password?email=';
@@ -68,15 +69,7 @@ const ForgotPassScreen = () => {
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="always">
         <SafeAreaView style={styles.container}>
-          <View style={styles.header}>
-            <View style={styles.backContainer}>
-              <TouchableOpacity onPress={handleBack}>
-                <SvgXml style={styles.back} xml={iconsBack()} />
-              </TouchableOpacity>
-            </View>
-            <Text style={styles.title}>Quên Mật khẩu</Text>
-            <View style={styles.placeholder} />
-          </View>
+          <HeaderComponent title="Quên mật khẩu" navigation={navigation} />
           <View style={styles.inputForm}>
             <View style={styles.inputRegister}>
               <Text style={styles.label}>Email</Text>

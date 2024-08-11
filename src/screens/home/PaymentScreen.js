@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   View,
   Text,
@@ -14,15 +14,15 @@ import {
   ActivityIndicator,
   ScrollView,
 } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { SvgXml } from 'react-native-svg';
+import {useNavigation} from '@react-navigation/native';
+import {SafeAreaView} from 'react-native-safe-area-context';
+import {SvgXml} from 'react-native-svg';
 import BackgroundTimer from 'react-native-background-timer';
 import iconPlayVideo from '../../assets/icons/iconPlayVideo';
 import iconLocation from '../../assets/icons/iconLocation';
 import iconClock from '../../assets/icons/iconClock';
 import iconDiscount from '../../assets/icons/iconDiscount';
-import { useStripe } from '@stripe/stripe-react-native';
+import {useStripe} from '@stripe/stripe-react-native';
 import axios from 'axios';
 import {
   IMAGE_API_URL,
@@ -36,16 +36,17 @@ import {
   updateTicket,
 } from '../../../api';
 import iconsBack from '../../assets/icons/iconsBack';
-import { useAuth } from '../../components/AuthProvider ';
+import {useAuth} from '../../components/AuthProvider ';
+import HeaderComponent from '../../components/HeaderComponent';
 
 const screenWidth = Dimensions.get('screen').width;
 const screenHeight = Dimensions.get('screen').height;
 const POSTS_API_URL1 = 'http://139.180.132.97:3000/tickets/status';
 const POSTS_API_URL = 'http://139.180.132.97:3000/tickets/payment';
-const PaymentScreen = ({ route }) => {
+const PaymentScreen = ({route}) => {
   const stripe = useStripe();
-  const { user } = useAuth();
-  const { ticketData } = route.params;
+  const {user} = useAuth();
+  const {ticketData} = route.params;
 
   const navigation = useNavigation();
   const handleBack = () => {
@@ -64,8 +65,16 @@ const PaymentScreen = ({ route }) => {
   const [discountAmountT, setDiscountAmountT] = useState(0);
   const [discountAmountF, setDiscountAmountF] = useState(0);
   const [showAllItems, setShowAllItems] = useState(false);
-  const [comboQuantities, setComboQuantities] = useState({ combo1: 1, combo2: 1, combo3: 1 });
-  const [comboChecked, setComboChecked] = useState({ combo1: false, combo2: false, combo3: false });
+  const [comboQuantities, setComboQuantities] = useState({
+    combo1: 1,
+    combo2: 1,
+    combo3: 1,
+  });
+  const [comboChecked, setComboChecked] = useState({
+    combo1: false,
+    combo2: false,
+    combo3: false,
+  });
   const [countdown, setCountdown] = useState(60);
   useEffect(() => {
     fetchData();
@@ -90,7 +99,6 @@ const PaymentScreen = ({ route }) => {
       setComboChecked(initialChecked);
     }
   }, [combo]);
-
 
   useEffect(() => {
     if (countdown > 0 && !countdownExpired) {
@@ -167,7 +175,6 @@ const PaymentScreen = ({ route }) => {
     }));
   };
 
-
   const getTotalPrice = () => {
     let total = 0;
     combo.forEach((item, index) => {
@@ -179,7 +186,6 @@ const PaymentScreen = ({ route }) => {
     });
     return total;
   };
-
 
   const formatDate = dateString => {
     const date = new Date(dateString);
@@ -269,7 +275,7 @@ const PaymentScreen = ({ route }) => {
 
       const clientSecret = response.data;
 
-      const { error: initError } = await stripe.initPaymentSheet({
+      const {error: initError} = await stripe.initPaymentSheet({
         paymentIntentClientSecret: clientSecret,
         googlePay: true,
         merchantDisplayName: 'MD-Cinema',
@@ -280,7 +286,7 @@ const PaymentScreen = ({ route }) => {
         return Alert.alert('Lỗi', initError.message);
       }
 
-      const { error: presentError } = await stripe.presentPaymentSheet({
+      const {error: presentError} = await stripe.presentPaymentSheet({
         clientSecret,
       });
 
@@ -313,7 +319,6 @@ const PaymentScreen = ({ route }) => {
       console.log(data);
 
       navigation.navigate('TicketScreen', {_id: ticketData._id, check: true});
-
     } catch (error) {
       console.error('Lỗi khi thanh toán: ', error);
     }
@@ -332,24 +337,14 @@ const PaymentScreen = ({ route }) => {
 
   return (
     <SafeAreaView style={styles.container}>
-
-      <View style={styles.header}>
-        <TouchableOpacity onPress={handleBack} style={styles.iconButton}>
-          <SvgXml xml={iconsBack()} />
-        </TouchableOpacity>
-
-
-        <View style={styles.titleContainer}>
-          <Text style={styles.title}>Thanh Toán</Text>
-        </View>
-      </View>
+      <HeaderComponent title="Thanh toán" navigation={navigation} />
       <ScrollView>
         <View style={styles.movieInfo}>
           <Image
             style={styles.image}
-            source={{ uri: IMAGE_API_URL + movieInfo.image }}
+            source={{uri: IMAGE_API_URL + movieInfo.image}}
           />
-          <View style={{ flexDirection: 'column', margin: 10 }}>
+          <View style={{flexDirection: 'column', margin: 10}}>
             <Text style={styles.movieTitle}>{movieInfo.name}</Text>
             <View
               style={{
@@ -388,7 +383,7 @@ const PaymentScreen = ({ route }) => {
         </View>
         <View style={styles.ticketInfo}>
           <Text style={styles.orderId}>Oder ID: {ticketData._id}</Text>
-          <View style={{ flexDirection: 'row' }}>
+          <View style={{flexDirection: 'row'}}>
             <Text style={styles.orderId}>Ghế: </Text>
             {seatInfo &&
               seatInfo.map((seat, index) => (
@@ -420,13 +415,20 @@ const PaymentScreen = ({ route }) => {
             <Text style={styles.applyButtonText}>Áp dụng</Text>
           </TouchableOpacity>
         </View>
-        <View style={{ flexDirection: 'row', justifyContent: 'space-between', margin: 10 }}>
-          <Text style={{ color: 'white' }}>Vé</Text>
-          <Text style={{ color: 'white', fontSize: 20 }}>{ticketData.total - discountAmountT} VND</Text>
+        <View
+          style={{
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            margin: 10,
+          }}>
+          <Text style={{color: 'white'}}>Vé</Text>
+          <Text style={{color: 'white', fontSize: 20}}>
+            {ticketData.total - discountAmountT} VND
+          </Text>
         </View>
         <View style={styles.line} />
 
-        <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+        <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
           <Text style={styles.comboTitle}> Chọn Combo</Text>
           <TouchableOpacity onPress={toggleShowAllItems}>
             <Text style={styles.viewAllText}>
@@ -449,18 +451,18 @@ const PaymentScreen = ({ route }) => {
           />
         </View>
         <View style={styles.line} />
-        <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
+        <View style={{flexDirection: 'row', justifyContent: 'flex-end'}}>
           <Text style={styles.comboTotalPrice}>
             {getTotalPrice() - discountAmountF} VND
           </Text>
         </View>
-        <Text style={{ color: 'white', margin: 5, fontSize: 20 }}>
+        <Text style={{color: 'white', margin: 5, fontSize: 20}}>
           Phương Thức Thanh Toán
         </Text>
         <TouchableOpacity
           style={[
             styles.paymentMethod,
-            selectedPaymentMethod === 'visa' && { borderColor: '#FFD700' }, // Cập nhật màu viền nếu được chọn
+            selectedPaymentMethod === 'visa' && {borderColor: '#FFD700'}, // Cập nhật màu viền nếu được chọn
           ]}
           onPress={() => setSelectedPaymentMethod('visa')} // Đặt phương thức thanh toán đã chọn
         >
@@ -471,8 +473,8 @@ const PaymentScreen = ({ route }) => {
               resizeMode: 'contain',
             }}
           />
-          <View style={{ marginLeft: 20 }}>
-            <Text style={{ color: 'white' }}>VISA International payments </Text>
+          <View style={{marginLeft: 20}}>
+            <Text style={{color: 'white'}}>VISA International payments </Text>
             <Text style={styles.paymentMethodValue}>
               (Visa, Master, JCB, Amex)
             </Text>
@@ -485,7 +487,7 @@ const PaymentScreen = ({ route }) => {
             alignItems: 'center',
             margin: 10,
           }}>
-          <Text style={{ color: 'white' }}>Tổng</Text>
+          <Text style={{color: 'white'}}>Tổng</Text>
           <Text style={styles.totalAmountValue}>
             {calculateTotalAmount()} VND
           </Text>
@@ -500,7 +502,7 @@ const PaymentScreen = ({ route }) => {
             margin: 10,
             backgroundColor: '#261D08',
           }}>
-          <Text style={{ color: 'white' }}>
+          <Text style={{color: 'white'}}>
             Hoàn thành thanh toán của bạn trong
           </Text>
           <Text style={styles.countdownValue}>
@@ -515,13 +517,23 @@ const PaymentScreen = ({ route }) => {
       </ScrollView>
     </SafeAreaView>
   );
-
 };
-const ComboList = ({ combo, comboQuantities, comboChecked, showAllItems, decreaseQuantity, increaseQuantity, toggleComboCheckbox, IMAGE_API_URL, screenHeight, styles }) => {
+const ComboList = ({
+  combo,
+  comboQuantities,
+  comboChecked,
+  showAllItems,
+  decreaseQuantity,
+  increaseQuantity,
+  toggleComboCheckbox,
+  IMAGE_API_URL,
+  screenHeight,
+  styles,
+}) => {
   return (
     <ScrollView
       contentContainerStyle={[
-        !showAllItems && { maxHeight: screenHeight * 0.5 },
+        !showAllItems && {maxHeight: screenHeight * 0.5},
       ]}>
       {combo.map((item, index) => {
         const comboKey = `combo${index + 1}`;
@@ -536,7 +548,7 @@ const ComboList = ({ combo, comboQuantities, comboChecked, showAllItems, decreas
           <View key={index} style={styles.comboModal}>
             <Image
               style={styles.imageCombo}
-              source={{ uri: IMAGE_API_URL + item.image }}
+              source={{uri: IMAGE_API_URL + item.image}}
             />
             <View style={styles.modalCombo}>
               <View style={styles.comboItem}>
@@ -600,7 +612,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingHorizontal: 16,
     paddingVertical: 8,
-
   },
   iconButton: {
     position: 'absolute',

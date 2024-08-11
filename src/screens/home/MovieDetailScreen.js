@@ -239,8 +239,6 @@ const MovieDetailScreen = ({route}) => {
               style={styles.button}
               onPress={() => {
                 if (!user) {
-                  // Nếu chưa đăng nhập, điều hướng tới màn hình đăng nhập
-<
                   navigation.navigate('Login');
 
                   return;
