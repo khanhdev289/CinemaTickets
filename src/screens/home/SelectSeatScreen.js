@@ -14,6 +14,7 @@ const cols = Array.from({ length: 8 }, (_, i) => i + 1);
 const screenWidth = Dimensions.get('screen').width;
 const screenHeight = Dimensions.get('screen').height;
 import io from 'socket.io-client';
+import HeaderComponent from '../../component/HeaderComponent';
 
 const SelectSeatScreen = ({ route }) => {
   const navigation = useNavigation();
@@ -48,12 +49,10 @@ const SelectSeatScreen = ({ route }) => {
   useEffect(() => {
     socket.on('connect', () => {
       console.log('Đã kết nối tới server');
-
-
     });
 
     socket.on('statusseat', (message) => {
-      console.log('Nhận được tin nhắn:', message);
+      console.log('statusseat soket:', message);
       setMessage(message);
     });
 
@@ -74,7 +73,6 @@ const SelectSeatScreen = ({ route }) => {
       fetchStatusSeat(roomId, showtimeId, timeId);
       setSelectedSeats([]); // Đặt lại danh sách ghế đã chọn
 
-
     }
   }, [selectedDateIndex, selectedTimeIndex, roomId, dateArray, timeArray]);
 
@@ -82,17 +80,34 @@ const SelectSeatScreen = ({ route }) => {
     try {
       const data = await fetchRoom(roomId);
 
-      const showtimes = data.getRoom.showtime.map(show => ({
+      // Chuyển đổi ngày suất chiếu thành đối tượng Date và sắp xếp
+      const showtimes = data.getRoom.showtime.map((show) => ({
         ...show,
-        date: new Date(show.date)
+        date: new Date(show.date),
       }));
       showtimes.sort((a, b) => a.date - b.date);
-      setDateArray(showtimes);
+
+      // Lấy ngày hiện tại và ngày của tuần tới (chỉ lấy phần ngày)
+      const today = new Date();
+      today.setHours(0, 0, 0, 0); // Đặt giờ phút giây và ms về 0 để chỉ so sánh ngày
+      const nextWeekDate = new Date(today);
+      nextWeekDate.setDate(today.getDate() + 7);
+
+      // Lọc các suất chiếu từ ngày hiện tại đến tuần tới
+      const filteredShowtimes = showtimes.filter((showtime) => {
+        const showtimeDate = showtime.date;
+        showtimeDate.setHours(0, 0, 0, 0); // Đặt giờ phút giây và ms về 0 để chỉ so sánh ngày
+        return showtimeDate >= today && showtimeDate <= nextWeekDate;
+      });
+
+      setDateArray(filteredShowtimes);
     } catch (error) {
       console.error(error);
       Alert.alert('Error', 'Unable to fetch room data');
     }
   };
+
+
   const fetchSeatData = async (roomId) => {
     try {
       const seatData = await fetchSeatByRoom(roomId);
@@ -129,36 +144,60 @@ const SelectSeatScreen = ({ route }) => {
       return;
     }
     if (selectedDateIndex === null || selectedTimeIndex === null) {
-      Alert.alert('Thông báo', 'Vui lòng chọn suất chiếu trước khi chọn ghế');
-      return;
+        Alert.alert('Thông báo', 'Vui lòng chọn suất chiếu trước khi chọn ghế');
+        return;
     }
 
+    // Kiểm tra nếu thời gian chiếu đã qua
+    const selectedDate = dateArray[selectedDateIndex].date;
+    const selectedTime = timeArray[selectedTimeIndex].time;
+    const [selectedHour, selectedMinute] = selectedTime.split(':').map(Number);
+    const currentDate = new Date();
+
+    const selectedShowtime = new Date(selectedDate);
+    selectedShowtime.setHours(selectedHour, selectedMinute, 0);
+
+    if (selectedShowtime <= currentDate) {
+        Alert.alert('Thông báo', 'Suất chiếu đã qua, vui lòng chọn suất chiếu khác');
+        return;
+    }
+
+    // Lấy trạng thái hiện tại của ghế được bấm
+    const selectedSeat = seats.find(seat => seat._id === seatId);
+    
+    // Nếu ghế đã chọn đủ 6 ghế và người dùng đang cố chọn thêm ghế mới
+    if (selectedSeats.length >= 6 && selectedSeat.status === 'available') {
+        Alert.alert('Thông báo', 'Bạn chỉ có thể chọn tối đa 6 ghế cho mỗi lần đặt vé');
+        return;
+    }
+
+    // Cập nhật trạng thái ghế
     const updatedSeats = seats.map(seat =>
-      seat._id === seatId
-        ? { ...seat, status: seat.status === 'available' ? 'select' : seat.status === 'select' ? 'available' : seat.status }
-        : seat
+        seat._id === seatId
+            ? { ...seat, status: seat.status === 'available' ? 'select' : 'available' }
+            : seat
     );
-    setSeats(updatedSeats);
 
-    const selectedSeat = updatedSeats.find(seat => seat._id === seatId);
-    if (selectedSeat.status === 'select') {
-      setSelectedSeats([...selectedSeats, selectedSeat]);
+    // Cập nhật danh sách ghế đã chọn
+    setSeats(updatedSeats);
+    if (selectedSeat.status === 'available') {
+        setSelectedSeats([...selectedSeats, selectedSeat]);
     } else {
-      setSelectedSeats(selectedSeats.filter(seat => seat._id !== seatId));
+        setSelectedSeats(selectedSeats.filter(seat => seat._id !== seatId));
     }
-   
-  };
+
+};
+
+
 
   const handleTicket = async () => {
     if (selectedSeats.length === 0) {
       Alert.alert('Thông báo', 'Vui lòng chọn ghế trước khi tiếp tục');
       return;
     }
-
     const seatIds = selectedSeats.map(seat => seat._id);
     const showtimeId = dateArray[selectedDateIndex]._id;
     const timeId = timeArray[selectedTimeIndex]._id;
-
     const ticketData = await createTicket(seatIds, userID, showtimeId, timeId, calculateTotal());
     if (ticketData) {
       console.log('Ticket created successfully:', ticketData);
@@ -187,7 +226,9 @@ const SelectSeatScreen = ({ route }) => {
         break;
       case 'close': // Thêm trường hợp cho ghế hỏng
         seatStyle = styles.brokenSeat;
-        seatTextStyle = [styles.seatText, { color: 'gray',fontWeight:'medium' }];
+
+        seatTextStyle = [styles.seatText, { color: 'gray', fontWeight: 'medium' }];
+
         break;
       default:
         seatStyle = styles.availableSeat;
@@ -294,7 +335,7 @@ const SelectSeatScreen = ({ route }) => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
+      {/* <View style={styles.header}>
         <TouchableOpacity onPress={handleBack} style={styles.iconButton}>
           <SvgXml xml={iconsBack()} />
         </TouchableOpacity>
@@ -302,7 +343,11 @@ const SelectSeatScreen = ({ route }) => {
         <View style={styles.titleContainer}>
           <Text style={styles.title}>Chọn Ghế</Text>
         </View>
-      </View>
+      </View> */}
+      <HeaderComponent
+        title="Danh sách sản phẩm"
+        navigation={navigation}
+      />
 
 
       <ScrollView>
@@ -464,8 +509,9 @@ const styles = StyleSheet.create({
   seatText: {
     fontSize: 12,
     color: '#BFBFBF',
-    fontWeight:'bold'
-  },
+
+    fontWeight: 'bold'
+
   legendContainer: {
     flexDirection: 'row',
     justifyContent: 'space-around',

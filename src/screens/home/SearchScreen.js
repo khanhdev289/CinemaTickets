@@ -50,7 +50,8 @@ const MovieByGenre = () => {
       const response = await fetchMovies(); // Gọi API lấy danh sách phim theo thể loại
 
       setMovieList(response); // Lưu danh sách phim vào state movieList
-      setFilteredMovieList(response.getall); // Khởi tạo danh sách phim tìm kiếm với toàn bộ danh sách ban đầu
+      setFilteredMovieList(response); // Khởi tạo danh sách phim tìm kiếm với toàn bộ danh sách ban đầu
+
     } catch (error) {
       console.error('Error fetching movies by genre:', error);
       // Xử lý lỗi nếu cần

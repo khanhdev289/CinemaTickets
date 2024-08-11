@@ -28,8 +28,10 @@ import {
   fetchMovieById,
 } from '../../../api';
 import iconBack from '../../assets/icons/iconBack';
-import {useNavigation} from '@react-navigation/native';
-import {useAuth} from '../../components/AuthProvider ';
+
+import { useNavigation } from '@react-navigation/native';
+import { useAuth } from '../../components/AuthProvider ';
+
 
 const screenWidth = Dimensions.get('screen').width;
 const screenHeight = Dimensions.get('screen').height;
@@ -42,7 +44,9 @@ const MovieDetailScreen = ({route}) => {
   const [selectedTheater, setSelectedTheater] = useState(null);
   const [isExpanded, setIsExpanded] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const {user} = useAuth();
+
+  const { user } = useAuth();
+
 
   const navigation = useNavigation();
   useEffect(() => {
@@ -52,13 +56,17 @@ const MovieDetailScreen = ({route}) => {
         const theaterResponse = await fetchCinemaByMovie(movieId);
         setMovie(movieResponse);
         setTheaters(theaterResponse);
-        console.log(movieResponse + 'kkk' + theaterResponse);
+
+        console.log(movieResponse + "kkk" + theaterResponse);
+
       } catch (error) {
         console.error('Error fetching data:', error);
       } finally {
         setIsLoading(false);
       }
-    };
+
+    }
+
 
     fetchData();
   }, [movieId]);
@@ -232,15 +240,17 @@ const MovieDetailScreen = ({route}) => {
               onPress={() => {
                 if (!user) {
                   // Nếu chưa đăng nhập, điều hướng tới màn hình đăng nhập
-                  navigation.navigate('Welcome');
+<
+                  navigation.navigate('Login');
+
                   return;
                 }
 
                 if (selectedTheater) {
                   // Nếu đã chọn rạp chiếu, điều hướng tới màn hình chọn ghế
-                  navigation.navigate('SelectSeatScreen', {
-                    roomId: selectedTheater,
-                  });
+
+                  navigation.navigate('SelectSeatScreen', { roomId: selectedTheater });
+
                 } else {
                   // Xử lý trường hợp không có rạp nào được chọn
                   Alert.alert('Thông báo', 'Vui lòng chọn một rạp chiếu');
@@ -248,6 +258,7 @@ const MovieDetailScreen = ({route}) => {
               }}>
               <Text style={styles.buttonText}>Tiếp tục</Text>
             </TouchableOpacity>
+
           </>
         )}
       </ScrollView>
