@@ -74,8 +74,8 @@ const MyTicketScreen = () => {
   }
 
   const qrData = JSON.stringify({
-    _id: ticketData._id,
     auth: ticketData.auth,
+    _id: ticketData._id,
   });
 
   return (
