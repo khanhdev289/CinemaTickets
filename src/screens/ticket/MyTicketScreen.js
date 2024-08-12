@@ -1,5 +1,13 @@
 import React, {useEffect, useState} from 'react';
-import {View, Text, Image, StyleSheet, ScrollView} from 'react-native';
+import {
+  View,
+  Text,
+  Image,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+  Modal,
+} from 'react-native';
 import QRCode from 'react-native-qrcode-svg';
 import {SvgXml} from 'react-native-svg';
 import {SafeAreaView} from 'react-native-safe-area-context';
@@ -23,6 +31,7 @@ const MyTicketScreen = () => {
   const route = useRoute();
   const [ticketData, setTicketData] = useState(null);
   const {user} = useAuth();
+  const [isModalVisible, setIsModalVisible] = useState(false);
 
   useEffect(() => {
     if (route.params && route.params._id) {
@@ -110,7 +119,9 @@ const MyTicketScreen = () => {
           </View>
           <View style={styles.line} />
           <View style={styles.qrCodeContainer}>
-            <QRCode value={qrData} size={200} />
+            <TouchableOpacity onPress={() => setIsModalVisible(true)}>
+              <QRCode value={qrData} size={200} />
+            </TouchableOpacity>
           </View>
           <View style={styles.line} />
           <View style={styles.detailsContainer}>
@@ -133,6 +144,22 @@ const MyTicketScreen = () => {
           </View>
         </View>
       </ScrollView>
+      <Modal
+        visible={isModalVisible}
+        transparent={true}
+        animationType="slide"
+        onRequestClose={() => setIsModalVisible(false)}>
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <QRCode value={qrData} size={250} />
+            <TouchableOpacity
+              style={styles.closeButton}
+              onPress={() => setIsModalVisible(false)}>
+              <Text style={styles.closeButtonText}>Close</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 };
@@ -255,6 +282,28 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: 'black',
     marginLeft: 10,
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0,0,0,0.5)',
+  },
+  modalContent: {
+    backgroundColor: 'white',
+    padding: 20,
+    borderRadius: 10,
+    alignItems: 'center',
+  },
+  closeButton: {
+    marginTop: 20,
+    padding: 10,
+    backgroundColor: '#FCC434',
+    borderRadius: 5,
+  },
+  closeButtonText: {
+    color: 'black',
+    fontSize: 16,
   },
 });
 
