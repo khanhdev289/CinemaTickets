@@ -37,6 +37,7 @@ import {
 } from '../../../api';
 import iconsBack from '../../assets/icons/iconsBack';
 import {useAuth} from '../../components/AuthProvider ';
+import HeaderComponent from '../../components/HeaderComponent';
 
 const screenWidth = Dimensions.get('screen').width;
 const screenHeight = Dimensions.get('screen').height;
@@ -63,17 +64,41 @@ const PaymentScreen = ({route}) => {
   const [discountCode, setDiscountCode] = useState('');
   const [discountAmountT, setDiscountAmountT] = useState(0);
   const [discountAmountF, setDiscountAmountF] = useState(0);
-
   const [showAllItems, setShowAllItems] = useState(false);
-
-  const [comboQuantities, setComboQuantities] = useState({ combo1: 1, combo2: 1, combo3: 1 });
-  const [comboChecked, setComboChecked] = useState({ combo1: false, combo2: false, combo3: false });
+  const [comboQuantities, setComboQuantities] = useState({
+    combo1: 1,
+    combo2: 1,
+    combo3: 1,
+  });
+  const [comboChecked, setComboChecked] = useState({
+    combo1: false,
+    combo2: false,
+    combo3: false,
+  });
   const [countdown, setCountdown] = useState(60);
-
-
   useEffect(() => {
     fetchData();
   }, [ticketData]);
+  useEffect(() => {
+    fetchData();
+  }, [ticketData]);
+
+  // Thêm logic khởi tạo comboQuantities và comboChecked
+  useEffect(() => {
+    if (combo.length > 0) {
+      const initialQuantities = {};
+      const initialChecked = {};
+
+      combo.forEach((item, index) => {
+        const comboKey = `combo${index + 1}`;
+        initialQuantities[comboKey] = 1; // Đặt số lượng mặc định là 1
+        initialChecked[comboKey] = false; // Đặt trạng thái mặc định là chưa chọn
+      });
+
+      setComboQuantities(initialQuantities);
+      setComboChecked(initialChecked);
+    }
+  }, [combo]);
 
   useEffect(() => {
     if (countdown > 0 && !countdownExpired) {
@@ -127,38 +152,38 @@ const PaymentScreen = ({route}) => {
       .padStart(2, '0')}`;
   };
 
-  const increaseQuantity = (combo, price) => {
+  const increaseQuantity = comboKey => {
     setComboQuantities(prevQuantities => ({
       ...prevQuantities,
-      [combo]: prevQuantities[combo] + 1,
+      [comboKey]: prevQuantities[comboKey] + 1,
     }));
   };
 
-  const decreaseQuantity = combo => {
-    if (comboQuantities[combo] > 1) {
+  const decreaseQuantity = comboKey => {
+    if (comboQuantities[comboKey] > 1) {
       setComboQuantities(prevQuantities => ({
         ...prevQuantities,
-        [combo]: prevQuantities[combo] - 1,
+        [comboKey]: prevQuantities[comboKey] - 1,
       }));
     }
   };
 
-  const toggleComboCheckbox = combo => {
-    setComboChecked({
-      ...comboChecked,
-      [combo]: !comboChecked[combo],
-    });
+  const toggleComboCheckbox = comboKey => {
+    setComboChecked(prevChecked => ({
+      ...prevChecked,
+      [comboKey]: !prevChecked[comboKey],
+    }));
   };
 
   const getTotalPrice = () => {
     let total = 0;
-    for (const comboKey in comboQuantities) {
+    combo.forEach((item, index) => {
+      const comboKey = `combo${index + 1}`;
       if (comboChecked[comboKey]) {
-        const comboIndex = parseInt(comboKey.replace('combo', '')) - 1;
-        const totalPrice = comboQuantities[comboKey] * combo[comboIndex].price;
+        const totalPrice = comboQuantities[comboKey] * item.price;
         total += totalPrice;
       }
-    }
+    });
     return total;
   };
 
@@ -172,23 +197,21 @@ const PaymentScreen = ({route}) => {
   const handleContinue = async () => {
     try {
       const selectedCombos = Object.keys(comboChecked)
-      .filter(comboKey => comboChecked[comboKey])
-      .map(comboKey => {
-        const comboIndex = parseInt(comboKey.replace('combo', '')) - 1;
-        const item = combo[comboIndex];
-    
-        if (item) {
-          return {
-            foodId: item._id,
-            quantity: comboQuantities[comboKey],
-          };
-        }
-    
-        return null;
-      })
-      .filter(combo => combo !== null);
+        .filter(comboKey => comboChecked[comboKey])
+        .map(comboKey => {
+          const comboIndex = parseInt(comboKey.replace('combo', '')) - 1;
+          const item = combo[comboIndex];
 
+          if (item) {
+            return {
+              foodId: item._id,
+              quantity: comboQuantities[comboKey],
+            };
+          }
 
+          return null;
+        })
+        .filter(combo => combo !== null);
       // Update ticket with new data
       await updateTicket(
         ticketData._id,
@@ -197,7 +220,6 @@ const PaymentScreen = ({route}) => {
         getTotalPrice(),
         calculateTotalAmount(),
       );
-
       // Navigate to next screen or show a success message
       // navigation.navigate('NextScreen'); // Thay đổi tên màn hình tiếp theo
     } catch (error) {
@@ -295,6 +317,7 @@ const PaymentScreen = ({route}) => {
 
       const data = response.data;
       console.log(data);
+
       navigation.navigate('TicketScreen', {_id: ticketData._id, check: true});
     } catch (error) {
       console.error('Lỗi khi thanh toán: ', error);
@@ -314,17 +337,7 @@ const PaymentScreen = ({route}) => {
 
   return (
     <SafeAreaView style={styles.container}>
-
-         <View style={styles.header}>
-        <TouchableOpacity onPress={handleBack} style={styles.iconButton}>
-          <SvgXml xml={iconsBack()} />
-        </TouchableOpacity>
-
-
-        <View style={styles.titleContainer}>
-          <Text style={styles.title}>Thanh Toán</Text>
-        </View>
-      </View>
+      <HeaderComponent title="Thanh toán" navigation={navigation} />
       <ScrollView>
         <View style={styles.movieInfo}>
           <Image
@@ -402,10 +415,17 @@ const PaymentScreen = ({route}) => {
             <Text style={styles.applyButtonText}>Áp dụng</Text>
           </TouchableOpacity>
         </View>
-        <View style={{ flexDirection: 'row', justifyContent: 'space-between', margin: 10 }}>
-          <Text style={{ color: 'white' }}>Vé</Text>
-          <Text style={{ color: 'white', fontSize: 20 }}>{ticketData.total - discountAmountT} VND</Text>
-          </View>
+        <View
+          style={{
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            margin: 10,
+          }}>
+          <Text style={{color: 'white'}}>Vé</Text>
+          <Text style={{color: 'white', fontSize: 20}}>
+            {ticketData.total - discountAmountT} VND
+          </Text>
+        </View>
         <View style={styles.line} />
 
         <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
@@ -497,10 +517,19 @@ const PaymentScreen = ({route}) => {
       </ScrollView>
     </SafeAreaView>
   );
-
-}; 
-const ComboList = ({ combo, comboQuantities, comboChecked, showAllItems, decreaseQuantity, increaseQuantity, toggleComboCheckbox, IMAGE_API_URL, screenHeight, styles }) => {
-
+};
+const ComboList = ({
+  combo,
+  comboQuantities,
+  comboChecked,
+  showAllItems,
+  decreaseQuantity,
+  increaseQuantity,
+  toggleComboCheckbox,
+  IMAGE_API_URL,
+  screenHeight,
+  styles,
+}) => {
   return (
     <ScrollView
       contentContainerStyle={[
@@ -583,7 +612,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingHorizontal: 16,
     paddingVertical: 8,
- 
   },
   iconButton: {
     position: 'absolute',

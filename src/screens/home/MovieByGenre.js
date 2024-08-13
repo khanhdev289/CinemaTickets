@@ -55,8 +55,8 @@ const MovieByGenre = ({route}) => {
       const response = await movieByGenre(genreId); // Gọi API lấy danh sách phim theo thể loại
       const genreName = await fetchGenreById(genreId); // Gọi API lấy tên thể loại
       setText(genreName.name); // Lưu tên thể loại vào state text
-      setMovieList(response.getmovie); // Lưu danh sách phim vào state movieList
-      setFilteredMovieList(response.getmovie); // Khởi tạo danh sách phim tìm kiếm với toàn bộ danh sách ban đầu
+      setMovieList(response); // Lưu danh sách phim vào state movieList
+      setFilteredMovieList(response); // Khởi tạo danh sách phim tìm kiếm với toàn bộ danh sách ban đầu
     } catch (error) {
       console.error('Error fetching movies by genre:', error);
       // Xử lý lỗi nếu cần

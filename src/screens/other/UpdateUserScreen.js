@@ -15,6 +15,7 @@ import {SvgXml} from 'react-native-svg';
 import axios from 'axios';
 import iconsBack from '../../assets/icons/iconsBack';
 import {useAuth} from '../../components/AuthProvider ';
+import HeaderComponent from '../../components/HeaderComponent';
 
 const POSTS_API_URL = 'http://139.180.132.97:3000/users';
 const IMAGE_API_URL = 'http://139.180.132.97:3000/images/';
@@ -105,15 +106,7 @@ const UpdateUserScreen = ({navigation, route}) => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <View style={styles.backContainer}>
-          <TouchableOpacity onPress={handleBack}>
-            <SvgXml style={styles.back} xml={iconsBack()} />
-          </TouchableOpacity>
-        </View>
-        <Text style={styles.title}>Cập nhật thông tin</Text>
-        <View style={styles.placeholder} />
-      </View>
+      <HeaderComponent title="Cập nhật thông tin" navigation={navigation} />
 
       <View style={{borderBottomColor: '#444', borderBottomWidth: 1}}></View>
 
@@ -133,11 +126,9 @@ const UpdateUserScreen = ({navigation, route}) => {
           }}>
           <Text style={styles.categoryTitle}>Ảnh đại diện</Text>
           <TouchableOpacity onPress={selectImage}>
-
             <Text style={{textAlign: 'center', color: '#FCC434'}}>
               Chọn ảnh{' '}
             </Text>
-
           </TouchableOpacity>
         </View>
         <View style={styles.container}>
@@ -160,16 +151,12 @@ const UpdateUserScreen = ({navigation, route}) => {
           <Text style={styles.categoryTitle}>Thông tin khác</Text>
         </View>
 
-
-
         <TextInput
           style={styles.modalInput}
           value={profileName}
           onChangeText={setProfileName}
           placeholder="Nhập tên"
         />
-
-
 
         <TextInput
           style={styles.modalInput}
@@ -262,7 +249,6 @@ const styles = StyleSheet.create({
     marginHorizontal: 15,
 
     marginTop: 30,
-
   },
   logoutText: {
     color: '#000',

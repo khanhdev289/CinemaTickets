@@ -73,7 +73,7 @@ const ScanQrScreen = () => {
   const handleQRRead = ({data}) => {
     try {
       const jsonData = JSON.parse(data);
-      if (jsonData && jsonData._id && jsonData.auth === 'mdcinema') {
+      if (jsonData && jsonData._id && jsonData.auth === 'mdticket') {
         fetchDataUser(jsonData._id);
       } else {
         Alert.alert(

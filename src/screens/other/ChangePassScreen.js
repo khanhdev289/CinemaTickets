@@ -13,6 +13,7 @@ import iconsBack from '../../assets/icons/iconsBack';
 import axios from 'axios'; // Import axios
 import {useNavigation} from '@react-navigation/native';
 import {useAuth} from '../../components/AuthProvider ';
+import HeaderComponent from '../../components/HeaderComponent';
 
 const CHANGE_PASS_API_URL = 'http://139.180.132.97:3000/users/password';
 
@@ -76,15 +77,10 @@ const ChangePassScreen = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <View style={styles.backContainer}>
-          <TouchableOpacity onPress={handleBack}>
-            <SvgXml style={styles.back} xml={iconsBack()} />
-          </TouchableOpacity>
-        </View>
-        <Text style={styles.title}>Đổi mật khẩu</Text>
-        <View style={styles.placeholder} />
-      </View>
+            <HeaderComponent
+        title="Đổi mật khẩu"
+        navigation={navigation}
+      />
       <View style={styles.inputForm}>
         <View style={styles.inputRegister}>
           <Text style={styles.label}>Mật khẩu hiện tại</Text>
