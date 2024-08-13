@@ -12,6 +12,7 @@ import {
   Image,
   SafeAreaView,
   ActivityIndicator,
+  Alert,
 } from 'react-native';
 import {SvgXml} from 'react-native-svg';
 import {useNavigation} from '@react-navigation/native';
@@ -182,13 +183,20 @@ const HomeScreen = () => {
 const Header = ({user}) => {
   const navigation = useNavigation();
 
+  const handleNotificationPress = () => {
+    if (user) {
+      navigation.navigate('NotificationScreen');
+    } else {
+      Alert.alert('Thông báo', 'Bạn cần đăng nhập để xem thông báo.');
+    }
+  };
+
   return (
     <View style={styles.headerContainer}>
       <Text style={styles.greetingText}>
         Xin Chào {user ? `${user.user.name} 👋` : ''}
       </Text>
-      <TouchableOpacity
-        onPress={() => navigation.navigate('NotificationScreen')}>
+      <TouchableOpacity onPress={handleNotificationPress}>
         <SvgXml xml={iconNotification()} />
       </TouchableOpacity>
     </View>
