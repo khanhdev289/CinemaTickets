@@ -511,7 +511,7 @@ const styles = StyleSheet.create({
     color: '#BFBFBF',
 
     fontWeight: 'bold'
-
+  },
   legendContainer: {
     flexDirection: 'row',
     justifyContent: 'space-around',
