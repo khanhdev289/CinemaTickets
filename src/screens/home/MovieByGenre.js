@@ -31,6 +31,7 @@ import iconCalendar from '../../assets/icons/iconCalendar';
 import {useNavigation} from '@react-navigation/native';
 import iconsBack from '../../assets/icons/iconsBack';
 import {SafeAreaView} from 'react-native-safe-area-context';
+import HeaderComponent from '../../components/HeaderComponent';
 
 const screenWidth = Dimensions.get('screen').width;
 const screenHeight = Dimensions.get('screen').height;
@@ -136,16 +137,9 @@ const MovieByGenre = ({route}) => {
         backgroundColor="#000"
         hidden={false}
       />
-      <View style={styles.container}>
-        <View style={styles.header}>
-          <TouchableOpacity onPress={handleBack}>
-            <SvgXml xml={iconsBack()} />
-          </TouchableOpacity>
-          <View style={styles.titleContainer}>
-            <Text style={styles.title}>{text}</Text>
-          </View>
-        </View>
 
+      <View style={styles.container}>
+        <HeaderComponent title={text} navigation={navigation}/>
         <View style={styles.searchContainer}>
           <View style={styles.searchWrapper}>
             <SvgXml xml={iconSearch()} />
