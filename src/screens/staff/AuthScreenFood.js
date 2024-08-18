@@ -57,7 +57,8 @@ const AuthScreenFood = () => {
           ...data.showdate,
           date: data.showdate.date.split('T')[0],
         },
-      });``
+      });
+      ``;
     } catch (error) {
       console.error('Error fetching ticket data: ', error);
     }
@@ -257,10 +258,9 @@ const styles = StyleSheet.create({
   },
   ticketContainer: {
     backgroundColor: 'white',
-    padding: 30,
+    padding: 10,
     borderRadius: 10,
     elevation: 3,
-    marginTop: 30,
   },
   movieContainer: {
     flexDirection: 'row',
@@ -281,6 +281,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: 'black',
     marginBottom: 10,
+    textAlign: 'center',
   },
   detailsContainerAndIcon: {
     flexDirection: 'row',
@@ -364,24 +365,33 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-around',
     marginVertical: 10,
+    alignItems: 'center',
   },
+  foodName: {
+    width: '30%',
+    flexDirection: 'row',
+    textAlign: 'center',
+    marginVertical: 10,
+  },
+  foodQuantity: {
+    width: '30%',
+    flexDirection: 'row',
+    textAlign: 'center',
+    marginVertical: 10,
+    alignItems: 'center',
+  },
+  foodPrice: {
+    width: '30%',
+    flexDirection: 'row',
+    marginVertical: 10,
+    textAlign: 'center',
+  },
+
   foodItem1: {
     flexDirection: 'row',
     justifyContent: 'space-around',
     marginVertical: 10,
     borderWidth: 1,
-  },
-  printButton: {
-    marginTop: 10,
-    backgroundColor: '#f7b731',
-    paddingVertical: 15,
-    alignItems: 'center',
-    borderRadius: 10,
-  },
-  printText: {
-    color: '#000',
-    fontSize: 16,
-    fontWeight: 'bold',
   },
 });
 

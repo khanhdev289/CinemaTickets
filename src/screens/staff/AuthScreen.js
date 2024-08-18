@@ -228,14 +228,14 @@ const AuthScreen = () => {
           </View>
           <View style={styles.timeLocationContainer}>
             <SvgXml style={{color: 'black'}} xml={iconCalendarBlack()} />
-            <View style={{flexDirection: 'column'}}>
+            <View style={styles.dateTimeContainer}>
               <Text style={styles.timeText}>{ticketData.time.time}</Text>
               <Text style={styles.dateText}>
                 {new Date(ticketData.showdate.date).toLocaleDateString()}
               </Text>
             </View>
             <SvgXml style={{color: 'black'}} xml={iconSetMyTicket()} />
-            <View style={{flexDirection: 'column'}}>
+            <View style={styles.locationContainer}>
               <Text style={styles.rapText}>{ticketData.room.name}</Text>
               <Text style={styles.seatText}>
                 {ticketData.seat.map(item => item.name).join(', ')}
@@ -344,9 +344,23 @@ const styles = StyleSheet.create({
     marginHorizontal: 5,
   },
   timeLocationContainer: {
+    justifyContent: 'space-between',
     flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 20,
+  },
+  dateTimeContainer: {
+    flex: 1,
+    flexDirection: 'column',
     justifyContent: 'space-around',
-    marginVertical: 20,
+    marginRight: 20,
+  },
+  locationContainer: {
+    flex: 1,
+    flexDirection: 'column',
+    justifyContent: 'space-around',
+    marginLeft: 20,
   },
   timeText: {
     fontSize: 16,
