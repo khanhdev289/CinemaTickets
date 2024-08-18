@@ -33,7 +33,7 @@ const styles = StyleSheet.create({
   },
   buttonBack: {
     position: 'absolute',
-    left: 16,
+    left: 6,
   },
   title: {
     textAlign: 'center',

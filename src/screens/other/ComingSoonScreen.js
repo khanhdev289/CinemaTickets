@@ -47,7 +47,7 @@ const ComingSoonScreen = () => {
           style={{
             width: '100%',
             height: '75%',
-            aspectRatio: 3 / 4,
+           objectFit:'cover',
             borderRadius: 10,
           }}
           source={{ uri: IMAGE_API_URL + item.image }}
@@ -111,7 +111,6 @@ const styles = StyleSheet.create({
     margin: 10,
   },
   titleItem: {
-    marginTop: 10,
     fontSize: 14,
     color: '#FCC434'
   },
