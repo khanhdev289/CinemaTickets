@@ -12,6 +12,7 @@ import {
   Image,
   SafeAreaView,
   ActivityIndicator,
+  RefreshControl,
 } from 'react-native';
 import { SvgXml } from 'react-native-svg';
 import { useNavigation } from '@react-navigation/native';
@@ -45,6 +46,7 @@ const HomeScreen = () => {
   const [genreList, setGenreList] = useState([]);
   const [visibleIndex, setVisibleIndex] = useState(0);
   const flatListRef = useRef(null);
+  const [refreshing, setRefreshing] = useState(false);
   const onViewableItemsChanged = useRef(({ viewableItems }) => {
     if (viewableItems.length > 0) {
       setVisibleIndex(viewableItems[0].index);
@@ -80,6 +82,11 @@ const HomeScreen = () => {
   useEffect(() => {
     fetchData();
   }, []);
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await fetchData();
+    setRefreshing(false);
+  };
   if (isLoading) {
     return (
       <View style={styles.loadingContainer}>
@@ -94,7 +101,16 @@ const HomeScreen = () => {
         backgroundColor="#000"
         hidden={false}
       />
-      <ScrollView style={styles.container} bounces={false}>
+      {isLoading && (
+        <View style={styles.loadingOverlay}>
+          <ActivityIndicator size="large" color="#f7b731" />
+        </View>
+      )}
+      <ScrollView
+        contentContainerStyle={styles.scrollViewContainer}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }>
         <Header user={user} />
         <SearchBar navigation={navigation} />
         <Section
@@ -361,6 +377,16 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#000000',
     padding: 5,
+  },
+  scrollViewContainer: {
+    flexGrow: 1,
+  },
+  loadingOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 1,
   },
   loadingContainer: {
     flex: 1,

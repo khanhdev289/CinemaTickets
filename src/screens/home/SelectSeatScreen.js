@@ -66,7 +66,7 @@ const SelectSeatScreen = ({route}) => {
       console.log('Đã kết nối tới server');
     });
 
-    socket.on('statusseat', message => {
+    socket.on('statusseat', (message) => {
       console.log('statusseat soket:', message);
       setMessage(message);
     });
@@ -95,7 +95,7 @@ const SelectSeatScreen = ({route}) => {
       const data = await fetchRoom(roomId);
 
       // Chuyển đổi ngày suất chiếu thành đối tượng Date và sắp xếp
-      const showtimes = data.getRoom.showtime.map(show => ({
+      const showtimes = data.getRoom.showtime.map((show) => ({
         ...show,
         date: new Date(show.date),
       }));
@@ -108,7 +108,7 @@ const SelectSeatScreen = ({route}) => {
       nextWeekDate.setDate(today.getDate() + 7);
 
       // Lọc các suất chiếu từ ngày hiện tại đến tuần tới
-      const filteredShowtimes = showtimes.filter(showtime => {
+      const filteredShowtimes = showtimes.filter((showtime) => {
         const showtimeDate = showtime.date;
         showtimeDate.setHours(0, 0, 0, 0); // Đặt giờ phút giây và ms về 0 để chỉ so sánh ngày
         return showtimeDate >= today && showtimeDate <= nextWeekDate;
@@ -121,7 +121,7 @@ const SelectSeatScreen = ({route}) => {
     }
   };
 
-  const fetchSeatData = async roomId => {
+  const fetchSeatData = async (roomId) => {
     try {
       const seatData = await fetchSeatByRoom(roomId);
       const formattedSeats = seatData.map(seat => ({
@@ -155,8 +155,8 @@ const SelectSeatScreen = ({route}) => {
       return;
     }
     if (selectedDateIndex === null || selectedTimeIndex === null) {
-      Alert.alert('Thông báo', 'Vui lòng chọn suất chiếu trước khi chọn ghế');
-      return;
+        Alert.alert('Thông báo', 'Vui lòng chọn suất chiếu trước khi chọn ghế');
+        return;
     }
 
     // Kiểm tra nếu thời gian chiếu đã qua
@@ -169,43 +169,34 @@ const SelectSeatScreen = ({route}) => {
     selectedShowtime.setHours(selectedHour, selectedMinute, 0);
 
     if (selectedShowtime <= currentDate) {
-      Alert.alert(
-        'Thông báo',
-        'Suất chiếu đã qua, vui lòng chọn suất chiếu khác',
-      );
-      return;
+        Alert.alert('Thông báo', 'Suất chiếu đã qua, vui lòng chọn suất chiếu khác');
+        return;
     }
 
     // Lấy trạng thái hiện tại của ghế được bấm
     const selectedSeat = seats.find(seat => seat._id === seatId);
-
+    
     // Nếu ghế đã chọn đủ 6 ghế và người dùng đang cố chọn thêm ghế mới
     if (selectedSeats.length >= 6 && selectedSeat.status === 'available') {
-      Alert.alert(
-        'Thông báo',
-        'Bạn chỉ có thể chọn tối đa 6 ghế cho mỗi lần đặt vé',
-      );
-      return;
+        Alert.alert('Thông báo', 'Bạn chỉ có thể chọn tối đa 6 ghế cho mỗi lần đặt vé');
+        return;
     }
 
     // Cập nhật trạng thái ghế
     const updatedSeats = seats.map(seat =>
-      seat._id === seatId
-        ? {
-            ...seat,
-            status: seat.status === 'available' ? 'select' : 'available',
-          }
-        : seat,
+        seat._id === seatId
+            ? { ...seat, status: seat.status === 'available' ? 'select' : 'available' }
+            : seat
     );
 
     // Cập nhật danh sách ghế đã chọn
     setSeats(updatedSeats);
     if (selectedSeat.status === 'available') {
-      setSelectedSeats([...selectedSeats, selectedSeat]);
+        setSelectedSeats([...selectedSeats, selectedSeat]);
     } else {
-      setSelectedSeats(selectedSeats.filter(seat => seat._id !== seatId));
+        setSelectedSeats(selectedSeats.filter(seat => seat._id !== seatId));
     }
-  };
+};
 
   const handleTicket = async () => {
     if (selectedSeats.length === 0) {
@@ -215,13 +206,7 @@ const SelectSeatScreen = ({route}) => {
     const seatIds = selectedSeats.map(seat => seat._id);
     const showtimeId = dateArray[selectedDateIndex]._id;
     const timeId = timeArray[selectedTimeIndex]._id;
-    const ticketData = await createTicket(
-      seatIds,
-      userID,
-      showtimeId,
-      timeId,
-      calculateTotal(),
-    );
+    const ticketData = await createTicket(seatIds, userID, showtimeId, timeId, calculateTotal());
     if (ticketData) {
       console.log('Ticket created successfully:', ticketData);
       navigation.navigate('PaymentScreen', {ticketData: ticketData.create});
@@ -250,10 +235,7 @@ const SelectSeatScreen = ({route}) => {
       case 'close': // Thêm trường hợp cho ghế hỏng
         seatStyle = styles.brokenSeat;
 
-        seatTextStyle = [
-          styles.seatText,
-          {color: 'gray', fontWeight: 'medium'},
-        ];
+        seatTextStyle = [styles.seatText, { color: 'gray', fontWeight: 'medium' }];
 
         break;
       default:
@@ -579,7 +561,7 @@ const styles = StyleSheet.create({
   seatText: {
     fontSize: 12,
     color: '#BFBFBF',
-    fontWeight: 'bold',
+    fontWeight: 'bold'
   },
   legendContainer: {
     flexDirection: 'row',
