@@ -60,9 +60,12 @@ target 'CinemaTicketApp' do
     # An absolute path to your application root.
     :app_path => "#{Pod::Config.instance.installation_root}/.."
   )
+  use_modular_headers!
 
   target 'CinemaTicketAppTests' do
     inherit! :complete
+      pod 'Firebase/Analytics'
+      pod 'Firebase/Messaging'
     # Pods for testing
   end
 
