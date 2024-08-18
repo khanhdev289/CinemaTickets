@@ -75,7 +75,7 @@ const PaymentScreen = ({route}) => {
     combo2: false,
     combo3: false,
   });
-  const [countdown, setCountdown] = useState(60);
+  const [countdown, setCountdown] = useState(60 * 10);
   useEffect(() => {
     fetchData();
   }, [ticketData]);
@@ -546,11 +546,11 @@ const ComboList = ({
 
         return (
           <View key={index} style={styles.comboModal}>
-            <Image
-              style={styles.imageCombo}
-              source={{uri: IMAGE_API_URL + item.image}}
-            />
             <View style={styles.modalCombo}>
+              <Image
+                style={styles.imageCombo}
+                source={{uri: IMAGE_API_URL + item.image}}
+              />
               <View style={styles.comboItem}>
                 <Text style={styles.comboTitle}>{item.name}</Text>
                 <Text style={styles.comboPrice}>
@@ -562,7 +562,6 @@ const ComboList = ({
                     onPress={() => decreaseQuantity(comboKey)}>
                     <Text style={styles.buttonText}>-</Text>
                   </TouchableOpacity>
-
                   <Text style={styles.comboQuantity}>
                     {comboQuantities[comboKey]}
                   </Text>
@@ -640,7 +639,7 @@ const styles = StyleSheet.create({
   },
   imageCombo: {
     width: '20%',
-    height: '100%',
+    height: 80,
     objectFit: 'cover',
     borderRadius: 8,
     borderWidth: 1,
@@ -733,24 +732,28 @@ const styles = StyleSheet.create({
   combo: {
     flexDirection: 'row',
     height: 'auto',
+    width: '100%',
     margin: 10, // Adjust margin as neede
     // Optional: Add horizontal padding
   },
   comboModal: {
+    width: '100%',
     flexDirection: 'row',
-    justifyContent: 'space-evenly',
-    height: screenHeight * 0.1,
-    margin: 10, // Adjust margin as neede
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    height: 'auto',
+    marginTop: 10, // Adjust margin as neede
     // Optional: Add horizontal padding
   },
   comboItem: {
-    marginLeft: 20,
+    width: '60%',
+    marginLeft: 10,
     flexDirection: 'column',
-    justifyContent: 'center',
+    justifyContent: 'space-between',
   },
 
   comboTitle: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: 'bold',
     color: 'white',
   },
@@ -766,7 +769,7 @@ const styles = StyleSheet.create({
   checkboxContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 5,
+    marginLeft: 10,
   },
   checkbox: {
     width: 20,
@@ -884,10 +887,10 @@ const styles = StyleSheet.create({
   },
   modalCombo: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
-    width: '80%',
-    margin: 10,
+    width: '100%',
+
+    marginTop: 10,
   },
   modalTotalPrice: {
     fontSize: 16,

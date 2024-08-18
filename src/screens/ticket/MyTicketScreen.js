@@ -112,9 +112,11 @@ const MyTicketScreen = () => {
             <SvgXml xml={iconSetMyTicket()} />
             <View style={styles.locationContainer}>
               <Text style={styles.rapText}>{ticketData.room.name}</Text>
-              <Text style={styles.seatText}>
-                {ticketData.seat.map(s => s.name).join(', ')}
-              </Text>
+              <View style={{width: 150}}>
+                <Text style={styles.seatText}>
+                  {ticketData.seat.map(s => s.name).join(', ')}
+                </Text>
+              </View>
             </View>
           </View>
           <View style={styles.line} />
@@ -216,15 +218,17 @@ const styles = StyleSheet.create({
     marginLeft: 5,
   },
   timeLocationContainer: {
+    justifyContent: 'space-between',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 20,
   },
   dateTimeContainer: {
+    flex: 1,
     flexDirection: 'column',
     justifyContent: 'space-around',
-    marginHorizontal: 20,
+    marginRight: 20,
   },
   timeText: {
     fontSize: 16,
@@ -237,9 +241,10 @@ const styles = StyleSheet.create({
     color: 'black',
   },
   locationContainer: {
+    flex: 1,
     flexDirection: 'column',
     justifyContent: 'space-around',
-    marginHorizontal: 20,
+    marginLeft: 20,
   },
   rapText: {
     fontSize: 16,
@@ -247,9 +252,11 @@ const styles = StyleSheet.create({
     color: 'black',
   },
   seatText: {
+    width: '50%',
     fontSize: 16,
     fontWeight: 'bold',
     color: 'black',
+    flexWrap: 'wrap',
   },
   qrCodeContainer: {
     alignItems: 'center',

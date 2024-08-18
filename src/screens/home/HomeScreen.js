@@ -348,6 +348,7 @@ const DiscountItem = ({ item, navigation }) => (
 const CategoryItem = ({ item, navigation }) => (
   <View style={styles.categoryItem}>
     <TouchableOpacity
+    style={styles.categoryImage}
       onPress={() => {
         navigation.navigate('MovieByGenre', { genreId: item._id });
       }}>
@@ -355,6 +356,7 @@ const CategoryItem = ({ item, navigation }) => (
         style={styles.categoryImage}
         source={{ uri: IMAGE_API_URL + item.image }}
       />
+      </TouchableOpacity>
       <Text
         numberOfLines={1}
         style={{
@@ -365,7 +367,7 @@ const CategoryItem = ({ item, navigation }) => (
         }}>
         {item.name}
       </Text>
-    </TouchableOpacity>
+    
   </View>
 );
 

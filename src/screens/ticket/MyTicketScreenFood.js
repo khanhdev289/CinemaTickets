@@ -242,7 +242,28 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-around',
     marginVertical: 10,
+    alignItems: 'center',
   },
+  foodName: {
+    width: '30%',
+    flexDirection: 'row',
+    textAlign: 'center',
+    marginVertical: 10,
+  },
+  foodQuantity: {
+    width: '30%',
+    flexDirection: 'row',
+    textAlign: 'center',
+    marginVertical: 10,
+    alignItems: 'center',
+  },
+  foodPrice: {
+    width: '30%',
+    flexDirection: 'row',
+    marginVertical: 10,
+    textAlign: 'center',
+  },
+
   foodItem1: {
     flexDirection: 'row',
     justifyContent: 'space-around',
