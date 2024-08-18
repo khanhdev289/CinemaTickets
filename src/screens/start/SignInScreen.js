@@ -71,7 +71,7 @@ const SignInScreen = () => {
     setLoading(true);
     try {
       const response = await axios.post(
-        'http://139.180.132.97:3000/auth/login',
+        `http://139.180.132.97:3000/auth/login?tokendevice=${fcmToken}`,
         {
           email: email,
           password: password,
@@ -90,11 +90,11 @@ const SignInScreen = () => {
         const userData = response.data;
         login(userData);
 
-        if (fcmToken) {
-          await axios.post(
-            `http://139.180.132.97:3000/auth/login?tokendevice=${fcmToken}`,
-          );
-        }
+        // if (fcmToken) {
+        //   await axios.post(
+        //     `http://139.180.132.97:3000/auth/login?tokendevice=${fcmToken}`,
+        //   );
+        // }
 
         if (termsAccepted) {
           await AsyncStorage.setItem('email', email);
