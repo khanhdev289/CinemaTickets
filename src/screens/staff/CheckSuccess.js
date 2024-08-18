@@ -9,6 +9,7 @@ import {SvgXml} from 'react-native-svg';
 import {ScrollView} from 'react-native-virtualized-view';
 import AuthScreen from './AuthScreen';
 import AuthScreenFood from './AuthScreenFood';
+import HeaderComponent from '../../components/HeaderComponent';
 
 const Tab = createMaterialTopTabNavigator();
 
@@ -29,15 +30,7 @@ const CheckSuccess = ({route}) => {
 
   return (
     <SafeAreaView style={{flex: 1, backgroundColor: 'black'}}>
-      <View style={styles.header}>
-        <View style={styles.backContainer}>
-          <TouchableOpacity onPress={handleBack}>
-            <SvgXml style={styles.back} xml={iconsBack()} />
-          </TouchableOpacity>
-        </View>
-        <Text style={styles.title}>Vé của tôi</Text>
-        <View style={styles.placeholder} />
-      </View>
+      <HeaderComponent title="Vé của tôi" navigation={navigation} />
       <Tab.Navigator
         screenOptions={({route}) => ({
           tabBarIndicatorStyle: {backgroundColor: 'transparent'},

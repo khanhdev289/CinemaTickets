@@ -37,6 +37,7 @@ import {
 } from '../../../api';
 import iconsBack from '../../assets/icons/iconsBack';
 import {useAuth} from '../../components/AuthProvider ';
+import HeaderComponent from '../../components/HeaderComponent';
 
 const screenWidth = Dimensions.get('screen').width;
 const screenHeight = Dimensions.get('screen').height;
@@ -81,6 +82,26 @@ const PaymentScreen = ({route}) => {
   useEffect(() => {
     fetchData();
   }, [ticketData]);
+  useEffect(() => {
+    fetchData();
+  }, [ticketData]);
+
+  // Thêm logic khởi tạo comboQuantities và comboChecked
+  useEffect(() => {
+    if (combo.length > 0) {
+      const initialQuantities = {};
+      const initialChecked = {};
+
+      combo.forEach((item, index) => {
+        const comboKey = `combo${index + 1}`;
+        initialQuantities[comboKey] = 1; // Đặt số lượng mặc định là 1
+        initialChecked[comboKey] = false; // Đặt trạng thái mặc định là chưa chọn
+      });
+
+      setComboQuantities(initialQuantities);
+      setComboChecked(initialChecked);
+    }
+  }, [combo]);
 
   // Thêm logic khởi tạo comboQuantities và comboChecked
   useEffect(() => {
@@ -336,15 +357,7 @@ const PaymentScreen = ({route}) => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity onPress={handleBack} style={styles.iconButton}>
-          <SvgXml xml={iconsBack()} />
-        </TouchableOpacity>
-
-        <View style={styles.titleContainer}>
-          <Text style={styles.title}>Thanh Toán</Text>
-        </View>
-      </View>
+      <HeaderComponent title="Thanh toán" navigation={navigation} />
       <ScrollView>
         <View style={styles.movieInfo}>
           <Image

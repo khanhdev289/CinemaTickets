@@ -20,6 +20,7 @@ import {format} from 'date-fns';
 import axios from 'axios';
 import Spinner from 'react-native-loading-spinner-overlay';
 import ModalSelector from 'react-native-modal-selector';
+import HeaderComponent from '../../components/HeaderComponent';
 
 const POSTS_API_URL = 'http://139.180.132.97:3000/auth/register';
 
@@ -88,15 +89,7 @@ const SignUpScreen = () => {
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="always">
         <SafeAreaView style={styles.container}>
-          <View style={styles.header}>
-            <View style={styles.backContainer}>
-              <TouchableOpacity onPress={handleBack}>
-                <SvgXml style={styles.back} xml={iconsBack()} />
-              </TouchableOpacity>
-            </View>
-            <Text style={styles.title}>Đăng ký</Text>
-            <View style={styles.placeholder} />
-          </View>
+          <HeaderComponent title="Đăng ký" navigation={navigation} />
           <View style={styles.inputForm}>
             <View style={styles.inputRegister}>
               <Text style={styles.label}>Tên tài khoản</Text>

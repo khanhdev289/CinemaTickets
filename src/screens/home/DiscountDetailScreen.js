@@ -1,14 +1,22 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity, Image } from 'react-native';
+import React, {useEffect, useState} from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  SafeAreaView,
+  TouchableOpacity,
+  Image,
+} from 'react-native';
 import iconsBack from '../../assets/icons/iconsBack';
-import { SvgXml } from 'react-native-svg';
-import { useNavigation } from '@react-navigation/native';
-import { IMAGE_API_URL, fetchDiscountById } from '../../../api';
+import {SvgXml} from 'react-native-svg';
+import {useNavigation} from '@react-navigation/native';
+import {IMAGE_API_URL, fetchDiscountById} from '../../../api';
 import Clipboard from '@react-native-clipboard/clipboard'; // Import thư viện clipboard
+import HeaderComponent from '../../components/HeaderComponent';
 
-const DiscountDetailScreen = ({ route }) => {
+const DiscountDetailScreen = ({route}) => {
   const navigation = useNavigation();
-  const { discountId } = route.params;
+  const {discountId} = route.params;
   const [discount, setDiscount] = useState(null); // Khởi tạo là null
   const [copied, setCopied] = useState(false);
 
@@ -27,7 +35,7 @@ const DiscountDetailScreen = ({ route }) => {
   };
 
   // Hàm lấy dữ liệu khuyến mại
-  const fetchDiscount = async (discountId) => {
+  const fetchDiscount = async discountId => {
     try {
       const data = await fetchDiscountById(discountId);
       setDiscount(data);
@@ -43,7 +51,7 @@ const DiscountDetailScreen = ({ route }) => {
   }, [discountId]);
 
   // Hàm định dạng ngày tháng năm
-  const formatDate = (date) => {
+  const formatDate = date => {
     return new Date(date).toLocaleDateString('vi-VN', {
       day: '2-digit',
       month: '2-digit',
@@ -63,20 +71,19 @@ const DiscountDetailScreen = ({ route }) => {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <TouchableOpacity onPress={handleBack} style={styles.iconButton}>
-          <SvgXml xml={iconsBack()} />
-        </TouchableOpacity>
-        <View style={styles.titleContainer}>
-          <Text style={styles.title}>Khuyến mại</Text>
-        </View>
+        <HeaderComponent title="Danh sách ưu đãi" navigation={navigation} />
       </View>
-      <Image source={{ uri: IMAGE_API_URL + discount.image }} style={styles.image} />
+      <Image
+        source={{uri: IMAGE_API_URL + discount.image}}
+        style={styles.image}
+      />
       <Text style={styles.discountTitle}>{discount.name}</Text>
 
       <View style={styles.details}>
         <Text style={styles.text}>Giảm giá: {discount.percent * 100}%</Text>
         <Text style={styles.text}>
-          Thời gian áp dụng: {formatDate(discount.dayStart)} - {formatDate(discount.dayEnd)}
+          Thời gian áp dụng: {formatDate(discount.dayStart)} -{' '}
+          {formatDate(discount.dayEnd)}
         </Text>
         <Text style={styles.text}>Rạp áp dụng:</Text>
         {discount.cinema.map((cinema, index) => (
@@ -85,10 +92,13 @@ const DiscountDetailScreen = ({ route }) => {
           </Text>
         ))}
       </View>
-      <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 5, }}>
+      <View
+        style={{flexDirection: 'row', alignItems: 'center', marginBottom: 5}}>
         <Text style={styles.code}>Code: {discount.code}</Text>
         <TouchableOpacity onPress={handleCopy} style={styles.button}>
-          <Text style={styles.buttonText}>{copied ? 'Đã sao chép' : 'Sao chép mã'}</Text>
+          <Text style={styles.buttonText}>
+            {copied ? 'Đã sao chép' : 'Sao chép mã'}
+          </Text>
         </TouchableOpacity>
       </View>
       <Text style={styles.text}>Chúc các bạn xem phim vui vẻ</Text>
@@ -136,7 +146,6 @@ const styles = StyleSheet.create({
   code: {
     fontSize: 18,
     color: 'white',
-
   },
   details: {
     marginBottom: 5,
@@ -160,7 +169,6 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     alignItems: 'center',
     marginLeft: 20,
-   
   },
   buttonText: {
     color: '#FFCB46',
