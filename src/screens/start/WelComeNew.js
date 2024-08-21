@@ -1,6 +1,6 @@
 import React, {useRef, useEffect} from 'react';
 import {View, StyleSheet, Animated, Dimensions} from 'react-native';
-import {useNavigation} from '@react-navigation/native';
+import {CommonActions, useNavigation} from '@react-navigation/native';
 
 const {width, height} = Dimensions.get('window');
 
@@ -22,7 +22,12 @@ const WelComeNew = () => {
         useNativeDriver: true,
       }),
     ]).start(() => {
-      navigation.navigate('Home');
+      navigation.dispatch(
+        CommonActions.reset({
+          index: 0,
+          routes: [{name: 'Home'}],
+        }),
+      );
     });
   };
 
