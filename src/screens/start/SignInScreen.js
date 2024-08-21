@@ -87,7 +87,7 @@ const SignInScreen = () => {
       } else {
         console.log('Đăng nhập thành công:', response.data);
         const userData = response.data;
-
+        login(userData);
         // if (fcmToken) {
         //   await axios.post(
         //     `http://139.180.132.97:3000/auth/login?tokendevice=${fcmToken}`,
