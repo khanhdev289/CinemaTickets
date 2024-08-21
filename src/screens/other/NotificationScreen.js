@@ -98,7 +98,6 @@ const NotificationScreen = () => {
           n._id === notification._id ? {...n, status: false} : n,
         ),
       );
-
       navigation.navigate('TicketScreen', {_id: notification.ticket});
     } catch (error) {
       console.error('Error updating notification status:', error);
@@ -224,3 +223,4 @@ const styles = StyleSheet.create({
     right: 10,
   },
 });
+
