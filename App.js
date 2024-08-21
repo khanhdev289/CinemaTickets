@@ -127,13 +127,11 @@ export default function App() {
       notifee.onForegroundEvent(async ({type, detail}) => {
         if (type === EventType.PRESS) {
           console.log('Foreground Event Detail:', detail);
-
           const {data} = detail.notification || {};
 
           if (data) {
             console.log('Ticket ID:', data.ticketId);
             console.log('Notification ID:', data.notifiId);
-
             if (data.ticketId && data.notifiId) {
               await updateNotificationStatus(data.notifiId);
               Linking.openURL(`mychat://ticket/${data.ticketId}`);

@@ -55,7 +55,6 @@ const ListCheckTicket = () => {
       const response = await axiosInstance.get(url);
 
       const userData = response.data;
-      console.log('User data fetched: ', userData);
       setTicketData(userData);
       setIsLoading(false);
     } catch (error) {

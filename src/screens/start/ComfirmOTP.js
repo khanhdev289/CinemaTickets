@@ -151,7 +151,7 @@ const ConfirmOTP = () => {
         </TouchableOpacity>
         <Text style={styles.titleBig}>Nhập mã OTP</Text>
         <Text style={styles.titleSmall}>
-          Bạn hãy nhập mã OTP đã được gửi về số điện thoại mà bạn đã đăng ký.
+          Bạn hãy nhập mã OTP đã được gửi về email mà bạn đã đăng ký.
         </Text>
         <CodeField
           ref={ref}

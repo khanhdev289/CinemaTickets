@@ -152,7 +152,7 @@ const HomeScreen = () => {
           )}
         />
 
-        <SectionNoClick title="Thể Loại" />
+        <SectionNoClick title="Thể loại" />
         <FlatList
           data={genreList}
           keyExtractor={item => item._id}
@@ -222,7 +222,7 @@ const Header = ({user}) => {
         {user && unreadCount > 0 && (
           <Badge
             value={unreadCount}
-            badgeStyle={{backgroundColor: '#2EF536'}}
+            badgeStyle={{backgroundColor: '#eb4034'}}
             containerStyle={{position: 'absolute', right: 0}}
           />
         )}

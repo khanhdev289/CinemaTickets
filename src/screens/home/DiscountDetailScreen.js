@@ -39,7 +39,6 @@ const DiscountDetailScreen = ({route}) => {
     try {
       const data = await fetchDiscountById(discountId);
       setDiscount(data);
-      console.log(data);
     } catch (error) {
       console.error('Unable to fetch discount by id:', error);
     }

@@ -28,8 +28,6 @@ const NotificationScreen = () => {
   const userID = user.user._id;
   const token = user.token.access_token;
 
-  // console.log(token);
-
   useEffect(() => {
     const fetchNotifications = async () => {
       try {
@@ -100,7 +98,6 @@ const NotificationScreen = () => {
           n._id === notification._id ? {...n, status: false} : n,
         ),
       );
-
       navigation.navigate('TicketScreen', {_id: notification.ticket});
     } catch (error) {
       console.error('Error updating notification status:', error);
@@ -226,3 +223,4 @@ const styles = StyleSheet.create({
     right: 10,
   },
 });
+

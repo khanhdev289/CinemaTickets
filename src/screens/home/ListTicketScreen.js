@@ -142,8 +142,6 @@ const ListTicketScreen = () => {
           },
         },
       );
-
-      console.log(response.data);
       const clientSecret = response.data;
 
       const {error: initError} = await stripe.initPaymentSheet({
@@ -186,9 +184,7 @@ const ListTicketScreen = () => {
 
       const url = `${PAY_API_URL1}/${ticketId}`;
       const response = await axiosInstance.put(url);
-
       const data = response.data;
-      console.log(data);
       navigation.navigate('TicketScreen', {_id: ticketId});
     } catch (error) {
       console.error('Lỗi khi thanh toán: ', error);

@@ -45,8 +45,6 @@ const NewPassScreen = () => {
       },
     });
     const url = `${NEW_PASSWORD_API_URL}${data.newPassword}`;
-
-    console.log('day r:', url);
     axiosInstance
       .put(url, {
         params: {

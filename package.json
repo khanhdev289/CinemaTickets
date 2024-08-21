@@ -35,6 +35,7 @@
     "react-native-background-timer": "^2.4.1",
     "react-native-camera": "^4.2.1",
     "react-native-confirmation-code-field": "^7.4.0",
+    "react-native-elements": "^3.4.3",
     "react-native-html-to-pdf": "^0.12.0",
     "react-native-image-picker": "^7.1.2",
     "react-native-linear-gradient": "^2.8.3",

@@ -129,7 +129,7 @@ const AuthScreen = () => {
             <div class="movie-title">${data.movie.name}</div>
             <div class="info-item">
               <p>Thời lượng:</p>
-              <p>${data.movie.duration} minutes</p>
+              <p>${data.movie.duration}</p>
             </div>
             <div class="info-item">
               <p>Thể loại:</p>
@@ -160,6 +160,7 @@ const AuthScreen = () => {
               <p>${data.cinema.name}<br>${data.cinema.address}</p>
             </div>
           </div>
+                 <div class="movie-title">----------------------</div>
           <div class="qr-code">
             <div class="success-message">Kiểm tra vé thành công<br>Nhân viên hướng dẫn khách vào rạp</div>
           </div>
@@ -312,6 +313,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     elevation: 3,
     flexDirection: 'column',
+    marginTop: 20,
   },
   title: {
     fontSize: 20,
