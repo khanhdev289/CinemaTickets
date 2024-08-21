@@ -37,7 +37,7 @@ import messaging from '@react-native-firebase/messaging';
 import {PERMISSIONS, request} from 'react-native-permissions';
 import NotificationScreen from './src/screens/other/NotificationScreen';
 import linking from './src/utils/linking';
-
+import axios from 'axios';
 const Stack = createNativeStackNavigator();
 
 const UPDATE_NOTIFI_API_URL = 'http://139.180.132.97:3000/notification';
@@ -68,36 +68,66 @@ export default function App() {
         console.error('Error checking first launch:', error);
       }
     };
-    checkFirstLaunch();
-    if (Platform.OS === 'android') {
-      const fetchToken = async () => {
+
+    const fetchToken = async () => {
+      try {
         const token = await getFcmToken();
         if (token) {
           await AsyncStorage.setItem('fcmToken', token);
           console.log('FCM Token stored:', token);
         }
-      };
-      fetchToken();
+      } catch (error) {
+        console.error('Error fetching FCM token:', error);
+      }
+    };
 
-      const createNotificationChannel = async () => {
-        try {
-          await notifee.createChannel({
-            id: 'default',
-            name: 'Default Channel',
-            sound: 'default',
-            importance: AndroidImportance.HIGH,
-            // smallIcon: 'ic_launcher_notification_foreground',
-            // color: '#FFFFFF',
-          });
-          console.log('Notification channel created');
-        } catch (error) {
-          console.error('Error creating notification channel:', error);
+    const createNotificationChannel = async () => {
+      try {
+        await notifee.createChannel({
+          id: 'default',
+          name: 'Default Channel',
+          sound: 'default',
+          importance: AndroidImportance.HIGH,
+        });
+        console.log('Notification channel created');
+      } catch (error) {
+        console.error('Error creating notification channel:', error);
+      }
+    };
+
+    const handleNotificationPress = async (data, isTokenAvailable) => {
+      if (data && data.ticketId && data.notifiId) {
+        await updateNotificationStatus(data.notifiId);
+        const url = isTokenAvailable
+          ? `mychat://ticket/${data.ticketId}`
+          : `mychat://home`;
+        Linking.openURL(url);
+      } else {
+        console.log('Data is missing in the notification');
+      }
+    };
+
+    const setupForegroundNotificationListener = () => {
+      notifee.onForegroundEvent(async ({type, detail}) => {
+        if (type === EventType.PRESS) {
+          console.log('Foreground Event Detail:', detail);
+          const token = await AsyncStorage.getItem('token');
+          await handleNotificationPress(detail.notification?.data, !!token);
         }
-      };
+      });
+    };
 
-      createNotificationChannel();
+    const setupBackgroundNotificationListener = () => {
+      notifee.onBackgroundEvent(async ({type, detail}) => {
+        if (type === EventType.PRESS && detail.pressAction.id === 'default') {
+          const token = await AsyncStorage.getItem('token');
+          await handleNotificationPress(detail.notification?.data, !!token);
+        }
+      });
+    };
 
-      const unsubscribe = messaging().onMessage(async remoteMessage => {
+    const setupMessagingListeners = () => {
+      messaging().onMessage(async remoteMessage => {
         console.log(
           'A new FCM message arrived!',
           JSON.stringify(remoteMessage),
@@ -124,67 +154,40 @@ export default function App() {
         }
       });
 
-      notifee.onForegroundEvent(async ({type, detail}) => {
-        if (type === EventType.PRESS) {
-          console.log('Foreground Event Detail:', detail);
-          const {data} = detail.notification || {};
-
-          if (data) {
-            console.log('Ticket ID:', data.ticketId);
-            console.log('Notification ID:', data.notifiId);
-            if (data.ticketId && data.notifiId) {
-              await updateNotificationStatus(data.notifiId);
-              Linking.openURL(`mychat://ticket/${data.ticketId}`);
-            }
-          } else {
-            console.log('Data is missing in the notification');
-          }
-        }
-      });
-
-      notifee.onBackgroundEvent(async ({type, detail}) => {
-        const {notification, pressAction} = detail;
-
-        if (type === EventType.ACTION_PRESS && pressAction.id === 'default') {
-          const {data} = notification || {};
-
-          if (data && data.ticketId && data.notifiId) {
-            await updateNotificationStatus(data.notifiId);
-            Linking.openURL(`mychat://ticket/${data.ticketId}`);
-          } else {
-            console.log('Data is missing in the notification');
-          }
-        }
-      });
-
       messaging().onNotificationOpenedApp(async remoteMessage => {
-        const {data} = remoteMessage;
-        if (data && data.ticketId && data.notifiId) {
-          await updateNotificationStatus(data.notifiId);
-          Linking.openURL(`mychat://ticket/${data.ticketId}`);
-        } else {
-          console.log('Data is missing in the notification2');
-        }
+        console.log(
+          'Notification caused app to open from background state:',
+          remoteMessage.notification,
+        );
+        await handleNotificationPress(remoteMessage.data, true);
       });
 
       messaging()
         .getInitialNotification()
         .then(async remoteMessage => {
           if (remoteMessage) {
-            const {data} = remoteMessage;
-            if (data && data.ticketId && data.notifiId) {
-              await updateNotificationStatus(data.notifiId);
-              Linking.openURL(`mychat://ticket/${data.ticketId}`);
-            } else {
-              console.log('Data is missing in the notification3');
-            }
+            console.log(
+              'Notification caused app to open from quit state:',
+              remoteMessage.notification,
+            );
+            await handleNotificationPress(remoteMessage.data, true);
           }
         });
+    };
 
-      return () => {
-        unsubscribe();
-      };
+    checkFirstLaunch();
+
+    if (Platform.OS === 'android') {
+      fetchToken();
+      createNotificationChannel();
+      setupForegroundNotificationListener();
+      setupBackgroundNotificationListener();
+      setupMessagingListeners();
     }
+
+    return () => {
+      messaging().onMessage(() => {}); // Unsubscribe on cleanup
+    };
   }, []);
 
   if (initialRoute === null) {

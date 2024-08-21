@@ -26,6 +26,7 @@ const ForgotPassScreen = () => {
     control,
     handleSubmit,
     formState: {errors},
+    setError,
   } = useForm();
   const [loading, setLoading] = useState(false);
 
@@ -38,24 +39,30 @@ const ForgotPassScreen = () => {
     const email = data.email;
     const url = `${FORGOT_PASSWORD_API_URL}${email}`;
 
-    axios
-      .post(url, data)
-      .then(response => {
-        const {access_token} = response.data.token;
-        const {email} = response.data.user;
+    try {
+      const response = await axios.post(url, data);
 
-        navigation.navigate('Otp', {
-          token: access_token,
-          email,
-          action: 'forgotPassword',
-        });
-      })
-      .catch(error => {
-        console.error('Error:', error);
-      })
-      .finally(() => {
-        setLoading(false);
+      const {access_token} = response.data.token;
+      const {email} = response.data.user;
+
+      navigation.navigate('Otp', {
+        token: access_token,
+        email,
+        action: 'forgotPassword',
       });
+    } catch (error) {
+      if (error.response && error.response.status === 401) {
+        setError('email', {
+          type: 'manual',
+          message: 'Email không tồn tại hoặc không hợp lệ.',
+        });
+      } else {
+        console.error('Error:', error);
+        alert('Đã xảy ra lỗi. Vui lòng thử lại sau.');
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   const dismissKeyboard = () => {

@@ -31,6 +31,7 @@ const SignUpScreen = () => {
     handleSubmit,
     formState: {errors},
     setValue,
+    setError,
   } = useForm();
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [termsAccepted, setTermsAccepted] = useState(false);
@@ -49,24 +50,33 @@ const SignUpScreen = () => {
 
     setLoading(true);
 
-    axios
-      .post(POSTS_API_URL, formattedData)
-      .then(response => {
-        const {access_token} = response.data.token;
-        const {email} = response.data.user;
+    try {
+      const response = await axios.post(POSTS_API_URL, formattedData);
 
-        navigation.navigate('Otp', {
-          token: access_token,
-          email,
-          action: 'register',
+      if (response.data.user.data === 'Email already exists') {
+        setError('email', {
+          type: 'manual',
+          message: 'Email này đã được đăng ký.',
         });
-      })
-      .catch(error => {
-        console.error('Error:', error);
-      })
-      .finally(() => {
-        setLoading(false);
+        return;
+      }
+
+      const {access_token} = response.data.token;
+      const {email} = response.data.user;
+
+      navigation.navigate('Otp', {
+        token: access_token,
+        email,
+        action: 'register',
       });
+    } catch (error) {
+      setLoading(false);
+
+      console.error('Error:', error);
+      alert('Đã xảy ra lỗi. Vui lòng thử lại sau.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleBack = () => {
@@ -158,13 +168,14 @@ const SignUpScreen = () => {
                 rules={{
                   required: 'Vui lòng nhập Số điện thoại',
                   pattern: {
-                    value: /^[0-9+-]*$/,
+                    value: /^(0[3|5|7|8|9])+([0-9]{8,9})\b$/,
                     message: 'Số điện thoại không hợp lệ',
                   },
                 }}
                 render={({field: {onChange, onBlur, value}}) => (
                   <TextInput
                     style={styles.input}
+                    a
                     placeholder="Nhập Số điện thoại"
                     placeholderTextColor="#FFFFFF"
                     onBlur={onBlur}
@@ -189,6 +200,10 @@ const SignUpScreen = () => {
                   minLength: {
                     value: 6,
                     message: 'Mật khẩu phải có ít nhất 6 ký tự',
+                  },
+                  maxLength: {
+                    value: 30,
+                    message: 'Mật khẩu không được vượt quá 30 ký tự',
                   },
                 }}
                 render={({field: {onChange, onBlur, value}}) => (
@@ -228,10 +243,11 @@ const SignUpScreen = () => {
                     </TouchableOpacity>
                     {showDatePicker && (
                       <DateTimePicker
-                        value={value ? new Date(value) : new Date()}
+                        value={value ? new Date(value) : new Date(2000, 0, 1)}
                         mode="date"
                         display="default"
-                        maximumDate={new Date()}
+                        maximumDate={new Date(2007, 12, 31)}
+                        minimumDate={new Date(1900, 0, 1)} // Optionally, set a minimum date
                         onChange={(event, selectedDate) => {
                           setShowDatePicker(false);
                           if (selectedDate) {
@@ -288,7 +304,7 @@ const SignUpScreen = () => {
                 boxType="circle"
               />
               <Text style={[styles.checkBoxText, {color: '#FF9C00'}]}>
-                Chấp nhận các quyền riêng tư
+                Chấp nhận chính sách và các quyền riêng tư
               </Text>
             </View>
           </View>

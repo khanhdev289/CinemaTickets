@@ -31,29 +31,29 @@ const SignInScreen = () => {
   const {login} = useAuth();
   const navigation = useNavigation();
   const [loading, setLoading] = useState(false);
-  const [termsAccepted, setTermsAccepted] = useState(false);
+  // const [termsAccepted, setTermsAccepted] = useState(false);
   const [fcmToken, setFcmToken] = useState('');
 
-  useEffect(() => {
-    const fetchStoredCredentials = async () => {
-      try {
-        const storedEmail = await AsyncStorage.getItem('email');
-        const storedPassword = await AsyncStorage.getItem('password');
+  // useEffect(() => {
+  //   const fetchStoredCredentials = async () => {
+  //     try {
+  //       const storedEmail = await AsyncStorage.getItem('email');
+  //       const storedPassword = await AsyncStorage.getItem('password');
 
-        if (storedEmail && storedPassword) {
-          setEmail(storedEmail);
-          setPassword(storedPassword);
-          setTermsAccepted(true);
-        } else {
-          console.log('Không tìm thấy email hoặc password trong AsyncStorage.');
-        }
-      } catch (error) {
-        console.error('Lỗi khi lấy thông tin đã lưu:', error);
-      }
-    };
+  //       if (storedEmail && storedPassword) {
+  //         setEmail(storedEmail);
+  //         setPassword(storedPassword);
+  //         setTermsAccepted(true);
+  //       } else {
+  //         console.log('Không tìm thấy email hoặc password trong AsyncStorage.');
+  //       }
+  //     } catch (error) {
+  //       console.error('Lỗi khi lấy thông tin đã lưu:', error);
+  //     }
+  //   };
 
-    fetchStoredCredentials();
-  }, []);
+  //   fetchStoredCredentials();
+  // }, []);
 
   useEffect(() => {
     const getToken = async () => {
@@ -94,13 +94,13 @@ const SignInScreen = () => {
         //   );
         // }
 
-        if (termsAccepted) {
-          await AsyncStorage.setItem('email', email);
-          await AsyncStorage.setItem('password', password);
-        } else {
-          await AsyncStorage.removeItem('email');
-          await AsyncStorage.removeItem('password');
-        }
+        // if (termsAccepted) {
+        // await AsyncStorage.setItem('email', email);
+        // await AsyncStorage.setItem('password', password);
+        // } else {
+        //   await AsyncStorage.removeItem('email');
+        //   await AsyncStorage.removeItem('password');
+        // }
 
         navigation.navigate('Home');
       }
@@ -159,8 +159,8 @@ const SignInScreen = () => {
                 />
               </View>
             </View>
-            <View style={styles.row}>
-              <View style={styles.checkBoxContainer}>
+            {/* <View style={styles.row}> */}
+            {/* <View style={styles.checkBoxContainer}>
                 <CheckBox
                   value={termsAccepted}
                   onValueChange={setTermsAccepted}
@@ -171,13 +171,13 @@ const SignInScreen = () => {
                 <Text style={[styles.checkBoxText, {color: '#FF9C00'}]}>
                   Nhớ mật khẩu
                 </Text>
-              </View>
-              <View style={styles.forgotPassword}>
-                <TouchableOpacity onPress={handleForgotPassword}>
-                  <Text style={styles.forgotPasswordText}>Quên mật khẩu ?</Text>
-                </TouchableOpacity>
-              </View>
+              </View> */}
+            <View style={styles.forgotPassword}>
+              <TouchableOpacity onPress={handleForgotPassword}>
+                <Text style={styles.forgotPasswordText}>Quên mật khẩu ?</Text>
+              </TouchableOpacity>
             </View>
+            {/* </View> */}
             <TouchableOpacity
               style={styles.buttonContainer}
               onPress={handleLogin}>
@@ -278,14 +278,14 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
   },
-  checkBoxContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  row: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginHorizontal: '5%',
-  },
+  // checkBoxContainer: {
+  //   flexDirection: 'row',
+  //   alignItems: 'center',
+  // },
+  // row: {
+  //   flexDirection: 'row',
+  //   alignItems: 'center',
+  //   justifyContent: 'space-between',
+  //   marginHorizontal: '5%',
+  // },
 });

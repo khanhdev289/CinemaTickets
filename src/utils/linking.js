@@ -8,6 +8,8 @@ const linking = {
       },
       Welcome: {path: 'welcome'},
       Login: {path: 'login'},
+      Home: {path: 'home'},
+
       // Add other screens as needed...
     },
   },
