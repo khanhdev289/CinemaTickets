@@ -85,6 +85,12 @@ android {
         missingDimensionStrategy 'react-native-camera', 'general'
     }
     signingConfigs {
+        release{
+            storeFile file('new_key.keystore')
+            storePassword 'khanh2809'
+            keyAlias 'new_key'
+            keyPassword 'khanh2809'
+        }
         debug {
             storeFile file('debug.keystore')
             storePassword 'android'

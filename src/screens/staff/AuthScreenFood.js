@@ -50,7 +50,6 @@ const AuthScreenFood = () => {
       const url = `${POSTS_API_URL}/${ticketId}`;
       const response = await axiosInstance.get(url);
       const data = response.data.getTicket;
-      console.log(data);
       setTicketData({
         ...data,
         showdate: {
@@ -206,7 +205,7 @@ const AuthScreenFood = () => {
               <View style={styles.foodItem}>
                 <Text style={styles.foodName}>{item.foodId.name}</Text>
                 <Text style={styles.foodQuantity}>{item.quantity}</Text>
-                <Text style={styles.foodPrice}>{item.price} VND</Text>
+                <Text style={styles.foodPrice}>{item.foodId.price} VND</Text>
               </View>
             )}
           />
@@ -244,7 +243,7 @@ const AuthScreenFood = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingHorizontal: 20,
+    padding: 20,
     backgroundColor: 'black',
   },
   loadingContainer: {
@@ -261,6 +260,7 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 10,
     elevation: 3,
+    marginTop: 20,
   },
   movieContainer: {
     flexDirection: 'row',

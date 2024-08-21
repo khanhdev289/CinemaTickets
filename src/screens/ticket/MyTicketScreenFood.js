@@ -48,7 +48,6 @@ const MyTicketScreenFood = () => {
       const url = `${POSTS_API_URL}/${ticketId}`;
       const response = await axiosInstance.get(url);
       const data = response.data.getTicket;
-      console.log(data);
       setTicketData({
         ...data,
         showdate: {
@@ -134,6 +133,7 @@ const styles = StyleSheet.create({
     color: 'white',
   },
   ticketContainer: {
+    marginTop: 50,
     backgroundColor: 'white',
     padding: 10,
     borderRadius: 10,
@@ -267,7 +267,6 @@ const styles = StyleSheet.create({
   foodItem1: {
     flexDirection: 'row',
     justifyContent: 'space-around',
-    marginVertical: 10,
     borderWidth: 1,
   },
 });

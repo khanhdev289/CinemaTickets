@@ -1,7 +1,13 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
 import {useNavigation} from '@react-navigation/native';
-import {View, Text, StyleSheet, TouchableOpacity} from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  BackHandler,
+} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import MyTicketScreen from './MyTicketScreen';
 
@@ -33,6 +39,20 @@ const TicketScreen = ({route}) => {
       navigation.goBack();
     }
   };
+
+  useEffect(() => {
+    const backAction = () => {
+      handleBack();
+      return true;
+    };
+
+    const backHandler = BackHandler.addEventListener(
+      'hardwareBackPress',
+      backAction,
+    );
+
+    return () => backHandler.remove();
+  }, [check, navigation]);
 
   return (
     <SafeAreaView style={{flex: 1, backgroundColor: 'black'}}>

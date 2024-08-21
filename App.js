@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
-import {StyleSheet, Text, View} from 'react-native';
-import {NavigationContainer} from '@react-navigation/native';
+import {StyleSheet, Text, View, Linking, Platform} from 'react-native';
+import {NavigationContainer, useNavigation} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import BottomNavication from './src/screens/other/BottomNavication';
 import SignInScreen from './src/screens/start/SignInScreen';
@@ -32,12 +32,24 @@ import WelComeNew from './src/screens/start/WelComeNew';
 import DiscountDetailScreen from './src/screens/home/DiscountDetailScreen';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-import notifee, {EventType} from '@notifee/react-native';
+import notifee, {EventType, AndroidImportance} from '@notifee/react-native';
 import messaging from '@react-native-firebase/messaging';
 import {PERMISSIONS, request} from 'react-native-permissions';
 import NotificationScreen from './src/screens/other/NotificationScreen';
+import linking from './src/utils/linking';
 
 const Stack = createNativeStackNavigator();
+
+const UPDATE_NOTIFI_API_URL = 'http://139.180.132.97:3000/notification';
+
+const updateNotificationStatus = async notifiId => {
+  try {
+    await axios.put(`${UPDATE_NOTIFI_API_URL}/${notifiId}`, {status: false});
+    console.log('Notification status updated successfully');
+  } catch (error) {
+    console.error('Error updating notification status:', error);
+  }
+};
 
 export default function App() {
   const [initialRoute, setInitialRoute] = useState(null);
@@ -47,11 +59,9 @@ export default function App() {
       try {
         const isFirstLaunch = await AsyncStorage.getItem('isFirstLaunch');
         if (isFirstLaunch === null) {
-          // First launch
           await AsyncStorage.setItem('isFirstLaunch', 'false');
           setInitialRoute('WelComeNew');
         } else {
-          // Not the first launch
           setInitialRoute('Home');
         }
       } catch (error) {
@@ -59,92 +69,128 @@ export default function App() {
       }
     };
     checkFirstLaunch();
+    if (Platform.OS === 'android') {
+      const fetchToken = async () => {
+        const token = await getFcmToken();
+        if (token) {
+          await AsyncStorage.setItem('fcmToken', token);
+        }
+      };
+      fetchToken();
 
-    const fetchToken = async () => {
-      const token = await getFcmToken();
-      if (token) {
-        await AsyncStorage.setItem('fcmToken', token);
-        console.log('FCM Token stored:', token);
-      }
-    };
-    fetchToken();
+      const createNotificationChannel = async () => {
+        try {
+          await notifee.createChannel({
+            id: 'default',
+            name: 'Default Channel',
+            sound: 'default',
+            importance: AndroidImportance.HIGH,
+            // smallIcon: 'ic_launcher_notification_foreground',
+            // color: '#FFFFFF',
+          });
+          console.log('Notification channel created');
+        } catch (error) {
+          console.error('Error creating notification channel:', error);
+        }
+      };
 
-    const createNotificationChannel = async () => {
-      try {
-        await notifee.createChannel({
-          id: 'default',
-          name: 'Default Channel',
-          sound: 'default',
-          vibration: true,
-        });
-        console.log('Notification channel created');
-      } catch (error) {
-        console.error('Error creating notification channel:', error);
-      }
-    };
+      createNotificationChannel();
 
-    createNotificationChannel();
+      const unsubscribe = messaging().onMessage(async remoteMessage => {
+        console.log(
+          'A new FCM message arrived!',
+          JSON.stringify(remoteMessage),
+        );
 
-    const unsubscribe = messaging().onMessage(async remoteMessage => {
-      console.log('A new FCM message arrived!', JSON.stringify(remoteMessage));
-      if (
-        remoteMessage?.notification?.title &&
-        remoteMessage?.notification?.body
-      ) {
-        await notifee.displayNotification({
-          title: remoteMessage.notification.title,
-          body: remoteMessage.notification.body,
-          android: {
-            channelId: 'default',
-            pressAction: {
-              id: 'default',
+        if (
+          remoteMessage?.notification?.title &&
+          remoteMessage?.notification?.body
+        ) {
+          await notifee.displayNotification({
+            title: remoteMessage.notification.title,
+            body: remoteMessage.notification.body,
+            data: remoteMessage.data,
+            android: {
+              channelId: 'default',
+              pressAction: {
+                id: 'default',
+              },
+              importance: AndroidImportance.HIGH,
+              smallIcon: 'ic_mess_noti',
+              color: '#ef5455',
             },
-          },
-        });
-      }
-    });
-
-    notifee.onForegroundEvent(({type, detail}) => {
-      switch (type) {
-        case EventType.DISMISSED:
-          console.log('User dismissed notification', detail.notification);
-          break;
-        case EventType.PRESS:
-          console.log('User pressed notification', detail.notification);
-          break;
-      }
-    });
-
-    messaging().onNotificationOpenedApp(async remoteMessage => {
-      console.log(
-        'onNotificationOpenedApp Received',
-        JSON.stringify(remoteMessage),
-      );
-    });
-
-    messaging()
-      .getInitialNotification()
-      .then(remoteMessage => {
-        if (remoteMessage) {
-          console.log(
-            'Notification caused app to open from quit state:',
-            remoteMessage.notification,
-          );
+          });
         }
       });
 
-    return () => {
-      unsubscribe();
-    };
+      notifee.onForegroundEvent(async ({type, detail}) => {
+        if (type === EventType.PRESS) {
+
+          const {data} = detail.notification || {};
+
+          if (data) {
+            if (data.ticketId && data.notifiId) {
+              await updateNotificationStatus(data.notifiId);
+              Linking.openURL(`mychat://ticket/${data.ticketId}`);
+            }
+          } else {
+            console.log('Data is missing in the notification');
+          }
+        }
+      });
+
+      notifee.onBackgroundEvent(async ({type, detail}) => {
+        const {notification, pressAction} = detail;
+
+        if (type === EventType.ACTION_PRESS && pressAction.id === 'default') {
+          const {data} = notification || {};
+
+          if (data && data.ticketId && data.notifiId) {
+            await updateNotificationStatus(data.notifiId);
+            Linking.openURL(`mychat://ticket/${data.ticketId}`);
+          } else {
+            console.log('Data is missing in the notification');
+          }
+        }
+      });
+
+      messaging().onNotificationOpenedApp(async remoteMessage => {
+        const {data} = remoteMessage;
+        if (data && data.ticketId && data.notifiId) {
+          await updateNotificationStatus(data.notifiId);
+          Linking.openURL(`mychat://ticket/${data.ticketId}`);
+        } else {
+          console.log('Data is missing in the notification2');
+        }
+      });
+
+      messaging()
+        .getInitialNotification()
+        .then(async remoteMessage => {
+          if (remoteMessage) {
+            const {data} = remoteMessage;
+            if (data && data.ticketId && data.notifiId) {
+              await updateNotificationStatus(data.notifiId);
+              Linking.openURL(`mychat://ticket/${data.ticketId}`);
+            } else {
+              console.log('Data is missing in the notification3');
+            }
+          }
+        });
+
+      return () => {
+        unsubscribe();
+      };
+    }
   }, []);
 
   if (initialRoute === null) {
-    return null; // or a loading spinner
+    return null;
   }
 
   return (
     <AuthProvider>
-      <NavigationContainer>
+      <NavigationContainer linking={linking}>
         <StripeProvider publishableKey="pk_test_51PNdpDDbcfrQz51XX1abFbkrZH4yagcpYDWPNRrA8ursSgjR1LCRAPh5TFqjPsYKcgsnSPEu5BWMSvW20lYqwVEy00ludlggnR">
           <Stack.Navigator initialRouteName={initialRoute}>
             <Stack.Screen

@@ -60,7 +60,6 @@ const SignInScreen = () => {
       const fcmToken = await AsyncStorage.getItem('fcmToken');
       if (fcmToken) {
         setFcmToken(fcmToken);
-        console.log('AsyncStorage FCM Token :', fcmToken);
       }
     };
 
@@ -88,7 +87,6 @@ const SignInScreen = () => {
       } else {
         console.log('Đăng nhập thành công:', response.data);
         const userData = response.data;
-        login(userData);
 
         // if (fcmToken) {
         //   await axios.post(

@@ -50,7 +50,6 @@ const MyTicketScreen = () => {
       const url = `${POSTS_API_URL}/${ticketId}`;
       const response = await axiosInstance.get(url);
       const data = response.data.getTicket;
-      console.log(data);
       setTicketData({
         ...data,
         showdate: {
@@ -186,6 +185,7 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 10,
     elevation: 3,
+    marginTop: 50,
   },
   movieContainer: {
     flexDirection: 'row',

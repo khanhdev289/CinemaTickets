@@ -131,6 +131,7 @@ const PaymentScreen = ({route}) => {
         }),
       );
       const comboRespose = await fetchCombo();
+
       setCombo(comboRespose);
       setMovieInfo(movieResponse);
       setCinemaInfo(cinemaResponse);
@@ -139,6 +140,19 @@ const PaymentScreen = ({route}) => {
       setSeatInfor(seatResponses);
     } catch (error) {
       console.error('Error fetching data:', error);
+      if (error.response && error.response.status === 500) {
+        Alert.alert(
+          'Thông báo',
+          'Vé đã có người đặt. Vui lòng chọn vé khác.',
+          [
+            {
+              text: 'OK',
+              onPress: () => navigation.goBack(),
+            },
+          ],
+          {cancelable: false},
+        );
+      }
     } finally {
       setIsLoading(false);
     }
@@ -230,7 +244,6 @@ const PaymentScreen = ({route}) => {
   const handleApplyDiscount = async () => {
     try {
       const discountData = await checkDiscount(discountCode, ticketData.cinema);
-      console.log(discountData);
       if (discountData.type === 'ticket') {
         setDiscountAmountT(discountData.percent * parseFloat(ticketData.total));
       } else if (discountData.type === 'food') {
@@ -261,7 +274,6 @@ const PaymentScreen = ({route}) => {
           },
         },
       );
-      console.log(response.data);
 
       if (!selectedPaymentMethod) {
         Alert.alert('Thông báo', 'Bạn cần chọn phương thức thanh toán');
@@ -316,7 +328,6 @@ const PaymentScreen = ({route}) => {
       const response = await axiosInstance.put(url);
 
       const data = response.data;
-      console.log(data);
 
       navigation.navigate('TicketScreen', {_id: ticketData._id, check: true});
     } catch (error) {
@@ -345,7 +356,9 @@ const PaymentScreen = ({route}) => {
             source={{uri: IMAGE_API_URL + movieInfo.image}}
           />
           <View style={{flexDirection: 'column', margin: 10}}>
-            <Text style={styles.movieTitle}>{movieInfo.name}</Text>
+            <Text numberOfLines={2} style={styles.movieTitle}>
+              {movieInfo.name}
+            </Text>
             <View
               style={{
                 flexDirection: 'row',
@@ -457,7 +470,7 @@ const PaymentScreen = ({route}) => {
           </Text>
         </View>
         <Text style={{color: 'white', margin: 5, fontSize: 20}}>
-          Phương Thức Thanh Toán
+          Phương thức thanh toán
         </Text>
         <TouchableOpacity
           style={[

@@ -52,7 +52,6 @@ const SignUpScreen = () => {
     axios
       .post(POSTS_API_URL, formattedData)
       .then(response => {
-        console.log('Success:', response.data);
         const {access_token} = response.data.token;
         const {email} = response.data.user;
 
