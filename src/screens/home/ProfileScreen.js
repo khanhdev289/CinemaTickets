@@ -110,7 +110,7 @@ const ProfileScreen = ({navigation}) => {
         {
           text: 'Đăng xuất',
           onPress: () => {
-            navigation.navigate('Welcome');
+            navigation.navigate('Home');
             logout();
           },
           style: 'destructive',

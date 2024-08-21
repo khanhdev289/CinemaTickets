@@ -29,9 +29,8 @@ import {
 } from '../../../api';
 import iconBack from '../../assets/icons/iconBack';
 
-import { useNavigation } from '@react-navigation/native';
-import { useAuth } from '../../components/AuthProvider ';
-
+import {useNavigation} from '@react-navigation/native';
+import {useAuth} from '../../components/AuthProvider ';
 
 const screenWidth = Dimensions.get('screen').width;
 const screenHeight = Dimensions.get('screen').height;
@@ -45,8 +44,7 @@ const MovieDetailScreen = ({route}) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
-  const { user } = useAuth();
-
+  const {user} = useAuth();
 
   const navigation = useNavigation();
   useEffect(() => {
@@ -61,9 +59,7 @@ const MovieDetailScreen = ({route}) => {
       } finally {
         setIsLoading(false);
       }
-
-    }
-
+    };
 
     fetchData();
   }, [movieId]);
@@ -236,7 +232,7 @@ const MovieDetailScreen = ({route}) => {
               style={styles.button}
               onPress={() => {
                 if (!user) {
-                  navigation.navigate('Login');
+                  navigation.navigate('Welcome');
 
                   return;
                 }
@@ -244,8 +240,9 @@ const MovieDetailScreen = ({route}) => {
                 if (selectedTheater) {
                   // Nếu đã chọn rạp chiếu, điều hướng tới màn hình chọn ghế
 
-                  navigation.navigate('SelectSeatScreen', { roomId: selectedTheater });
-
+                  navigation.navigate('SelectSeatScreen', {
+                    roomId: selectedTheater,
+                  });
                 } else {
                   // Xử lý trường hợp không có rạp nào được chọn
                   Alert.alert('Thông báo', 'Vui lòng chọn một rạp chiếu');
@@ -253,7 +250,6 @@ const MovieDetailScreen = ({route}) => {
               }}>
               <Text style={styles.buttonText}>Tiếp tục</Text>
             </TouchableOpacity>
-
           </>
         )}
       </ScrollView>
