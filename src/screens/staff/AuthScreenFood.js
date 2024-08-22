@@ -67,7 +67,10 @@ const AuthScreenFood = () => {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.loadingContainer}>
-          <Text style={styles.loadingText}>Không có dữ liệu</Text>
+          <Text style={styles.loadingText}>
+            {' '}
+            Vé đã được quét hoặc không có dữ liệu
+          </Text>
         </View>
       </SafeAreaView>
     );
@@ -230,12 +233,12 @@ const AuthScreenFood = () => {
             </View>
           </View>
         </View>
+        <TouchableOpacity
+          style={styles.printButton}
+          onPress={() => createPdf(ticketData)}>
+          <Text style={styles.printText}>Xuất Vé</Text>
+        </TouchableOpacity>
       </ScrollView>
-      <TouchableOpacity
-        style={styles.printButton}
-        onPress={() => createPdf(ticketData)}>
-        <Text style={styles.printText}>Xuất Vé</Text>
-      </TouchableOpacity>
     </SafeAreaView>
   );
 };
@@ -356,8 +359,9 @@ const styles = StyleSheet.create({
     marginLeft: 10,
   },
   instructionText: {
+    width: '80%',
     fontSize: 14,
-    textAlign: 'center',
+    textAlign: 'start',
     color: 'black',
     marginLeft: 10,
   },

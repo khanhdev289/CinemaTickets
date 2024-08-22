@@ -285,8 +285,9 @@ const styles = StyleSheet.create({
     marginLeft: 10,
   },
   instructionText: {
+    width: '80%',
     fontSize: 14,
-    textAlign: 'center',
+    textAlign: 'start',
     color: 'black',
     marginLeft: 10,
   },

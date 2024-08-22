@@ -179,7 +179,9 @@ const AuthScreen = () => {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.loadingContainer}>
-          <Text style={styles.loadingText}>Không có dữ liệu</Text>
+          <Text style={styles.loadingText}>
+            Vé đã được quét hoặc không có dữ liệu
+          </Text>
         </View>
       </SafeAreaView>
     );
@@ -269,12 +271,12 @@ const AuthScreen = () => {
             </Text>
           </View>
         </View>
+        <TouchableOpacity
+          style={styles.printButton}
+          onPress={() => createPdf(ticketData)}>
+          <Text style={styles.printText}>Xuất Vé</Text>
+        </TouchableOpacity>
       </ScrollView>
-      <TouchableOpacity
-        style={styles.printButton}
-        onPress={() => createPdf(ticketData)}>
-        <Text style={styles.printText}>Xuất Vé</Text>
-      </TouchableOpacity>
     </SafeAreaView>
   );
 };
@@ -288,6 +290,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'black',
   },
   loadingContainer: {
+    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -426,9 +429,9 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   instructionText: {
+    width: '80%',
     fontSize: 14,
-    textAlign: 'center',
-    marginTop: 5,
+    textAlign: 'start',
     color: 'black',
     marginLeft: 10,
   },

@@ -31,10 +31,12 @@ const ChangePassScreen = () => {
         return;
       }
 
-      if (newPassword.length < 6 || newPassword.trim() === '') {
-        Alert.alert(
-          'Mật khẩu mới phải có ít nhất 6 ký tự và không được để trống',
-        );
+      if (newPassword.length < 6 || newPassword.length > 30) {
+        Alert.alert('Mật khẩu mới phải có ít nhất 6 kí tự và tối đa 30 kí tự');
+        return;
+      }
+      if (newPassword.trim() === '') {
+        Alert.alert('Mật khẩu mới phải không được để trống');
         return;
       }
 
@@ -77,10 +79,7 @@ const ChangePassScreen = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-            <HeaderComponent
-        title="Đổi mật khẩu"
-        navigation={navigation}
-      />
+      <HeaderComponent title="Đổi mật khẩu" navigation={navigation} />
       <View style={styles.inputForm}>
         <View style={styles.inputRegister}>
           <Text style={styles.label}>Mật khẩu hiện tại</Text>

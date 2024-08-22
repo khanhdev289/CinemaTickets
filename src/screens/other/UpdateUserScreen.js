@@ -9,13 +9,13 @@ import {
   SafeAreaView,
   ScrollView,
   ActivityIndicator,
+  Alert,
 } from 'react-native';
 import {launchImageLibrary} from 'react-native-image-picker';
-import {SvgXml} from 'react-native-svg';
 import axios from 'axios';
-import iconsBack from '../../assets/icons/iconsBack';
-import {useAuth} from '../../components/AuthProvider ';
+
 import HeaderComponent from '../../components/HeaderComponent';
+import {useAuth} from '../../components/AuthProvider ';
 
 const POSTS_API_URL = 'http://139.180.132.97:3000/users';
 const IMAGE_API_URL = 'http://139.180.132.97:3000/images/';
@@ -34,11 +34,39 @@ const UpdateUserScreen = ({navigation, route}) => {
     const randomString = Math.random().toString(36).substring(7);
     return `${randomString}.jpg`;
   };
+
   const handleBack = () => {
     navigation.goBack();
   };
 
+  const validateInputs = () => {
+    if (!profileName) {
+      alert('Tên không được để trống.');
+      return false;
+    }
+    const nameRegex = /^[a-zA-Z\s]{6,30}$/;
+    if (!nameRegex.test(profileName)) {
+      alert('Tên phải từ 6 đến 30 ký tự và không chứa ký tự đặc biệt.');
+      return false;
+    }
+    if (!profilePhone) {
+      alert('Số điện thoại không được để trống.');
+      return false;
+    }
+    const phoneRegex = /^[0-9]{10,11}$/;
+    if (!phoneRegex.test(profilePhone)) {
+      alert('Số điện thoại phải chứa từ 10 đến 11 chữ số và chỉ chứa số.');
+      return false;
+    }
+
+    return true;
+  };
+
   const updateUserData = async () => {
+    if (!validateInputs()) {
+      return;
+    }
+
     try {
       setIsLoading(true);
 
@@ -52,11 +80,10 @@ const UpdateUserScreen = ({navigation, route}) => {
           name: generateRandomName(),
         });
       } else {
-        // Nếu profileImage rỗng, sử dụng ảnh cũ (dataUserImage)
         formData.append('image', {
           uri: IMAGE_API_URL + dataUserImage,
           type: 'image/jpeg',
-          name: dataUserImage, // Đặt tên ảnh là tên hiện tại
+          name: dataUserImage,
         });
       }
       formData.append('name', profileName);
@@ -247,7 +274,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderRadius: 10,
     marginHorizontal: 15,
-
     marginTop: 30,
   },
   logoutText: {
