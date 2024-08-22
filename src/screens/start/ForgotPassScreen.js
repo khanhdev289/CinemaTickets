@@ -95,7 +95,7 @@ const ForgotPassScreen = () => {
                     placeholder="Nhập Email của bạn"
                     placeholderTextColor="#FFFFFF"
                     onBlur={onBlur}
-                    onChangeText={onChange}
+                    onChangeText={text => onChange(text.trim())}
                     value={value}
                     keyboardType="email-address"
                   />

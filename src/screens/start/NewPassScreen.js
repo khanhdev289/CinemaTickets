@@ -14,7 +14,7 @@ import {
 import {SvgXml} from 'react-native-svg';
 import iconsBack from '../../assets/icons/iconsBack';
 import {useForm, Controller} from 'react-hook-form';
-import {useNavigation, useRoute} from '@react-navigation/native';
+import {useNavigation, useRoute, CommonActions} from '@react-navigation/native';
 import Spinner from 'react-native-loading-spinner-overlay';
 import axios from 'axios';
 
@@ -59,7 +59,18 @@ const NewPassScreen = () => {
           [
             {
               text: 'OK',
-              onPress: () => navigation.navigate('Login'),
+              onPress: () => {
+                navigation.dispatch(
+                  CommonActions.reset({
+                    index: 2,
+                    routes: [
+                      {name: 'Home'},
+                      {name: 'Welcome'},
+                      {name: 'Login'},
+                    ],
+                  }),
+                );
+              },
             },
           ],
         );
@@ -101,6 +112,13 @@ const NewPassScreen = () => {
                     value: 6,
                     message: 'Mật khẩu phải có ít nhất 6 ký tự',
                   },
+                  maxLength: {
+                    value: 30,
+                    message: 'Mật khẩu không được vượt quá 30 ký tự',
+                  },
+                  validate: value =>
+                    value.trim().length > 0 ||
+                    'Mật khẩu không được chỉ chứa ký tự trắng',
                 }}
                 render={({field: {onChange, onBlur, value}}) => (
                   <TextInput
@@ -125,8 +143,13 @@ const NewPassScreen = () => {
                 control={control}
                 rules={{
                   required: 'Vui lòng nhập lại Mật khẩu',
-                  validate: value =>
-                    value === watch('newPassword') || 'Mật khẩu không khớp',
+                  validate: {
+                    matchesPassword: value =>
+                      value === watch('newPassword') || 'Mật khẩu không khớp',
+                    notOnlyWhitespace: value =>
+                      value.trim().length > 0 ||
+                      'Mật khẩu không được chỉ chứa ký tự trắng',
+                  },
                 }}
                 render={({field: {onChange, onBlur, value}}) => (
                   <TextInput

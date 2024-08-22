@@ -110,8 +110,11 @@ const ProfileScreen = ({navigation}) => {
         {
           text: 'Đăng xuất',
           onPress: () => {
-            navigation.navigate('Home');
             logout();
+            navigation.reset({
+              index: 0,
+              routes: [{name: 'Home'}],
+            });
           },
           style: 'destructive',
         },

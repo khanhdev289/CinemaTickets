@@ -5,20 +5,17 @@ import iconSs from '../../assets/icons/iconSs';
 
 import {useNavigation, CommonActions} from '@react-navigation/native';
 
-
 const SuccessScreen = () => {
   const navigation = useNavigation();
 
   const handleLogin = () => {
-
     navigation.dispatch(
       CommonActions.reset({
-        index: 1,
-        routes: [{name: 'Welcome'}, {name: 'Login'}],
+        index: 2,
+        routes: [{name: 'Home'}, {name: 'Welcome'}, {name: 'Login'}],
       }),
     );
   };
-
 
   return (
     <View style={styles.container}>
@@ -36,9 +33,7 @@ const SuccessScreen = () => {
       </View>
       <TouchableOpacity style={styles.buttonContainer} onPress={handleLogin}>
         <View style={styles.button}>
-
           <Text style={styles.buttonText}>Đi tới màn hình đăng nhập</Text>
-
         </View>
       </TouchableOpacity>
     </View>

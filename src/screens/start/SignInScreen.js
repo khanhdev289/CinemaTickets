@@ -143,7 +143,7 @@ const SignInScreen = () => {
                   style={styles.input}
                   placeholder="Nhập Email"
                   placeholderTextColor="#FFFFFF"
-                  onChangeText={text => setEmail(text)}
+                  onChangeText={text => setEmail(text.trim())}
                   value={email}
                 />
               </View>

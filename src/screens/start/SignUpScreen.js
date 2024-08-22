@@ -149,7 +149,7 @@ const SignUpScreen = () => {
                     placeholder="Nhập Email"
                     placeholderTextColor="#FFFFFF"
                     onBlur={onBlur}
-                    onChangeText={onChange}
+                    onChangeText={text => onChange(text.trim())}
                     value={value}
                     keyboardType="email-address"
                   />
@@ -179,7 +179,7 @@ const SignUpScreen = () => {
                     placeholder="Nhập Số điện thoại"
                     placeholderTextColor="#FFFFFF"
                     onBlur={onBlur}
-                    onChangeText={onChange}
+                    onChangeText={text => onChange(text.trim())}
                     value={value}
                     keyboardType="phone-pad"
                   />
@@ -205,6 +205,9 @@ const SignUpScreen = () => {
                     value: 30,
                     message: 'Mật khẩu không được vượt quá 30 ký tự',
                   },
+                  validate: value =>
+                    value.trim().length > 0 ||
+                    'Mật khẩu không được chỉ chứa ký tự trắng',
                 }}
                 render={({field: {onChange, onBlur, value}}) => (
                   <TextInput
@@ -391,9 +394,6 @@ const styles = StyleSheet.create({
     fontSize: 20,
   },
 
-  checkBox: {
-    marginRight: 10,
-  },
   checkBoxText: {
     color: '#FFFFFF',
   },
