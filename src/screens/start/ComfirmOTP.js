@@ -14,7 +14,7 @@ import {
   useClearByFocusCell,
 } from 'react-native-confirmation-code-field';
 import {SvgXml} from 'react-native-svg';
-import {useNavigation, useRoute, useIsFocused} from '@react-navigation/native';
+import {useNavigation, useRoute} from '@react-navigation/native';
 import {format} from 'date-fns';
 import axios from 'axios';
 import Spinner from 'react-native-loading-spinner-overlay';
@@ -46,30 +46,26 @@ const ConfirmOTP = () => {
   const [timeLeft, setTimeLeft] = useState(60);
   const navigation = useNavigation();
   const [isLoading, setIsLoading] = useState(false);
+
+  // Sử dụng useRef để theo dõi trạng thái điều hướng
   const isNavigated = useRef(false);
-  const isFocused = useIsFocused();
-  const timerRef = useRef(null);
 
   useEffect(() => {
     if (isNavigated.current) {
-      return;
+      return; // Dừng timer nếu đã điều hướng
     }
 
-    timerRef.current = setTimeout(() => {
+    const timer = setTimeout(() => {
       setTimeLeft(prevTime => (prevTime > 0 ? prevTime - 1 : 0));
     }, 1000);
 
-    if (timeLeft === 0 && isFocused && !isNavigated.current) {
-      navigation.goBack();
-    }
-
     return () => {
-      clearTimeout(timerRef.current); // Clear timer when component unmounts
+      clearTimeout(timer);
     };
-  }, [timeLeft, navigation, isFocused]);
+  }, [timeLeft]);
 
   useEffect(() => {
-    if (timeLeft === 0) {
+    if (timeLeft === 0 && !isNavigated.current) {
       navigation.goBack();
     }
   }, [timeLeft, navigation]);
@@ -120,8 +116,7 @@ const ConfirmOTP = () => {
       setIsLoading(false);
 
       if (response.status === 200) {
-        isNavigated.current = true; // Mark that navigation has occurred
-        clearTimeout(timerRef.current);
+        isNavigated.current = true; // Đánh dấu đã điều hướng
         switch (action) {
           case 'register':
             navigation.navigate('Ss');

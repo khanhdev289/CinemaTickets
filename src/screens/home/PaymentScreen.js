@@ -65,6 +65,8 @@ const PaymentScreen = ({route}) => {
   const [discountAmountT, setDiscountAmountT] = useState(0);
   const [discountAmountF, setDiscountAmountF] = useState(0);
   const [showAllItems, setShowAllItems] = useState(false);
+  const [idDiscountTicket, setidDiscountTicket] = useState('');
+  const [idDiscountFood, setidDiscountFood] = useState('');
   const [comboQuantities, setComboQuantities] = useState({
     combo1: 1,
     combo2: 1,
@@ -226,10 +228,11 @@ const PaymentScreen = ({route}) => {
           return null;
         })
         .filter(combo => combo !== null);
+      const discountIds = [idDiscountTicket, idDiscountFood];
       // Update ticket with new data
       await updateTicket(
         ticketData._id,
-        null,
+        discountIds,
         selectedCombos,
         getTotalPrice(),
         calculateTotalAmount(),
@@ -244,10 +247,13 @@ const PaymentScreen = ({route}) => {
   const handleApplyDiscount = async () => {
     try {
       const discountData = await checkDiscount(discountCode, ticketData.cinema);
+      console.log(discountData);
       if (discountData.type === 'ticket') {
         setDiscountAmountT(discountData.percent * parseFloat(ticketData.total));
+        setidDiscountTicket(discountData._id);
       } else if (discountData.type === 'food') {
         setDiscountAmountF(discountData.percent * parseFloat(getTotalPrice()));
+        setidDiscountFood(discountData._id);
       } else {
         Alert.alert('Thông báo', 'Mã code của bạn không hợp lệ');
       }
@@ -442,7 +448,7 @@ const PaymentScreen = ({route}) => {
         <View style={styles.line} />
 
         <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-          <Text style={styles.comboTitle}> Chọn combo</Text>
+          <Text style={styles.comboContainer}> Chọn combo</Text>
           <TouchableOpacity onPress={toggleShowAllItems}>
             <Text style={styles.viewAllText}>
               {showAllItems ? 'Ẩn đi' : 'Xem tất cả'}
@@ -702,6 +708,10 @@ const styles = StyleSheet.create({
   genre: {
     fontSize: 10,
     color: '#E6E6E6',
+  },
+  comboContainer: {
+    fontSize: 20,
+    color: 'white',
   },
 
   ticketInfo: {

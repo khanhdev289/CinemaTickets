@@ -18,35 +18,7 @@ import Spinner from 'react-native-loading-spinner-overlay';
 
 const WelcomeScreen = () => {
   const navigation = useNavigation();
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const checkCredentials = async () => {
-      try {
-        const storedEmail = await AsyncStorage.getItem('email');
-        const storedPassword = await AsyncStorage.getItem('password');
-
-        if (storedEmail && storedPassword) {
-          navigation.navigate('Login');
-        }
-      } catch (error) {
-        console.error('Lỗi khi kiểm tra thông tin đã lưu:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    checkCredentials();
-  }, [navigation]);
-
-  const handleTest = () => {
-    Alert.alert(
-      'Ngôn ngữ',
-      'chỉ vn thôi !',
-      [{text: 'OK', onPress: () => console.log('OK Pressed')}],
-      {cancelable: true},
-    );
-  };
+  const [loading, setLoading] = useState(false);
 
   const handleRegistwer = () => {
     navigation.navigate('Register');
