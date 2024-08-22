@@ -24,11 +24,10 @@ const SuccessScreen = () => {
           <SvgXml style={styles.back} xml={iconSs()} />
         </View>
         <Text style={styles.successText}>
-          Your sign up has been successfully placed
+          Chúc mừng bạn đã đăng ký thành công !
         </Text>
         <Text style={styles.infoText}>
-          Sit and relax while your order is being worked on. It’ll take 5
-          minutes before you get it.
+          Hãy tới màn hình đăng nhập và tìm kiếm bộ phim mà bạn yêu thích !
         </Text>
       </View>
       <TouchableOpacity style={styles.buttonContainer} onPress={handleLogin}>

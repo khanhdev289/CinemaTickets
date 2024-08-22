@@ -44,8 +44,8 @@ const UpdateUserScreen = ({navigation, route}) => {
       alert('Tên không được để trống.');
       return false;
     }
-    const nameRegex = /^[a-zA-Z\s]{6,30}$/;
-    if (!nameRegex.test(profileName)) {
+
+    if (profileName.length < 6 || profileName.length > 30) {
       alert('Tên phải từ 6 đến 30 ký tự và không chứa ký tự đặc biệt.');
       return false;
     }

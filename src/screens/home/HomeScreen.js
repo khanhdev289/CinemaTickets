@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {
   Text,
   View,
@@ -81,6 +81,7 @@ const HomeScreen = () => {
       setIsLoading(false);
     }
   };
+
   useEffect(() => {
     fetchData();
   }, []);
@@ -214,9 +215,7 @@ const Header = ({user}) => {
 
   return (
     <View style={styles.headerContainer}>
-      <Text style={styles.greetingText}>
-        Xin Chào {user ? `${user.user.name} 👋` : ''}
-      </Text>
+      <Text style={styles.greetingText}>Xin Chào 👋</Text>
       <TouchableOpacity onPress={handleNotificationPress}>
         <SvgXml xml={iconNotification()} />
         {user && unreadCount > 0 && (

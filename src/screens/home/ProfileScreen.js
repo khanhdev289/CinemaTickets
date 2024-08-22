@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import {
   View,
   Text,
@@ -27,6 +27,7 @@ import {useAuth} from '../../components/AuthProvider ';
 
 import iconMailProfile from '../../assets/icons/iconProfile/iconMailProfile';
 import iconPhoneProfile from '../../assets/icons/iconProfile/iconPhoneProfile';
+import {useFocusEffect} from '@react-navigation/native';
 
 const POSTS_API_URL = 'http://139.180.132.97:3000/users';
 const IMAGE_API_URL = 'http://139.180.132.97:3000/images/';
@@ -130,6 +131,13 @@ const ProfileScreen = ({navigation}) => {
       dataUserPhone: profilePhone,
     });
   };
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchDataUser();
+      return () => {};
+    }, []),
+  );
 
   useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {

@@ -194,7 +194,6 @@ const AuthScreen = () => {
           <View
             style={{
               flexDirection: 'row',
-
               justifyContent: 'space-around',
               padding: 20,
             }}>
@@ -202,7 +201,6 @@ const AuthScreen = () => {
               source={{uri: IMAGE_API_URL + ticketData.movie.image}}
               style={styles.moviePoster}
             />
-
             <View
               style={{
                 flexDirection: 'column',

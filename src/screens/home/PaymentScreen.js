@@ -442,7 +442,7 @@ const PaymentScreen = ({route}) => {
         <View style={styles.line} />
 
         <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-          <Text style={styles.comboTitle}> Chọn Combo</Text>
+          <Text style={styles.comboTitle}> Chọn combo</Text>
           <TouchableOpacity onPress={toggleShowAllItems}>
             <Text style={styles.viewAllText}>
               {showAllItems ? 'Ẩn đi' : 'Xem tất cả'}

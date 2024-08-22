@@ -232,12 +232,12 @@ const AuthScreenFood = () => {
               </Text>
             </View>
           </View>
-        </View>
-        <TouchableOpacity
+          <TouchableOpacity
           style={styles.printButton}
           onPress={() => createPdf(ticketData)}>
           <Text style={styles.printText}>Xuất Vé</Text>
         </TouchableOpacity>
+        </View>
       </ScrollView>
     </SafeAreaView>
   );
