@@ -16,6 +16,7 @@ import {SvgXml} from 'react-native-svg';
 import {ScrollView} from 'react-native-virtualized-view';
 import {da} from 'date-fns/locale';
 import MyTicketScreenFood from './MyTicketScreenFood';
+import iconBack from '../../assets/icons/iconBack';
 
 const Tab = createMaterialTopTabNavigator();
 
@@ -58,8 +59,10 @@ const TicketScreen = ({route}) => {
     <SafeAreaView style={{flex: 1, backgroundColor: 'black'}}>
       <View style={styles.header}>
         <View style={styles.backContainer}>
-          <TouchableOpacity onPress={handleBack}>
-            <SvgXml style={styles.back} xml={iconsBack()} />
+          <TouchableOpacity
+            style={styles.backButton}
+            onPress={() => handleBack()}>
+            <SvgXml xml={iconBack()} />
           </TouchableOpacity>
         </View>
         <Text style={styles.title}>Vé của tôi</Text>
@@ -114,7 +117,12 @@ const styles = StyleSheet.create({
   },
   backContainer: {
     position: 'absolute',
-    left: 8,
+    left: 20,
+    top: 5,
+  },
+  backButton: {
+    position: 'absolute',
+    zIndex: 1,
   },
   title: {
     fontSize: 28,

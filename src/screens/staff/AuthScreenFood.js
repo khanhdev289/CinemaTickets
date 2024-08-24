@@ -232,12 +232,12 @@ const AuthScreenFood = () => {
               </Text>
             </View>
           </View>
-          <TouchableOpacity
+        </View>
+        <TouchableOpacity
           style={styles.printButton}
           onPress={() => createPdf(ticketData)}>
           <Text style={styles.printText}>Xuất Vé</Text>
         </TouchableOpacity>
-        </View>
       </ScrollView>
     </SafeAreaView>
   );
@@ -396,6 +396,18 @@ const styles = StyleSheet.create({
     justifyContent: 'space-around',
     marginVertical: 10,
     borderWidth: 1,
+  },
+  printButton: {
+    marginTop: 10,
+    backgroundColor: '#f7b731',
+    paddingVertical: 15,
+    alignItems: 'center',
+    borderRadius: 10,
+  },
+  printText: {
+    color: '#000',
+    fontSize: 16,
+    fontWeight: 'bold',
   },
 });
 

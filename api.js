@@ -260,7 +260,7 @@ export const updateTicket = async (ticketId, discountId, foodItems, total_food, 
     const url = `/tickets/food/${ticketId}`; 
 
     const response = await api.put(url, {
-      discountId: discountId, // Có thể là null
+      discount: discountId, // Có thể là null
       food: foodItems, // Danh sách các đối tượng food với id và quantity
       total_food: total_food, // Tổng số tiền của food
       total: total // Tổng số tiền
@@ -283,4 +283,5 @@ export const checkDiscount = async (code,cinemaId) => {
     throw error;
   }
 };
+
 
