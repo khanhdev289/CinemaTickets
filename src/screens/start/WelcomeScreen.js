@@ -16,10 +16,11 @@ import {useNavigation} from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Spinner from 'react-native-loading-spinner-overlay';
 
-const WelcomeScreen = () => {
+const WelcomeScreen = ({route}) => {
+  const {movieId} = route.params;
   const navigation = useNavigation();
   const [loading, setLoading] = useState(false);
-
+  console.log("movieId",movieId);
   const handleRegistwer = () => {
     navigation.navigate('Register');
   };
