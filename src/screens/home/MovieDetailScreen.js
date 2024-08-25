@@ -248,18 +248,18 @@ const MovieDetailScreen = ({route}) => {
                     },
                   ]);
                 }
-                
-                const selectedTheaterData = theaterResponse.find(
-                  theater => theater.cinema._id === selectedTheater,
-                );
 
-                if (selectedTheaterData) {
-                  navigation.navigate('SelectSeatScreen', {
-                    rooms: selectedTheaterData.rooms,
-                  });
-                } else {
-                  Alert.alert('Thông báo', 'Vui lòng chọn một rạp chiếu');
-                }
+                // const selectedTheaterData = theaterResponse.find(
+                //   theater => theater.cinema._id === selectedTheater,
+                // );
+
+                // if (selectedTheaterData) {
+                //   navigation.navigate('SelectSeatScreen', {
+                //     rooms: selectedTheaterData.rooms,
+                //   });
+                // } else {
+                //   Alert.alert('Thông báo', 'Vui lòng chọn một rạp chiếu');
+                // }
               }}>
               <Text style={styles.buttonText}>Tiếp tục</Text>
             </TouchableOpacity>

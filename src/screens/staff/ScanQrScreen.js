@@ -9,7 +9,6 @@ import {PERMISSIONS, request} from 'react-native-permissions';
 import {useAuth} from '../../components/AuthProvider ';
 
 const POSTS_API_URL = 'http://139.180.132.97:3000/tickets/status/';
-const POSTS_API_URL_STATUS = 'http://139.180.132.97:3000/users';
 
 const ScanQrScreen = () => {
   const {user} = useAuth();
@@ -17,52 +16,14 @@ const ScanQrScreen = () => {
   const scannerRef = useRef(null);
   const [scanned, setScanned] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const {logout} = useAuth();
-  const [userDataStatus, setUserDataStatus] = useState('');
-
-  const fetchDataUserStatus = async () => {
-    try {
-      const userID = user.user._id;
-      const token = user.token.access_token;
-
-      const axiosInstance = axios.create({
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      const url = `${POSTS_API_URL_STATUS}/${userID}`;
-      const response = await axiosInstance.get(url);
-
-      const userData = response.data.getUser;
-      setUserDataStatus(userData.status);
-      if (user) {
-        if (userData.status === 'inactive') {
-          Alert.alert('Tài khoản đã bị vô hiệu hóa');
-          navigation.navigate('Welcome');
-          logout();
-        }
-      } else {
-        navigation.navigate('Home');
-      }
-    } catch (error) {
-      console.log('Error fetching data');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchDataUserStatus();
-  }, [user]);
 
   const requestCameraPermission = async () => {
     const result = await request(PERMISSIONS.IOS.CAMERA);
     if (result !== 'granted') {
-      // Alert.alert(
-      //   'Quyền Truy Cập Máy Ảnh',
-      //   'Quyền truy cập máy ảnh là cần thiết để quét mã QR.',
-      // );
+      Alert.alert(
+        'Quyền Truy Cập Máy Ảnh',
+        'Quyền truy cập máy ảnh là cần thiết để quét mã QR.',
+      );
     }
   };
 
