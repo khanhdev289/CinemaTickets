@@ -248,14 +248,14 @@ const MovieDetailScreen = ({route}) => {
                     },
                   ]);
                 }
-                
-                const selectedTheaterData = theaterResponse.find(
+                const selectedTheaterData = theaters.find(
                   theater => theater.cinema._id === selectedTheater,
                 );
-
                 if (selectedTheaterData) {
                   navigation.navigate('SelectSeatScreen', {
                     rooms: selectedTheaterData.rooms,
+                    movieId:movieId,
+                    cinemaId:selectedTheater,
                   });
                 } else {
                   Alert.alert('Thông báo', 'Vui lòng chọn một rạp chiếu');

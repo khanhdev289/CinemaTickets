@@ -17,7 +17,9 @@ import {SvgXml} from 'react-native-svg';
 import {
   createTicket,
   fetchRoom,
+  fetchRoombyMovie,
   fetchSeatByRoom,
+  fetchShowTimeById,
   fetchStatusSeats,
   fetchTimeByShowTime,
 } from '../../../api';
@@ -31,10 +33,12 @@ const screenWidth = Dimensions.get('screen').width;
 const screenHeight = Dimensions.get('screen').height;
 import io from 'socket.io-client';
 import HeaderComponent from '../../components/HeaderComponent';
+import {da} from 'date-fns/locale';
 
 const SelectSeatScreen = ({route}) => {
   const navigation = useNavigation();
-  const {roomId} = route.params;
+  const {rooms, movieId, cinemaId} = route.params;
+  console.log('movieId:', movieId, 'cinemaId: ', cinemaId);
   const [message, setMessage] = useState();
   const socket = io('http://139.180.132.97:3000');
   const handleBack = () => {
@@ -47,14 +51,31 @@ const SelectSeatScreen = ({route}) => {
   const [selectedDate, setSelectedDate] = useState(null);
   const [seats, setSeats] = useState([]);
   const [selectedSeats, setSelectedSeats] = useState([]);
+  const [roomId, setRoomId] = useState(null);
 
   const {user} = useAuth();
   const userID = user.user._id;
 
   useEffect(() => {
-    fetchRoomData(roomId);
-    fetchSeatData(roomId);
-  }, [roomId]);
+    if (selectedDateIndex !== null && selectedTimeIndex !== null) {
+      const showtimeId = dateArray[selectedDateIndex]?._id;
+      const timeId = timeArray[selectedTimeIndex]?._id;
+      console.log(
+        'cinemaId :' + cinemaId,
+        'movieId: ' + movieId,
+        'showtimeId: ' + showtimeId,
+        'timeId:' + timeId,
+      );
+      fetchRoomId(cinemaId, movieId, showtimeId, timeId);
+      console.log('fech :' + roomId, timeId, showtimeId);
+      fetchSeatData(roomId);
+      fetchStatusSeat(roomId, showtimeId, timeId);
+      setSelectedSeats([]); // Đặt lại danh sách ghế đã chọn
+    }
+  }, [selectedDateIndex, selectedTimeIndex, , dateArray, timeArray, movieId]);
+  useEffect(() => {
+    fetchRoomData(rooms);
+  }, [rooms]);
   useEffect(() => {
     if (message) {
       updateSeatStatus(message);
@@ -81,21 +102,25 @@ const SelectSeatScreen = ({route}) => {
     }
   }, [selectedDateIndex]);
 
-  useEffect(() => {
-    if (selectedDateIndex !== null && selectedTimeIndex !== null) {
-      const showtimeId = dateArray[selectedDateIndex]?._id;
-      const timeId = timeArray[selectedTimeIndex]?._id;
-      fetchStatusSeat(roomId, showtimeId, timeId);
-      setSelectedSeats([]); // Đặt lại danh sách ghế đã chọn
-    }
-  }, [selectedDateIndex, selectedTimeIndex, roomId, dateArray, timeArray]);
-
-  const fetchRoomData = async roomId => {
+  const fetchRoomData = async rooms => {
     try {
-      const data = await fetchRoom(roomId);
+      const showtimesIds = rooms.map(room => room.showtimes).flat();
 
+      // Hàm lấy thông tin suất chiếu từ id
+      const fetchShowtimeData = async id => {
+        // Giả sử fetchShowTimeById là hàm API trả về thông tin suất chiếu
+        const response = await fetchShowTimeById(id);
+        return response; // hoặc response nếu không có data
+      };
+
+      // Lấy tất cả thông tin suất chiếu
+      const showtimesData = await Promise.all(
+        showtimesIds.map(id => fetchShowtimeData(id)),
+      );
+
+      console.log('showtimesData:', showtimesData);
       // Chuyển đổi ngày suất chiếu thành đối tượng Date và sắp xếp
-      const showtimes = data.getRoom.showtime.map(show => ({
+      const showtimes = showtimesData.flat().map(show => ({
         ...show,
         date: new Date(show.date),
       }));
@@ -115,6 +140,7 @@ const SelectSeatScreen = ({route}) => {
       });
 
       setDateArray(filteredShowtimes);
+      console.log('DateArray', filteredShowtimes);
     } catch (error) {
       console.error(error);
       Alert.alert('Error', 'Unable to fetch room data');
@@ -293,11 +319,24 @@ const SelectSeatScreen = ({route}) => {
   const fetchStatusSeat = async (roomId, showtimeId, timeId) => {
     try {
       const data = await fetchStatusSeats(roomId, showtimeId, timeId);
-      if (data) {
-        SeatStatus(data);
-      } else {
-        console.warn('Empty seat status data or invalid response:', data);
-      }
+      SeatStatus(data);
+    } catch (error) {
+      console.error('Error fetching seat status:', error);
+      Alert.alert('Error', 'Unable to fetch seat status');
+    }
+  };
+
+  const fetchRoomId = async (cinemaId, movieId, showtimeId, timeId) => {
+    try {
+      const data = await fetchRoombyMovie(
+        cinemaId,
+        movieId,
+        showtimeId,
+        timeId,
+      );
+      console.log('data', data);
+      const roomId = data._id;
+      setRoomId(roomId);
     } catch (error) {
       console.error('Error fetching seat status:', error);
       Alert.alert('Error', 'Unable to fetch seat status');
