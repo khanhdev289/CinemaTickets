@@ -25,7 +25,7 @@ import CheckBox from '@react-native-community/checkbox';
 import messaging from '@react-native-firebase/messaging';
 import {getFcmToken} from '../../utils/firebase';
 
-const SignInScreen = () => {
+const SignInScreen = ({route}) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const {login} = useAuth();
@@ -33,7 +33,7 @@ const SignInScreen = () => {
   const [loading, setLoading] = useState(false);
   // const [termsAccepted, setTermsAccepted] = useState(false);
   const [fcmToken, setFcmToken] = useState('');
-
+  const movieId = route.params?.movieId || '';
   // useEffect(() => {
   //   const fetchStoredCredentials = async () => {
   //     try {
@@ -101,8 +101,11 @@ const SignInScreen = () => {
         //   await AsyncStorage.removeItem('email');
         //   await AsyncStorage.removeItem('password');
         // }
-
-        navigation.navigate('Home');
+        if (movieId) {
+          navigation.navigate('MovieDetailScreen', {movieId: movieId});
+        } else {
+          navigation.navigate('Home');
+        }
       }
     } catch (error) {
       console.error('Đăng nhập thất bại:', error);

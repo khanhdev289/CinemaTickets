@@ -85,6 +85,8 @@ const ListTicketScreen = () => {
       const response = await axiosInstance.get(url);
 
       const userData = response.data;
+      console.log(userData);
+
       setTicketData(
         userData.getTicket
           .map(item => ({

@@ -23,6 +23,7 @@ import iconNoteMyTicket from '../../assets/icons/iconMyTicket/iconNoteMyTicket';
 
 import {useRoute} from '@react-navigation/native';
 import {useAuth} from '../../components/AuthProvider ';
+import iconMyTicketProfile from '../../assets/icons/iconProfile/iconMyTicketProfile';
 
 const IMAGE_API_URL = 'http://139.180.132.97:3000/images/';
 const POSTS_API_URL = 'http://139.180.132.97:3000/tickets';
@@ -86,8 +87,16 @@ const MyTicketScreen = () => {
               source={{uri: IMAGE_API_URL + ticketData.movie.image}}
               style={styles.moviePoster}
             />
+
             <View style={styles.movieDetailsContainer}>
               <Text style={styles.movieTitle}>{ticketData.movie.name}</Text>
+              <View style={styles.detailsContainerAndIcon}>
+                <Text style={{fontWeight: 'bold', color: 'black'}}>Mã vé:</Text>
+                <Text style={styles.movieDetails}>
+                  {' '}
+                  {ticketData._id.slice(-8)}
+                </Text>
+              </View>
               <View style={styles.detailsContainerAndIcon}>
                 <SvgXml xml={iconClockMyTicket()} />
                 <Text style={styles.movieDetails}>

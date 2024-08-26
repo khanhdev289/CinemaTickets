@@ -13,6 +13,7 @@ import {
   Alert,
   ActivityIndicator,
   ScrollView,
+  BackHandler,
 } from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import {SafeAreaView} from 'react-native-safe-area-context';
@@ -38,6 +39,7 @@ import {
 import iconsBack from '../../assets/icons/iconsBack';
 import {useAuth} from '../../components/AuthProvider ';
 import HeaderComponent from '../../components/HeaderComponent';
+import iconBack from '../../assets/icons/iconBack';
 
 const screenWidth = Dimensions.get('screen').width;
 const screenHeight = Dimensions.get('screen').height;
@@ -49,9 +51,6 @@ const PaymentScreen = ({route}) => {
   const {ticketData} = route.params;
 
   const navigation = useNavigation();
-  const handleBack = () => {
-    navigation.goBack();
-  };
   const [movieInfo, setMovieInfo] = useState([]);
   const [cinemaInfo, setCinemaInfo] = useState([]);
   const [dateInfo, setDateInfo] = useState([]);
@@ -65,8 +64,8 @@ const PaymentScreen = ({route}) => {
   const [discountAmountT, setDiscountAmountT] = useState(0);
   const [discountAmountF, setDiscountAmountF] = useState(0);
   const [showAllItems, setShowAllItems] = useState(false);
-  const [idDiscountTicket, setidDiscountTicket] = useState('');
-  const [idDiscountFood, setidDiscountFood] = useState('');
+  const [idDiscountTicket, setidDiscountTicket] = useState(null);
+  const [idDiscountFood, setidDiscountFood] = useState(null);
   const [comboQuantities, setComboQuantities] = useState({
     combo1: 1,
     combo2: 1,
@@ -228,7 +227,9 @@ const PaymentScreen = ({route}) => {
           return null;
         })
         .filter(combo => combo !== null);
-      const discountIds = [idDiscountTicket, idDiscountFood];
+      const discountIds = [idDiscountTicket, idDiscountFood].filter(
+        id => id !== null && id !== undefined,
+      );
       // Update ticket with new data
       await updateTicket(
         ticketData._id,
@@ -344,6 +345,25 @@ const PaymentScreen = ({route}) => {
   const toggleShowAllItems = () => {
     setShowAllItems(!showAllItems);
   };
+
+  const handleBack = () => {
+    navigation.navigate('Home');
+  };
+
+  useEffect(() => {
+    const backAction = () => {
+      handleBack();
+      return true;
+    };
+
+    const backHandler = BackHandler.addEventListener(
+      'hardwareBackPress',
+      backAction,
+    );
+
+    return () => backHandler.remove();
+  }, [navigation]);
+
   if (isLoading) {
     return (
       <View style={styles.loadingContainer}>
@@ -354,7 +374,18 @@ const PaymentScreen = ({route}) => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <HeaderComponent title="Thanh toán" navigation={navigation} />
+      {/* <HeaderComponent title="Thanh toán" navigation={navigation} /> */}
+      <View style={styles.header}>
+        <View style={styles.backContainer}>
+          <TouchableOpacity
+            style={styles.backButton}
+            onPress={() => handleBack()}>
+            <SvgXml xml={iconBack()} />
+          </TouchableOpacity>
+        </View>
+        <Text style={styles.title}>Thanh toán</Text>
+        <View style={styles.placeholder} />
+      </View>
       <ScrollView>
         <View style={styles.movieInfo}>
           <Image
@@ -401,7 +432,9 @@ const PaymentScreen = ({route}) => {
           </View>
         </View>
         <View style={styles.ticketInfo}>
-          <Text style={styles.orderId}>Oder ID: {ticketData._id}</Text>
+          <Text style={styles.orderId}>
+            Oder ID: {ticketData._id.slice(-8)}
+          </Text>
           <View style={{flexDirection: 'row'}}>
             <Text style={styles.orderId}>Ghế: </Text>
             {seatInfo &&
@@ -630,6 +663,11 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingHorizontal: 16,
     paddingVertical: 8,
+  },
+  backContainer: {
+    position: 'absolute',
+    left: 8,
+    top: 5,
   },
   iconButton: {
     position: 'absolute',
@@ -931,5 +969,10 @@ const styles = StyleSheet.create({
     color: 'black',
     fontSize: 16,
   },
+  backButton: {
+    position: 'absolute',
+    zIndex: 1,
+  },
 });
 export default PaymentScreen;
+ 

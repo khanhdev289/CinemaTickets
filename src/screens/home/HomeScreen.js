@@ -81,7 +81,6 @@ const HomeScreen = () => {
       setIsLoading(false);
     }
   };
-
   useEffect(() => {
     fetchData();
   }, []);
