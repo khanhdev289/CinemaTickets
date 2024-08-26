@@ -34,14 +34,12 @@ import {Badge} from 'react-native-elements';
 import axios from 'axios';
 
 const NOTIFI_API_URL = 'http://139.180.132.97:3000/notification/notifi/user';
-const POSTS_API_URL = 'http://139.180.132.97:3000/users';
 
 const screenWidth = Dimensions.get('screen').width;
 const screenHeight = Dimensions.get('screen').height;
 
 const HomeScreen = () => {
   const {user} = useAuth();
-  const {logout} = useAuth();
 
   const navigation = useNavigation();
   const [isLoading, setIsLoading] = useState(true);
@@ -49,7 +47,6 @@ const HomeScreen = () => {
   const [comingMoviesList, setcomingMoviesList] = useState([]);
   const [discountList, setDiscountList] = useState([]);
   const [genreList, setGenreList] = useState([]);
-  const [userDataStatus, setUserDataStatus] = useState('');
   const [visibleIndex, setVisibleIndex] = useState(0);
   const flatListRef = useRef(null);
   const onViewableItemsChanged = useRef(({viewableItems}) => {
@@ -84,45 +81,9 @@ const HomeScreen = () => {
       setIsLoading(false);
     }
   };
-
-  const fetchDataUser = async () => {
-    try {
-      const userID = user.user._id;
-      const token = user.token.access_token;
-
-      const axiosInstance = axios.create({
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      const url = `${POSTS_API_URL}/${userID}`;
-      const response = await axiosInstance.get(url);
-
-      const userData = response.data.getUser;
-      setUserDataStatus(userData.status);
-      if (user) {
-        if (userData.status === 'inactive') {
-          Alert.alert('Tài khoản đã bị vô hiệu hóa');
-          navigation.navigate('Welcome');
-          logout();
-        }
-      } else {
-        navigation.navigate('Home');
-      }
-    } catch (error) {
-      console.log('Error fetching data');
-    } finally {
-      setIsLoading(false);
-    }
-  };
   useEffect(() => {
     fetchData();
   }, []);
-  useEffect(() => {
-    fetchDataUser();
-  }, [user]);
-
   if (isLoading) {
     return (
       <View style={styles.loadingContainer}>

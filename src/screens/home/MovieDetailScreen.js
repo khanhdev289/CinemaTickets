@@ -248,6 +248,7 @@ const MovieDetailScreen = ({route}) => {
                     },
                   ]);
                 }
+
                 const selectedTheaterData = theaters.find(
                   theater => theater.cinema._id === selectedTheater,
                 );
