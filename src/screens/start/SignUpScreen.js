@@ -24,7 +24,9 @@ import HeaderComponent from '../../components/HeaderComponent';
 
 const POSTS_API_URL = 'http://139.180.132.97:3000/auth/register';
 
-const SignUpScreen = () => {
+const SignUpScreen = ({route}) => {
+  const movieId = route.params?.movieId || '';
+  // console.log('id mv signup:', movieId);
   const navigation = useNavigation();
   const {
     control,
@@ -68,6 +70,7 @@ const SignUpScreen = () => {
         token: access_token,
         email,
         action: 'register',
+        movieId: movieId,
       });
     } catch (error) {
       setLoading(false);
