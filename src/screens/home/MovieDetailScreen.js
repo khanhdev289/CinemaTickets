@@ -54,7 +54,6 @@ const MovieDetailScreen = ({route}) => {
         const theaterResponse = await fetchCinemaByMovie(movieId);
         setMovie(movieResponse);
         setTheaters(theaterResponse);
-        console.log('theaterResponse', theaterResponse);
       } catch (error) {
         console.error('Error fetching data:', error);
       } finally {
@@ -78,16 +77,13 @@ const MovieDetailScreen = ({route}) => {
       <Text style={styles.itemTitle}>{item.name}</Text>
     </View>
   );
-  const handleSelectTheater = cinemaId => {
-    setSelectedTheater(cinemaId);
-  };
 
   const renderTheater = ({item}) => (
     <TouchableOpacity
-      onPress={() => handleSelectTheater(item.cinema._id)}
+      onPress={() => setSelectedTheater(item._id)}
       style={[
         styles.theaterContainer,
-        selectedTheater === item.cinema._id ? {borderColor: '#FFD700'} : null,
+        selectedTheater === item._id ? {borderColor: '#FFD700'} : null,
       ]}>
       <View
         style={{
@@ -98,15 +94,12 @@ const MovieDetailScreen = ({route}) => {
         <View style={{flexDirection: 'column'}}>
           <Text style={styles.theaterTitle}>{item.cinema.name}</Text>
           <Text style={styles.theaterAddress}>{item.cinema.address}</Text>
-          <Text style={styles.theaterHotline}>
-            Hotline: {item.cinema.hotline}
-          </Text>
         </View>
         <Image
           source={require('../../assets/images/logo.png')}
           style={{
-            width: 80,
-            height: 80,
+            width: 80, // Điều chỉnh kích thước hình ảnh theo nhu cầu của bạn
+            height: 80, // Điều chỉnh kích thước hình ảnh theo nhu cầu của bạn
             resizeMode: 'stretch',
           }}
         />
@@ -239,27 +232,21 @@ const MovieDetailScreen = ({route}) => {
               style={styles.button}
               onPress={() => {
                 if (!user) {
-                  Alert.alert('Vui lòng đăng nhập để đặt vé!', '', [
-                    {
-                      text: 'OK',
-                      onPress: () => {
-                        navigation.navigate('Welcome', {movieId: movieId});
-                      },
-                    },
-                  ]);
+                  navigation.navigate('Welcome');
+
+                  return;
                 }
 
-                // const selectedTheaterData = theaterResponse.find(
-                //   theater => theater.cinema._id === selectedTheater,
-                // );
+                if (selectedTheater) {
+                  // Nếu đã chọn rạp chiếu, điều hướng tới màn hình chọn ghế
 
-                // if (selectedTheaterData) {
-                //   navigation.navigate('SelectSeatScreen', {
-                //     rooms: selectedTheaterData.rooms,
-                //   });
-                // } else {
-                //   Alert.alert('Thông báo', 'Vui lòng chọn một rạp chiếu');
-                // }
+                  navigation.navigate('SelectSeatScreen', {
+                    roomId: selectedTheater,
+                  });
+                } else {
+                  // Xử lý trường hợp không có rạp nào được chọn
+                  Alert.alert('Thông báo', 'Vui lòng chọn một rạp chiếu');
+                }
               }}>
               <Text style={styles.buttonText}>Tiếp tục</Text>
             </TouchableOpacity>

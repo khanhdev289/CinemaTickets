@@ -16,27 +16,16 @@ import {useNavigation} from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Spinner from 'react-native-loading-spinner-overlay';
 
-const WelcomeScreen = ({route}) => {
-  const movieId = route.params?.movieId || '';
-  // console.log('movieId1', movieId);
+const WelcomeScreen = () => {
   const navigation = useNavigation();
   const [loading, setLoading] = useState(false);
 
   const handleRegistwer = () => {
-    if (movieId) {
-      navigation.navigate('Register', {movieId: movieId});
-      console.log('zo');
-    } else {
-      navigation.navigate('Register');
-    }
+    navigation.navigate('Register');
   };
 
   const handleLogin = () => {
-    if (movieId) {
-      navigation.navigate('Login', {movieId: movieId});
-    } else {
-      navigation.navigate('Login');
-    }
+    navigation.navigate('Login');
   };
 
   return (

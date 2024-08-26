@@ -5,23 +5,16 @@ import iconSs from '../../assets/icons/iconSs';
 
 import {useNavigation, CommonActions} from '@react-navigation/native';
 
-const SuccessScreen = ({route}) => {
+const SuccessScreen = () => {
   const navigation = useNavigation();
-  const movieId = route.params?.movieId || '';
-
-  console.log('id mv ss:', movieId);
 
   const handleLogin = () => {
-    if (movieId) {
-      navigation.navigate('Login', {movieId: movieId});
-    } else {
-      navigation.dispatch(
-        CommonActions.reset({
-          index: 2,
-          routes: [{name: 'Home'}, {name: 'Welcome'}, {name: 'Login'}],
-        }),
-      );
-    }
+    navigation.dispatch(
+      CommonActions.reset({
+        index: 2,
+        routes: [{name: 'Home'}, {name: 'Welcome'}, {name: 'Login'}],
+      }),
+    );
   };
 
   return (

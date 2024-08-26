@@ -32,9 +32,9 @@ const VERIFY_REGISTER_API_URL =
 const VERIFY_FORGOT_PASSWORD_API_URL =
   'http://139.180.132.97:3000/auth/forgot-password/verify';
 
-const ConfirmOTP = ({route}) => {
-  const route1 = useRoute();
-  const {token, email, action} = route1.params;
+const ConfirmOTP = () => {
+  const route = useRoute();
+  const {token, email, action} = route.params;
 
   const [value, setValue] = useState('');
   const ref = useBlurOnFulfill({value, cellCount: CELL_COUNT});
@@ -49,8 +49,6 @@ const ConfirmOTP = ({route}) => {
 
   // Sử dụng useRef để theo dõi trạng thái điều hướng
   const isNavigated = useRef(false);
-  const movieId = route.params?.movieId || '';
-  // console.log('id mv OTP:', movieId);
 
   useEffect(() => {
     if (isNavigated.current) {
@@ -121,12 +119,7 @@ const ConfirmOTP = ({route}) => {
         isNavigated.current = true; // Đánh dấu đã điều hướng
         switch (action) {
           case 'register':
-            if (movieId) {
-              navigation.navigate('Ss', {movieId: movieId});
-            } else {
-              navigation.navigate('Ss');
-            }
-
+            navigation.navigate('Ss');
             break;
           case 'forgotPassword':
             navigation.navigate('NewPassScreen', {token});

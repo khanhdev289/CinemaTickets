@@ -1,5 +1,5 @@
-import {StyleSheet, Text, View, Alert} from 'react-native';
-import React, {useEffect, useCallback} from 'react';
+import {StyleSheet, Text, View} from 'react-native';
+import React from 'react';
 import MyTicketScreen from '../ticket/MyTicketScreen';
 import MovieScreen from '../home/MovieScreen';
 import ProfileScreen from '../home/ProfileScreen';
@@ -22,68 +22,12 @@ import ListTicketScreen from '../home/ListTicketScreen';
 import CheckSuccess from '../staff/CheckSuccess';
 import ListCheckTicket from '../staff/ListCheckTicket';
 import iconLocation from '../../assets/icons/iconLocation';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import axios from 'axios';
-import {useNavigation, useFocusEffect} from '@react-navigation/native';
+
 const Tab = createBottomTabNavigator();
 
 const BottomNavigation = () => {
   const {user} = useAuth();
-  const {logout} = useAuth();
-  const navigation = useNavigation();
-  useFocusEffect(
-    useCallback(() => {
-      const checkUserStatus = async () => {
-        // console.log('zooo');
-        try {
-          const storedUser = await AsyncStorage.getItem('user');
-          const userData = JSON.parse(storedUser);
 
-          if (userData) {
-            const userId = userData.user._id;
-            const token = userData.token.access_token;
-
-            const response = await axios.get(
-              `http://139.180.132.97:3000/users/${userId}`,
-              {
-                headers: {
-                  Authorization: `Bearer ${token}`,
-                },
-              },
-            );
-
-            const updatedUserData = response.data;
-            const userStatus = updatedUserData.getUser.status;
-            // console.log(userStatus);
-
-            if (userStatus == 'inactive') {
-              Alert.alert(
-                'Tài khoản của bạn đã bị vô hiệu hoá',
-                'Vui lòng liên hệ với bộ phận hỗ trợ.',
-                [
-                  {
-                    text: 'OK',
-                    onPress: () => {
-                      logout();
-                      navigation.navigate('Welcome');
-                    },
-                  },
-                ],
-              );
-            }
-          }
-        } catch (error) {
-          console.error('Lỗi khi kiểm tra trạng thái người dùng:', error);
-          Alert.alert(
-            'Lỗi',
-            'Không thể kiểm tra trạng thái tài khoản. Vui lòng đăng nhập lại.',
-          );
-        }
-      };
-
-      checkUserStatus();
-    }, []),
-  );
   const renderScreens = () => {
     const isStaff = user && user.user.role === 'staff';
     return (
