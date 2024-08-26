@@ -180,6 +180,16 @@ export const fetchStatusSeats = async (roomId, showtimeId, timeId) => {
     throw error;
   }
 };
+export const fetchRoombyMovie = async (cinemaId, movieId,showtimeId, timeId) => {
+  try {  const api = await createApiInstance();
+    const url = `/rooms/room/cmst?cinemaId=${cinemaId}&movieId=${movieId}&showtimeId=${showtimeId}&timeId=${timeId}`;
+    const response = await api.get(url);
+    return response.data.getRoombymovie;
+  } catch (error) {
+    console.error('Error fetching roomid:', error);
+    throw error;
+  }
+};
 
 // Hàm fetch danh sách thể loại
 export const fetchGenres = async () => {

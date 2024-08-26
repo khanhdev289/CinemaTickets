@@ -9,37 +9,40 @@ import {
   ScrollView,
   Dimensions,
   FlatList,
+  ActivityIndicator,
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import {useNavigation} from '@react-navigation/native';
 import {SvgXml} from 'react-native-svg';
+import DateTimePicker from '@react-native-community/datetimepicker';
+import io from 'socket.io-client';
 
 import {
   createTicket,
   fetchRoom,
+  fetchRoombyMovie,
   fetchSeatByRoom,
+  fetchShowTimeById,
   fetchStatusSeats,
   fetchTimeByShowTime,
 } from '../../../api';
 import iconBack from '../../assets/icons/iconBack';
 import iconLine from '../../assets/icons/iconLine';
 import iconsBack from '../../assets/icons/iconsBack';
+
+import HeaderComponent from '../../components/HeaderComponent';
 import {useAuth} from '../../components/AuthProvider ';
+
 const rows = 'ABCDEFGH'.split('');
 const cols = Array.from({length: 8}, (_, i) => i + 1);
 const screenWidth = Dimensions.get('screen').width;
 const screenHeight = Dimensions.get('screen').height;
-import io from 'socket.io-client';
-import HeaderComponent from '../../components/HeaderComponent';
 
 const SelectSeatScreen = ({route}) => {
   const navigation = useNavigation();
-  const {roomId} = route.params;
+  const {rooms, movieId, cinemaId} = route.params;
   const [message, setMessage] = useState();
   const socket = io('http://139.180.132.97:3000');
-  const handleBack = () => {
-    navigation.goBack();
-  };
   const [dateArray, setDateArray] = useState([]);
   const [timeArray, setTimeArray] = useState([]);
   const [selectedDateIndex, setSelectedDateIndex] = useState(null);
@@ -47,14 +50,18 @@ const SelectSeatScreen = ({route}) => {
   const [selectedDate, setSelectedDate] = useState(null);
   const [seats, setSeats] = useState([]);
   const [selectedSeats, setSelectedSeats] = useState([]);
+  const [roomId, setRoomId] = useState(null);
+  const [isLoadingSeats, setIsLoadingSeats] = useState(false);
 
   const {user} = useAuth();
   const userID = user.user._id;
 
   useEffect(() => {
-    fetchRoomData(roomId);
-    fetchSeatData(roomId);
-  }, [roomId]);
+    fetchRoomData(rooms);
+  }, [rooms]);
+  
+console.log(rooms);
+
   useEffect(() => {
     if (message) {
       updateSeatStatus(message);
@@ -67,7 +74,7 @@ const SelectSeatScreen = ({route}) => {
     });
 
     socket.on('statusseat', message => {
-      console.log('statusseat soket:', message);
+      console.log('statusseat socket:', message);
       setMessage(message);
     });
 
@@ -75,42 +82,108 @@ const SelectSeatScreen = ({route}) => {
       socket.disconnect();
     };
   }, []);
+
   useEffect(() => {
     if (selectedDateIndex !== null) {
       fetchTimeData(dateArray[selectedDateIndex]._id);
     }
-  }, [selectedDateIndex]);
+  }, [selectedDateIndex, dateArray]);
 
   useEffect(() => {
-    if (selectedDateIndex !== null && selectedTimeIndex !== null) {
-      const showtimeId = dateArray[selectedDateIndex]?._id;
-      const timeId = timeArray[selectedTimeIndex]?._id;
-      fetchStatusSeat(roomId, showtimeId, timeId);
-      setSelectedSeats([]); // Đặt lại danh sách ghế đã chọn
-    }
-  }, [selectedDateIndex, selectedTimeIndex, roomId, dateArray, timeArray]);
+    const fetchRoomData = async () => {
+      if (selectedDateIndex !== null && selectedTimeIndex !== null) {
+        const showtimeId = dateArray[selectedDateIndex]?._id;
+        const timeId = timeArray[selectedTimeIndex]?._id;
+        try {
+          const data = await fetchRoombyMovie(
+            cinemaId,
+            movieId,
+            showtimeId,
+            timeId,
+          );
+          setRoomId(data._id);
+        } catch (error) {
+          console.error('Error fetching room data:', error);
+          Alert.alert('Error', 'Unable to fetch room data');
+        }
+      }
+    };
 
-  const fetchRoomData = async roomId => {
+    fetchRoomData();
+  }, [
+    selectedDateIndex,
+    selectedTimeIndex,
+    dateArray,
+    timeArray,
+    movieId,
+    cinemaId,
+  ]);
+
+  useEffect(() => {
+    const fetchSeatData = async () => {
+      if (roomId && selectedDateIndex !== null && selectedTimeIndex !== null) {
+        setIsLoadingSeats(true);
+        try {
+          const showtimeId = dateArray[selectedDateIndex]._id;
+          const timeId = timeArray[selectedTimeIndex]._id;
+
+          const seatData = await fetchSeatByRoom(roomId);
+
+          const formattedSeats = seatData.map(seat => ({
+            _id: seat._id,
+            name: seat.name,
+            price: seat.price,
+            status: 'available',
+          }));
+          formattedSeats.sort((a, b) => a.name.localeCompare(b.name));
+
+          setSeats(formattedSeats);
+
+          const statusData = await fetchStatusSeats(roomId, showtimeId, timeId);
+          const updatedSeats = formattedSeats.map(seat => {
+            const statusSeat = statusData.find(s => s.seat._id === seat._id);
+            return statusSeat ? {...seat, status: statusSeat.status} : seat;
+          });
+
+          setSeats(updatedSeats);
+        } catch (error) {
+          console.error('Error fetching seat data:', error);
+          Alert.alert('Error', 'Unable to fetch seat data');
+        } finally {
+          setIsLoadingSeats(false);
+        }
+      }
+    };
+
+    fetchSeatData();
+  }, [roomId, selectedDateIndex, selectedTimeIndex, dateArray, timeArray]);
+
+  const fetchRoomData = async rooms => {
     try {
-      const data = await fetchRoom(roomId);
+      const showtimesIds = rooms.map(room => room.showtimes).flat();
 
-      // Chuyển đổi ngày suất chiếu thành đối tượng Date và sắp xếp
-      const showtimes = data.getRoom.showtime.map(show => ({
+      const fetchShowtimeData = async id => {
+        const response = await fetchShowTimeById(id);
+        return response;
+      };
+
+      const showtimesData = await Promise.all(
+        showtimesIds.map(id => fetchShowtimeData(id)),
+      );
+      const showtimes = showtimesData.flat().map(show => ({
         ...show,
         date: new Date(show.date),
       }));
       showtimes.sort((a, b) => a.date - b.date);
 
-      // Lấy ngày hiện tại và ngày của tuần tới (chỉ lấy phần ngày)
       const today = new Date();
-      today.setHours(0, 0, 0, 0); // Đặt giờ phút giây và ms về 0 để chỉ so sánh ngày
+      today.setHours(0, 0, 0, 0);
       const nextWeekDate = new Date(today);
       nextWeekDate.setDate(today.getDate() + 7);
 
-      // Lọc các suất chiếu từ ngày hiện tại đến tuần tới
       const filteredShowtimes = showtimes.filter(showtime => {
         const showtimeDate = showtime.date;
-        showtimeDate.setHours(0, 0, 0, 0); // Đặt giờ phút giây và ms về 0 để chỉ so sánh ngày
+        showtimeDate.setHours(0, 0, 0, 0);
         return showtimeDate >= today && showtimeDate <= nextWeekDate;
       });
 
@@ -121,27 +194,10 @@ const SelectSeatScreen = ({route}) => {
     }
   };
 
-  const fetchSeatData = async roomId => {
-    try {
-      const seatData = await fetchSeatByRoom(roomId);
-      const formattedSeats = seatData.map(seat => ({
-        _id: seat._id,
-        name: seat.name,
-        price: seat.price,
-        status: 'available',
-      }));
-      formattedSeats.sort((a, b) => a.name.localeCompare(b.name));
-      setSeats(formattedSeats);
-    } catch (error) {
-      console.error(error);
-      Alert.alert('Error', 'Unable to fetch seat data');
-    }
-  };
-
   const fetchTimeData = async showtimeId => {
     try {
-      const timeData = await fetchTimeByShowTime(showtimeId); // Gọi hàm fetchTimeByShowTime để lấy dữ liệu từ API
-      setTimeArray(timeData.getShowtime.time); // Cập nhật mảng timeArray với danh sách thời gian từ API
+      const timeData = await fetchTimeByShowTime(showtimeId);
+      setTimeArray(timeData.getShowtime.time);
     } catch (error) {
       console.error('Error fetching time data:', error);
       throw new Error('Unable to fetch time data');
@@ -159,7 +215,6 @@ const SelectSeatScreen = ({route}) => {
       return;
     }
 
-    // Kiểm tra nếu thời gian chiếu đã qua
     const selectedDate = dateArray[selectedDateIndex].date;
     const selectedTime = timeArray[selectedTimeIndex].time;
     const [selectedHour, selectedMinute] = selectedTime.split(':').map(Number);
@@ -176,10 +231,41 @@ const SelectSeatScreen = ({route}) => {
       return;
     }
 
+    const checkContiguousSelection = (seat, selectedSeats) => {
+      if (selectedSeats.length === 0) {
+        // First seat selection, always allowed
+        return true;
+      }
+
+      for (const selectedSeat of selectedSeats) {
+        const selectedSeatRow = selectedSeat.name.charAt(0);
+        const selectedSeatCol = parseInt(selectedSeat.name.slice(1));
+        const newSeatRow = seat.name.charAt(0);
+        const newSeatCol = parseInt(seat.name.slice(1));
+
+        if (
+          (selectedSeatRow === newSeatRow &&
+            Math.abs(selectedSeatCol - newSeatCol) <= 1) ||
+          (selectedSeatCol === newSeatCol &&
+            Math.abs(
+              selectedSeatRow.charCodeAt(0) - newSeatRow.charCodeAt(0),
+            ) === 1)
+        ) {
+          return true; // Seat is contiguous with at least one selected seat
+        }
+      }
+
+      // No contiguous seat found
+      return false;
+    };
     // Lấy trạng thái hiện tại của ghế được bấm
     const selectedSeat = seats.find(seat => seat._id === seatId);
+    const canSelectSeat = checkContiguousSelection(seat, selectedSeats);
+    if (!canSelectSeat) {
+      Alert.alert('Thông báo', 'Vui lòng chọn ghế sát nhau');
+      return;
+    }
 
-    // Nếu ghế đã chọn đủ 6 ghế và người dùng đang cố chọn thêm ghế mới
     if (selectedSeats.length >= 6 && selectedSeat.status === 'available') {
       Alert.alert(
         'Thông báo',
@@ -188,7 +274,6 @@ const SelectSeatScreen = ({route}) => {
       return;
     }
 
-    // Cập nhật trạng thái ghế
     const updatedSeats = seats.map(seat =>
       seat._id === seatId
         ? {
@@ -198,7 +283,6 @@ const SelectSeatScreen = ({route}) => {
         : seat,
     );
 
-    // Cập nhật danh sách ghế đã chọn
     setSeats(updatedSeats);
     if (selectedSeat.status === 'available') {
       setSelectedSeats([...selectedSeats, selectedSeat]);
@@ -247,14 +331,12 @@ const SelectSeatScreen = ({route}) => {
         seatStyle = styles.selectedSeat;
         seatTextStyle = [styles.seatText, {color: 'black'}];
         break;
-      case 'close': // Thêm trường hợp cho ghế hỏng
+      case 'close':
         seatStyle = styles.brokenSeat;
-
         seatTextStyle = [
           styles.seatText,
           {color: 'gray', fontWeight: 'medium'},
         ];
-
         break;
       default:
         seatStyle = styles.availableSeat;
@@ -274,7 +356,16 @@ const SelectSeatScreen = ({route}) => {
       </TouchableOpacity>
     );
   };
+
   const renderSeatGrid = () => {
+    if (isLoadingSeats) {
+      return <ActivityIndicator size="large" color="#FCC434" />;
+    }
+
+    if (seats.length === 0) {
+      return <Text style={styles.noSeatsText}>Không có dữ liệu ghế</Text>;
+    }
+
     const seatGrid = [];
     for (let i = 0; i < rows.length; i++) {
       const rowSeats = seats.slice(i * cols.length, (i + 1) * cols.length);
@@ -286,29 +377,14 @@ const SelectSeatScreen = ({route}) => {
     }
     return seatGrid;
   };
+
   const calculateTotal = () => {
     return selectedSeats.reduce((total, seat) => total + seat.price, 0);
   };
 
-  const fetchStatusSeat = async (roomId, showtimeId, timeId) => {
-    try {
-      const data = await fetchStatusSeats(roomId, showtimeId, timeId);
-      if (data) {
-        SeatStatus(data);
-      } else {
-        console.warn('Empty seat status data or invalid response:', data);
-      }
-    } catch (error) {
-      console.error('Error fetching seat status:', error);
-      Alert.alert('Error', 'Unable to fetch seat status');
-    }
-  };
-
   const updateSeatStatus = message => {
     const {seat, showday, showtime, status} = message;
-    // Cập nhật trạng thái của ghế dựa trên seatId, showday và showtime
     const updatedSeats = seats.map(seatItem => {
-      // Kiểm tra xem seatItem có phù hợp với seatId, showday và showtime
       const seatMatches = seatItem._id === seat;
       const dateMatches =
         selectedDateIndex !== null &&
@@ -316,26 +392,25 @@ const SelectSeatScreen = ({route}) => {
       const timeMatches =
         selectedTimeIndex !== null &&
         timeArray[selectedTimeIndex]._id === showtime;
-      // Nếu tất cả các điều kiện đều trùng khớp, cập nhật trạng thái ghế
       if (seatMatches && dateMatches && timeMatches) {
         return {...seatItem, status};
       }
-      // Nếu không trùng khớp, trả về ghế hiện tại không thay đổi
       return seatItem;
     });
-    // Cập nhật trạng thái ghế
     setSeats(updatedSeats);
   };
 
   const SeatStatus = seatStatusData => {
-    const updatedSeats = seats.map(seat => {
-      const seatData = seatStatusData.find(s => s.seat._id === seat._id);
-      if (seatData) {
-        return {...seat, status: seatData.status};
-      }
-      return {...seat, status: 'available'};
+    setSeats(prevSeats => {
+      const updatedSeats = prevSeats.map(seat => {
+        const seatData = seatStatusData.find(s => s.seat._id === seat._id);
+        if (seatData) {
+          return {...seat, status: seatData.status};
+        }
+        return seat;
+      });
+      return updatedSeats;
     });
-    setSeats(updatedSeats);
   };
 
   const renderLegend = () => (
@@ -356,35 +431,15 @@ const SelectSeatScreen = ({route}) => {
         <View style={[styles.legendColor, styles.selectedSeat]} />
         <Text style={styles.legendText}>Bạn đã chọn</Text>
       </View>
-      {/* <View style={styles.legendItem}>
-      <View style={[styles.legendColor, styles.brokenSeat]} />
-      <Text style={styles.legendText}>Đang bảo trì</Text>
-    </View> */}
     </View>
   );
 
   return (
     <SafeAreaView style={styles.container}>
-      {/* <View style={styles.header}>
-        <TouchableOpacity onPress={handleBack} style={styles.iconButton}>
-          <SvgXml xml={iconsBack()} />
-        </TouchableOpacity>
-
-        <View style={styles.titleContainer}>
-          <Text style={styles.title}>Chọn Ghế</Text>
-        </View>
-      </View> */}
       <HeaderComponent title="Chọn ghế" navigation={navigation} />
 
       <ScrollView>
-        <View
-          style={{
-            flexDirection: 'column',
-            justifyContent: 'center',
-            margin: 8,
-            alignSelf: 'center',
-            height: screenHeight * 0.1,
-          }}>
+        <View style={styles.screenContainer}>
           <SvgXml xml={iconLine()} />
           <LinearGradient
             colors={['#FCC434', '#00000000']}
@@ -396,15 +451,7 @@ const SelectSeatScreen = ({route}) => {
 
         {renderLegend()}
 
-        <Text
-          style={{
-            color: 'white',
-            margin: 5,
-            textAlign: 'center',
-            justifyContent: 'center',
-          }}>
-          {selectedDate}
-        </Text>
+        <Text style={styles.selectedDateText}>{selectedDate}</Text>
 
         <FlatList
           data={dateArray}
@@ -448,15 +495,7 @@ const SelectSeatScreen = ({route}) => {
                   ]}>
                   {item.date.toLocaleDateString('vi-VN', {weekday: 'long'})}
                 </Text>
-                <View
-                  style={{
-                    width: screenHeight * 0.04,
-                    height: screenHeight * 0.04,
-                    borderRadius: screenHeight * 0.02,
-                    backgroundColor: '#3B3B3B',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                  }}>
+                <View style={styles.dateCircle}>
                   <Text style={styles.dateText}>{item.date.getDate()}</Text>
                 </View>
               </View>
@@ -494,7 +533,7 @@ const SelectSeatScreen = ({route}) => {
         </View>
 
         <View style={styles.footer}>
-          <View style={{flexDirection: 'column'}}>
+          <View style={styles.totalContainer}>
             <Text style={styles.totalText1}>Tổng:</Text>
             <Text style={styles.totalText}>{calculateTotal()} VND</Text>
           </View>
@@ -506,9 +545,7 @@ const SelectSeatScreen = ({route}) => {
                   selectedSeats.length === 0 ? '#999' : '#FCC434',
               },
             ]}
-            onPress={() => {
-              handleTicket();
-            }}>
+            onPress={handleTicket}>
             <Text style={styles.buttonText}>Mua Vé</Text>
           </TouchableOpacity>
         </View>
@@ -522,26 +559,12 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: 'black',
   },
-
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
+  screenContainer: {
+    flexDirection: 'column',
     justifyContent: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-  },
-  iconButton: {
-    position: 'absolute',
-    left: 8,
-  },
-  titleContainer: {
-    flex: 1,
-    alignItems: 'center',
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: 'white',
+    margin: 8,
+    alignSelf: 'center',
+    height: screenHeight * 0.1,
   },
   gradientLine: {
     height: screenHeight * 0.08,
@@ -555,7 +578,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
   },
   seat: {
-    width: screenWidth * 0.1, // Điều chỉnh kích thước ghế
+    width: screenWidth * 0.1,
     height: screenWidth * 0.1,
     margin: screenWidth * 0.01,
     borderRadius: 5,
@@ -574,7 +597,9 @@ const styles = StyleSheet.create({
   },
   selectedSeat: {
     backgroundColor: '#FCC434',
-    color: 'black',
+  },
+  brokenSeat: {
+    backgroundColor: '#333333',
   },
   seatText: {
     fontSize: 12,
@@ -590,15 +615,20 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
-  legendText: {
-    color: 'white',
-    fontSize: 14,
-  },
   legendColor: {
     width: 20,
     height: 20,
     marginRight: 5,
     borderRadius: 5,
+  },
+  legendText: {
+    color: 'white',
+    fontSize: 14,
+  },
+  selectedDateText: {
+    color: 'white',
+    margin: 5,
+    textAlign: 'center',
   },
   containerGap24: {
     gap: screenWidth * 0.04,
@@ -611,6 +641,14 @@ const styles = StyleSheet.create({
     backgroundColor: '#1C1C1C',
     alignItems: 'center',
     justifyContent: 'space-around',
+  },
+  dateCircle: {
+    width: screenHeight * 0.04,
+    height: screenHeight * 0.04,
+    borderRadius: screenHeight * 0.02,
+    backgroundColor: '#3B3B3B',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   dateText: {
     fontSize: 16,
@@ -636,10 +674,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#F2F2F2',
   },
-  showTimeContainer: {
-    padding: 5,
-    alignItems: 'center',
-  },
   footer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -648,6 +682,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderTopWidth: 1,
     borderTopColor: '#ddd',
+  },
+  totalContainer: {
+    flexDirection: 'column',
   },
   totalText1: {
     fontSize: 16,
@@ -669,8 +706,11 @@ const styles = StyleSheet.create({
     color: '#000000',
     fontSize: 18,
   },
-  brokenSeat: {
-    backgroundColor: '#333333', // Màu cho ghế hỏng
+  noSeatsText: {
+    color: 'white',
+    fontSize: 16,
+    textAlign: 'center',
+    marginTop: 20,
   },
 });
 
