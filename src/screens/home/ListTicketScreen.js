@@ -85,16 +85,7 @@ const ListTicketScreen = () => {
       const response = await axiosInstance.get(url);
 
       const userData = response.data;
-      console.log(userData);
-
-      setTicketData(
-        userData.getTicket
-          .map(item => ({
-            ...item,
-            date: item.showdate.date.split('T')[0],
-          }))
-          .reverse(),
-      );
+      setTicketData(userData.getTicket.reverse());
       setIsLoading(false);
     } catch (error) {
       setIsLoading(false);
@@ -174,6 +165,18 @@ const ListTicketScreen = () => {
     }
   };
 
+  const formatDate = isoDate => {
+    const date = new Date(isoDate);
+    const options = {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    };
+    return date.toLocaleDateString('vi-VN', options);
+  };
+
   const paymentSuccess = async ticketId => {
     try {
       const token = user.token.access_token;
@@ -221,9 +224,15 @@ const ListTicketScreen = () => {
       />
       <View style={styles.ticketDetails}>
         <Text style={styles.ticketTitle}>{item.movie.name}</Text>
+        {item.status === 'active' && (
+          <Text style={styles.ticketStatus}>Chưa quét</Text>
+        )}
+        {item.status === 'complete' && (
+          <Text style={styles.ticketStatus}>Đã quét</Text>
+        )}
         <Text style={styles.ticketTime}>
           <SvgXml xml={iconClock()} width={14} height={14} />{' '}
-          {item.movie.duration} * {item.date}
+          {item.movie.duration} * {formatDate(item.date)}
         </Text>
         <Text style={styles.ticketLocation}>
           <SvgXml xml={iconLocation()} width={14} height={14} />{' '}
@@ -426,6 +435,11 @@ const styles = StyleSheet.create({
   },
   inactiveText: {
     color: '#fff',
+  },
+  ticketStatus: {
+    fontSize: 14,
+    color: '#f7b731',
+    marginTop: 4,
   },
   loadingOverlay: {
     position: 'absolute',
