@@ -4,7 +4,6 @@ import QRCodeScanner from 'react-native-qrcode-scanner';
 import {RNCamera} from 'react-native-camera';
 import {useNavigation} from '@react-navigation/native';
 import axios from 'axios';
-
 import {PERMISSIONS, request} from 'react-native-permissions';
 import {useAuth} from '../../components/AuthProvider ';
 
@@ -48,6 +47,7 @@ const ScanQrScreen = () => {
         headers: {
           Authorization: `Bearer ${token}`,
         },
+        timeout: 10000, // Set timeout to 10 seconds
       });
 
       const currentDate = new Date().toISOString();
@@ -63,7 +63,26 @@ const ScanQrScreen = () => {
       setScanned(true);
     } catch (error) {
       console.error('Lỗi khi tải dữ liệu: ', error);
-      Alert.alert('Lỗi', 'Có lỗi xảy ra khi xử lý mã QR.');
+      if (error.code === 'ECONNABORTED') {
+        Alert.alert(
+          'Lỗi Mạng',
+          'Kết nối mạng quá chậm hoặc không có mạng. Vui lòng kiểm tra kết nối và thử lại.',
+        );
+      } else if (error.response) {
+        Alert.alert(
+          'Lỗi Máy Chủ',
+          `Có lỗi xảy ra từ phía máy chủ. Mã lỗi: ${error.response.status}`,
+        );
+      } else if (error.request) {
+        // The request was made but no response was received
+        Alert.alert(
+          'Lỗi Kết Nối',
+          'Không thể kết nối đến máy chủ. Vui lòng kiểm tra kết nối mạng và thử lại.',
+        );
+      } else {
+        // Something happened in setting up the request that triggered an Error
+        Alert.alert('Lỗi', 'Có lỗi xảy ra khi xử lý mã QR.');
+      }
       setScanned(false);
     } finally {
       setIsLoading(false);
