@@ -59,8 +59,6 @@ const SelectSeatScreen = ({route}) => {
   useEffect(() => {
     fetchRoomData(rooms);
   }, [rooms]);
-  
-console.log(rooms);
 
   useEffect(() => {
     if (message) {
@@ -535,7 +533,9 @@ console.log(rooms);
         <View style={styles.footer}>
           <View style={styles.totalContainer}>
             <Text style={styles.totalText1}>Tổng:</Text>
-            <Text style={styles.totalText}>{calculateTotal()} VND</Text>
+            <Text style={styles.totalText}>
+              {calculateTotal().toLocaleString('en-US')} VND
+            </Text>
           </View>
           <TouchableOpacity
             style={[

@@ -248,7 +248,11 @@ const AuthScreen = () => {
           <View style={styles.detailsContainer}>
             <View style={styles.detailsContainerAndIcon}>
               <SvgXml style={{color: 'black'}} xml={iconMoneyMyTicket()} />
-              <Text style={styles.priceText}>{ticketData.total} VND</Text>
+              <Text style={styles.priceText}>
+                {ticketData.total
+                  .toLocaleString('en-US')}{' '}
+                VND
+              </Text>
             </View>
             <View style={styles.detailsContainerAndIcon}>
               <SvgXml style={{color: 'black'}} xml={iconLocationMyTicket()} />

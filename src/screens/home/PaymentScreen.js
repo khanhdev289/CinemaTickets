@@ -119,6 +119,7 @@ const PaymentScreen = ({route}) => {
     const comboTotal = parseFloat(getTotalPrice() - discountAmountF);
     return ticketTotal + comboTotal;
   };
+  const totalTicket = ticketData.total - discountAmountT;
 
   const fetchData = async () => {
     try {
@@ -201,6 +202,7 @@ const PaymentScreen = ({route}) => {
     });
     return total;
   };
+  const totalFood = getTotalPrice() - discountAmountF;
 
   const formatDate = dateString => {
     const date = new Date(dateString);
@@ -475,7 +477,7 @@ const PaymentScreen = ({route}) => {
           }}>
           <Text style={{color: 'white'}}>Vé</Text>
           <Text style={{color: 'white', fontSize: 20}}>
-            {ticketData.total - discountAmountT} VND
+            {totalTicket.toLocaleString('en-US')} VND
           </Text>
         </View>
         <View style={styles.line} />
@@ -505,7 +507,7 @@ const PaymentScreen = ({route}) => {
         <View style={styles.line} />
         <View style={{flexDirection: 'row', justifyContent: 'flex-end'}}>
           <Text style={styles.comboTotalPrice}>
-            {getTotalPrice() - discountAmountF} VND
+            {totalFood.toLocaleString('en-US')} VND
           </Text>
         </View>
         <Text style={{color: 'white', margin: 5, fontSize: 20}}>
@@ -541,7 +543,7 @@ const PaymentScreen = ({route}) => {
           }}>
           <Text style={{color: 'white'}}>Tổng</Text>
           <Text style={styles.totalAmountValue}>
-            {calculateTotalAmount()} VND
+            {calculateTotalAmount().toLocaleString('en-US')} VND
           </Text>
         </View>
         <View
@@ -975,4 +977,3 @@ const styles = StyleSheet.create({
   },
 });
 export default PaymentScreen;
- 

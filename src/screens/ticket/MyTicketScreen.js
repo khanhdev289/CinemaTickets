@@ -139,8 +139,7 @@ const MyTicketScreen = () => {
               <SvgXml xml={iconMoneyMyTicket()} />
               <Text style={styles.priceText}>
                 {ticketData.total
-                  .toString()
-                  .replace(/\B(?=(\d{3})+(?!\d))/g, ',')}{' '}
+                 .toLocaleString('en-US')}
                 VND
               </Text>
             </View>

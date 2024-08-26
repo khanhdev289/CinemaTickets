@@ -87,7 +87,9 @@ const MyTicketScreenFood = () => {
               <View style={styles.foodItem}>
                 <Text style={styles.foodName}>{item.foodId.name}</Text>
                 <Text style={styles.foodQuantity}>x{item.quantity}</Text>
-                <Text style={styles.foodPrice}>{item.foodId.price} VND</Text>
+                <Text style={styles.foodPrice}>
+                  {item.foodId.price.toLocaleString('en-US')} VND
+                </Text>
               </View>
             )}
           />
@@ -97,10 +99,7 @@ const MyTicketScreenFood = () => {
             <View style={styles.detailsContainerAndIcon}>
               <SvgXml xml={iconMoneyMyTicket()} />
               <Text style={styles.priceText}>
-                {ticketData.total_food
-                  .toString()
-                  .replace(/\B(?=(\d{3})+(?!\d))/g, ',')}{' '}
-                VND
+                {ticketData.total_food.toLocaleString('en-US')} VND
               </Text>
             </View>
             <View style={styles.detailsContainerAndIcon}>

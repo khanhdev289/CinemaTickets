@@ -87,13 +87,16 @@ const MovieDetailScreen = ({route}) => {
       onPress={() => handleSelectTheater(item.cinema._id)}
       style={[
         styles.theaterContainer,
-        selectedTheater === item.cinema._id ? {borderColor: '#FFD700'} : null,
+        selectedTheater === item.cinema._id
+          ? {borderColor: '#FFD700'}
+          : null,
       ]}>
       <View
         style={{
           flexDirection: 'row',
           alignItems: 'center',
           justifyContent: 'space-around',
+          color: 'white',
         }}>
         <View style={{flexDirection: 'column'}}>
           <Text style={styles.theaterTitle}>{item.cinema.name}</Text>
@@ -247,19 +250,19 @@ const MovieDetailScreen = ({route}) => {
                       },
                     },
                   ]);
-                }
-
-                const selectedTheaterData = theaters.find(
-                  theater => theater.cinema._id === selectedTheater,
-                );
-                if (selectedTheaterData) {
-                  navigation.navigate('SelectSeatScreen', {
-                    rooms: selectedTheaterData.rooms,
-                    movieId:movieId,
-                    cinemaId:selectedTheater,
-                  });
                 } else {
-                  Alert.alert('Thông báo', 'Vui lòng chọn một rạp chiếu');
+                  const selectedTheaterData = theaters.find(
+                    theater => theater.cinema._id === selectedTheater,
+                  );
+                  if (selectedTheaterData) {
+                    navigation.navigate('SelectSeatScreen', {
+                      rooms: selectedTheaterData.rooms,
+                      movieId: movieId,
+                      cinemaId: selectedTheater,
+                    });
+                  } else {
+                    Alert.alert('Thông báo', 'Vui lòng chọn một rạp chiếu');
+                  }
                 }
               }}>
               <Text style={styles.buttonText}>Tiếp tục</Text>
@@ -426,6 +429,10 @@ const styles = StyleSheet.create({
     marginBottom: 5,
   },
   theaterAddress: {
+    color: '#BFBFBF',
+    fontSize: 14,
+  },
+  theaterHotline: {
     color: '#BFBFBF',
     fontSize: 14,
   },
