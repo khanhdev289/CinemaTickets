@@ -184,8 +184,13 @@ const SelectSeatScreen = ({route}) => {
         showtimeDate.setHours(0, 0, 0, 0);
         return showtimeDate >= today && showtimeDate <= nextWeekDate;
       });
+      const sortedShowtimes = filteredShowtimes.sort(
+        (a, b) => new Date(a.date) - new Date(b.date),
+      );
 
-      setDateArray(filteredShowtimes);
+      setDateArray(sortedShowtimes);
+
+      // setDateArray(filteredShowtimes);
     } catch (error) {
       console.error(error);
       Alert.alert('Error', 'Unable to fetch room data');
